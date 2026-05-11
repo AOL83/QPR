@@ -1,1794 +1,449 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MEM Palace Game Terminal - Single File</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Aurora One v0.1 - Runnable Browser Console</title>
   <style>
-    :root {
-      --bg: #040201;
-      --panel: rgba(0, 0, 0, 0.36);
-      --panel2: rgba(0, 0, 0, 0.52);
-      --line: rgba(255, 186, 92, 0.22);
-      --line2: rgba(255, 186, 92, 0.38);
-      --text: #fff3df;
-      --muted: rgba(255, 232, 205, 0.68);
-      --dim: rgba(255, 232, 205, 0.45);
-      --hot: #ffb347;
-      --hot2: #ff7b22;
-      --good: #6dff9f;
-      --bad: #ff6b6b;
-      --blue: #83d9ff;
-      --purple: #d7a4ff;
-      --radius: 20px;
+    :root{
+      --bg:#03060c; --panel:rgba(9,15,28,.76); --panel2:rgba(0,0,0,.45);
+      --gold:#d4af37; --green:#4ade80; --cyan:#60a5fa; --red:#ef4444;
+      --text:#eef2ff; --muted:#94a3b8; --line:rgba(212,175,55,.28);
+      --radius:28px;
     }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--text);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top left, #472008 0, #120703 34%, #040201 72%),
-        linear-gradient(135deg, #090301, #000);
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:radial-gradient(circle at 10% 10%,#12203d,#03060c 58%,#000);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .boot{
+      position:fixed;inset:0;z-index:50;display:grid;place-items:center;
+      background:radial-gradient(circle at center,#10223d,#02040a 70%);
+      transition:opacity .7s ease,visibility .7s ease;
     }
-
-    button, input, textarea, select {
-      font: inherit;
+    .boot.hide{opacity:0;visibility:hidden}
+    .boot-card{text-align:center;border:1px solid var(--line);border-radius:34px;padding:40px;box-shadow:0 0 80px rgba(74,222,128,.14);background:rgba(0,0,0,.35)}
+    .boot-logo{font-size:clamp(2.5rem,8vw,5rem);font-weight:900;letter-spacing:.08em;background:linear-gradient(135deg,var(--gold),var(--green),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .boot-lines{font-family:ui-monospace,Menlo,Consolas,monospace;color:#b7ffd0;text-align:left;margin-top:24px;line-height:1.8}
+    .shell{max-width:1500px;margin:0 auto;padding:18px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:20;padding:14px 0;background:linear-gradient(to bottom,rgba(3,6,12,.96),rgba(3,6,12,.65),transparent);backdrop-filter:blur(12px)}
+    .brand{display:flex;align-items:center;gap:12px}
+    .orb{width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff,#facc15 18%,#22c55e 48%,#0f172a 78%);box-shadow:0 0 24px rgba(74,222,128,.5)}
+    h1{font-size:clamp(1.2rem,3vw,2rem);margin:0;letter-spacing:-.04em}
+    .sub{color:var(--muted);font-size:.85rem}
+    .nav{display:flex;gap:8px;flex-wrap:wrap}
+    .nav button,.btn{
+      border:1px solid var(--line);border-radius:999px;padding:10px 14px;background:rgba(15,23,42,.72);color:var(--text);
+      box-shadow:0 12px 25px rgba(0,0,0,.2);transition:.15s transform,.15s background,.15s border-color;text-decoration:none;display:inline-flex;align-items:center;gap:8px
     }
-
-    .wrap {
-      max-width: 1320px;
-      margin: 0 auto;
-      padding: 16px;
+    .nav button:hover,.btn:hover{transform:translateY(-1px);border-color:rgba(212,175,55,.65)}
+    .nav button.active,.btn.primary{background:linear-gradient(135deg,#d4af37,#4ade80);color:#07110b;font-weight:900}
+    .btn.danger{border-color:rgba(239,68,68,.5);color:#fecaca}
+    .grid{display:grid;gap:16px}
+    .home-grid{grid-template-columns:1.25fr .75fr}
+    .panel{
+      background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 22px 60px rgba(0,0,0,.32);backdrop-filter:blur(10px);overflow:hidden
     }
-
-    .header, .nav, .card {
-      border: 1px solid var(--line);
-      background: var(--panel);
-      border-radius: calc(var(--radius) + 8px);
-      box-shadow: 0 18px 55px rgba(0,0,0,0.28);
-      backdrop-filter: blur(8px);
-    }
-
-    .header {
-      padding: 18px;
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-icon {
-      font-size: 34px;
-      line-height: 1;
-    }
-
-    h1, h2, h3, p {
-      margin-top: 0;
-    }
-
-    h1 {
-      margin-bottom: 4px;
-      font-size: clamp(1.35rem, 3.2vw, 2rem);
-      letter-spacing: -0.03em;
-    }
-
-    h2 {
-      margin-bottom: 10px;
-      font-size: 1.12rem;
-    }
-
-    h3 {
-      margin-bottom: 8px;
-      color: #ffd29b;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .dim {
-      color: var(--dim);
-      font-size: 0.9rem;
-    }
-
-    .nav {
-      margin-top: 14px;
-      padding: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      position: sticky;
-      top: 8px;
-      z-index: 10;
-    }
-
-    .tab, .btn {
-      border: 1px solid var(--line);
-      background: rgba(0,0,0,0.25);
-      color: var(--text);
-      border-radius: 14px;
-      padding: 10px 12px;
-      cursor: pointer;
-      min-height: 42px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform .12s ease, background .12s ease, border-color .12s ease;
-      text-decoration: none;
-    }
-
-    .tab:hover, .btn:hover {
-      background: rgba(255, 179, 71, 0.12);
-      border-color: var(--line2);
-      transform: translateY(-1px);
-    }
-
-    .tab.active, .btn.primary {
-      background: var(--hot);
-      color: #120703;
-      font-weight: 800;
-      border-color: rgba(255,255,255,.15);
-    }
-
-    .btn.danger {
-      border-color: rgba(255, 107, 107, 0.42);
-      color: #ffd1d1;
-    }
-
-    .btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    .layout {
-      margin-top: 14px;
-      display: grid;
-      grid-template-columns: 290px 1fr;
-      gap: 14px;
-      align-items: start;
-    }
-
-    .card {
-      padding: 16px;
-      overflow: hidden;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .stat {
-      background: rgba(0,0,0,0.32);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 12px;
-    }
-
-    .stat .value {
-      font-size: 1.7rem;
-      font-weight: 900;
-      color: #fff0d0;
-      line-height: 1.1;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid var(--line2);
-      background: rgba(255, 179, 71, 0.1);
-      color: #ffe2b7;
-      border-radius: 999px;
-      padding: 5px 9px;
-      font-size: 0.78rem;
-      margin: 3px 5px 3px 0;
-      white-space: nowrap;
-    }
-
-    .pill.good { border-color: rgba(109,255,159,.35); background: rgba(109,255,159,.1); color: #c8ffd8; }
-    .pill.bad { border-color: rgba(255,107,107,.42); background: rgba(255,107,107,.1); color: #ffd4d4; }
-    .pill.blue { border-color: rgba(131,217,255,.35); background: rgba(131,217,255,.1); color: #d8f4ff; }
-    .pill.purple { border-color: rgba(215,164,255,.35); background: rgba(215,164,255,.1); color: #ecd8ff; }
-
-    .dropzone {
-      border: 2px dashed rgba(255, 179, 71, 0.45);
-      background: rgba(255, 179, 71, 0.08);
-      border-radius: 24px;
-      padding: 28px;
-      text-align: center;
-      min-height: 180px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-
-    .dropzone.dragover {
-      background: rgba(255, 179, 71, 0.18);
-      border-color: #ffd29b;
-    }
-
-    .hidden { display: none !important; }
-
-    .columns {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .columns.two {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .file-row, .event-row, .node-row {
-      border: 1px solid rgba(255, 186, 92, 0.14);
-      background: rgba(0,0,0,0.28);
-      border-radius: 16px;
-      padding: 12px;
-      margin: 8px 0;
-      word-break: break-word;
-    }
-
-    .file-row strong, .event-row strong, .node-row strong {
-      color: #ffe3b4;
-    }
-
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      font-size: 0.88rem;
-    }
-
-    textarea, input[type="text"], select {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: rgba(0,0,0,0.35);
-      color: var(--text);
-      border-radius: 14px;
-      padding: 11px;
-      outline: none;
-    }
-
-    textarea {
-      min-height: 130px;
-      resize: vertical;
-    }
-
-    video, canvas, iframe {
-      width: 100%;
-      min-height: 420px;
-      border-radius: 18px;
-      border: 1px solid var(--line);
-      background: #000;
-    }
-
-    .capture-preview {
-      max-width: 100%;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.08);
-      margin-top: 10px;
-    }
-
-    .warning {
-      border: 1px solid rgba(255,107,107,.38);
-      background: rgba(255,107,107,.1);
-      border-radius: 18px;
-      padding: 14px;
-      color: #ffe0e0;
-    }
-
-    .ok {
-      border: 1px solid rgba(109,255,159,.32);
-      background: rgba(109,255,159,.08);
-      border-radius: 18px;
-      padding: 14px;
-      color: #d8ffe3;
-    }
-
-    .sr-status {
-      position: absolute;
-      left: -9999px;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-    }
-
-    @media (max-width: 900px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .columns, .columns.two {
-        grid-template-columns: 1fr;
-      }
-
-      .nav {
-        position: static;
-      }
-    }
+    .hero{min-height:430px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+    .hero:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 72% 32%,rgba(96,165,250,.25),transparent 30%),radial-gradient(circle at 30% 70%,rgba(74,222,128,.16),transparent 34%);pointer-events:none}
+    .hero>*{position:relative}
+    .big-title{font-size:clamp(2rem,7vw,5.2rem);line-height:.9;margin:0 0 14px;font-weight:950;letter-spacing:-.08em}
+    .tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .tile{padding:18px;border-radius:22px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08)}
+    .tile strong{display:block;font-size:1.15rem;margin-bottom:6px;color:#fef3c7}
+    .pill{display:inline-flex;border:1px solid var(--line);background:rgba(212,175,55,.1);border-radius:999px;padding:5px 10px;font-size:.78rem;color:#fde68a;margin:3px}
+    .pill.good{border-color:rgba(74,222,128,.45);background:rgba(74,222,128,.1);color:#bbf7d0}
+    .pill.blue{border-color:rgba(96,165,250,.45);background:rgba(96,165,250,.1);color:#bfdbfe}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .field{display:grid;gap:7px;margin:10px 0}
+    label{font-size:.82rem;color:var(--muted)}
+    input,select{width:100%;border:1px solid rgba(212,175,55,.28);background:rgba(0,0,0,.35);color:var(--text);border-radius:16px;padding:11px;outline:none}
+    .drop{border:2px dashed rgba(212,175,55,.5);border-radius:28px;min-height:190px;display:grid;place-items:center;text-align:center;padding:22px;background:rgba(212,175,55,.06)}
+    .drop.drag{background:rgba(74,222,128,.1);border-color:var(--green)}
+    .library{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+    .gamecard{background:linear-gradient(145deg,rgba(15,23,42,.9),rgba(0,0,0,.5));border:1px solid rgba(212,175,55,.25);border-radius:24px;padding:16px;min-height:175px;display:flex;flex-direction:column;justify-content:space-between}
+    .gamecard h3{margin:0 0 8px}
+    .screen{background:#000;border:1px solid rgba(74,222,128,.35);border-radius:24px;min-height:520px;overflow:hidden;position:relative}
+    #game{width:100%;height:72vh;min-height:520px}
+    iframe{width:100%;height:70vh;min-height:520px;border:none;background:#000;border-radius:22px}
+    .log{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(0,0,0,.55);border:1px solid rgba(74,222,128,.25);border-radius:18px;padding:12px;min-height:130px;max-height:240px;overflow:auto;color:#bbf7d0;font-size:.84rem}
+    .hidden{display:none!important}
+    .modal{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:18px}
+    .modal-card{max-width:620px;width:100%;background:#0f172a;border:1px solid var(--line);border-radius:30px;padding:22px;box-shadow:0 30px 90px rgba(0,0,0,.6)}
+    .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#020617;border:1px solid #334155;border-radius:8px;padding:2px 6px;color:#dbeafe}
+    @media(max-width:900px){.home-grid{grid-template-columns:1fr}.tiles{grid-template-columns:1fr}.topbar{position:static}.nav{width:100%}.nav button{flex:1;justify-content:center}.big-title{font-size:3rem}#game,.screen,iframe{min-height:430px;height:64vh}}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div id="readerStatus" class="sr-status" aria-live="polite"></div>
-
-    <header class="header">
-      <div>
-        <div class="brand">
-          <div class="brand-icon" aria-hidden="true">🎮</div>
-          <div>
-            <h1>MEM Palace Game Terminal</h1>
-            <p class="muted">Load. Detect. Mount. Attach. Observe. Save. Resume.</p>
-          </div>
-        </div>
-      </div>
-      <div>
-        <span class="pill purple" id="runtimePill">single-file GitHub Pages console</span>
-      </div>
-    </header>
-
-    <nav class="nav" aria-label="Main terminal tabs" id="tabs"></nav>
-
-    <section class="layout">
-      <aside class="grid">
-        <div class="card">
-          <h2>Project Stats</h2>
-          <div class="stats">
-            <div class="stat"><div class="dim">Nodes</div><div class="value" id="statNodes">0</div></div>
-            <div class="stat"><div class="dim">Events</div><div class="value" id="statEvents">0</div></div>
-            <div class="stat"><div class="dim">Captures</div><div class="value" id="statCaptures">0</div></div>
-            <div class="stat"><div class="dim">GameCards</div><div class="value" id="statGameCards">0</div></div>
-            <div class="stat"><div class="dim">PALCards</div><div class="value" id="statPalCards">0</div></div>
-            <div class="stat"><div class="dim">Pairs</div><div class="value" id="statPairs">0</div></div>
-            <div class="stat"><div class="dim">Drawers</div><div class="value" id="statDrawers">0</div></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>Current Room</h2>
-          <h3 id="currentRoomTitle">Midgar</h3>
-          <p class="muted" id="currentRoomType">location</p>
-          <div id="currentTags"></div>
-
-          <button class="btn" id="saveDrawerBtn">📦 Save Drawer</button>
-          <button class="btn" id="exportActiveDrawerBtn">⬇️ Export Active Drawer</button>
-          <button class="btn primary" id="saveFullSessionBtn">⬇️ Save Full Session</button>
-        </div>
-
-        <div class="card">
-          <h2>Native Runtime Rule</h2>
-          <p class="muted">
-            GitHub Pages can inspect files, bind packages, capture a running window, and save the MEM Palace state.
-            It cannot directly execute Windows EXE files by itself.
-          </p>
-        </div>
-      </aside>
-
-      <main id="main"></main>
-    </section>
+  <div class="boot" id="boot">
+    <div class="boot-card">
+      <div class="boot-logo">AURORA ONE</div>
+      <div class="sub">v0.1 browser console · cartridge shell · MEM drawer runtime</div>
+      <div class="boot-lines" id="bootLines"></div>
+    </div>
   </div>
 
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="orb"></div>
+        <div>
+          <h1>Aurora One Console</h1>
+          <div class="sub">Load ROM · Play · Save Card · Runtime Bay · Export Session</div>
+        </div>
+      </div>
+      <nav class="nav" id="nav"></nav>
+    </header>
+
+    <main id="main"></main>
+  </div>
+
+  <input id="romInput" type="file" class="hidden">
+  <input id="sessionInput" type="file" class="hidden" accept=".json,.aurora-session">
+
 <script>
-(function () {
+(function(){
   "use strict";
-
-  const STORAGE_KEY = "mem-palace-game-terminal-single-file-v2";
-
-  const now = () => new Date().toISOString();
-
-  const tabs = [
-    ["load", "📦 Load"],
-    ["inspect", "🔎 Inspect"],
-    ["run", "▶ Run / Attach"],
-    ["cards", "💳 Memory Cards"],
-    ["drawers", "🗄 Drawers"],
-    ["palace", "🗺 Palace"],
-    ["blueprint", "🧬 Blueprint"],
-    ["timeline", "📝 Timeline"],
-    ["notes", "📖 Notes"],
-    ["build", "🪄 Build"]
+  const EJS_DATA = "https://cdn.emulatorjs.org/stable/data/";
+  const STORAGE_KEY = "aurora-one-v01-state";
+  const pages = [
+    ["home","🏠 Home"],["library","🎮 Library"],["play","▶ Play"],
+    ["memory","💾 Memory"],["runtime","🧩 Runtime Bay"],["developer","🛠 Developer"]
   ];
 
-  const seed = {
-    project: {
-      id: "ff7-pc-beta",
-      title: "Final Fantasy VII PC Beta Map",
-      subtitle: "Game Load Test Console",
-      createdAt: now(),
-      updatedAt: now()
-    },
-    package: {
-      name: "No package loaded",
-      sourceType: "none",
-      runMode: "none",
-      entryCandidates: [],
-      detectedFolders: [],
-      detectedFiles: [],
-      detectedScripts: [],
-      detectedAssets: [],
-      detectedExecutables: [],
-      detectedShortcuts: [],
-      warnings: [],
-      importReport: null
-    },
-    runtime: {
-      status: "idle",
-      runMode: "none",
-      decision: "No package loaded yet."
-    },
-    currentNodeId: "midgar",
-    nodes: [
-      {
-        id: "midgar",
-        type: "location",
-        title: "Midgar",
-        description: "Central city hub and opening region.",
-        connections: ["sector-7", "reactor-1", "shinra-building"],
-        notes: ["Use this as the first palace wing for the beta test."],
-        tags: ["city", "opening", "hub"],
-        screenshots: [],
-        createdAt: now()
-      },
-      {
-        id: "reactor-1",
-        type: "location",
-        title: "Mako Reactor 1",
-        description: "Opening bombing mission area.",
-        connections: ["midgar", "guard-scorpion"],
-        notes: [],
-        tags: ["reactor", "mission", "midgar"],
-        screenshots: [],
-        createdAt: now()
-      },
-      {
-        id: "sector-7",
-        type: "location",
-        title: "Sector 7",
-        description: "Avalanche base area and early story hub.",
-        connections: ["midgar"],
-        notes: [],
-        tags: ["slums", "avalanche"],
-        screenshots: [],
-        createdAt: now()
-      },
-      {
-        id: "shinra-building",
-        type: "location",
-        title: "Shinra Building",
-        description: "Major Midgar infiltration sequence.",
-        connections: ["midgar"],
-        notes: [],
-        tags: ["midgar", "shinra", "infiltration"],
-        screenshots: [],
-        createdAt: now()
-      },
-      {
-        id: "guard-scorpion",
-        type: "battle",
-        title: "Guard Scorpion",
-        description: "First boss encounter. Watch the tail warning.",
-        connections: ["reactor-1"],
-        notes: ["Capture battle timing and tutorial dialogue."],
-        tags: ["boss", "tutorial", "reactor-1"],
-        screenshots: [],
-        createdAt: now()
-      }
-    ],
-    edges: [
-      { id: "edge-midgar-reactor", from: "midgar", to: "reactor-1", label: "mission route" },
-      { id: "edge-reactor-boss", from: "reactor-1", to: "guard-scorpion", label: "boss trigger" },
-      { id: "edge-midgar-sector", from: "midgar", to: "sector-7", label: "hub path" }
-    ],
-    timeline: [
-      {
-        id: "evt-opening",
-        timestamp: now(),
-        nodeId: "midgar",
-        type: "story",
-        title: "Opening sequence",
-        summary: "Begin mapping the first FF7 run as a memory palace.",
-        tags: ["opening"]
-      }
-    ],
-    captures: [],
-    memoryCards: {
-      gameCards: [],
-      palCards: [],
-      pairs: [],
-      activePairId: ""
-    },
-    progressionDrawers: {
-      drawers: [],
-      activeDrawerId: "",
-      pinnedDrawerIds: []
-    }
+  const coreMap = {
+    nes:["nes","fceumm"],fds:["nes","fceumm"],
+    smc:["snes","snes9x"],sfc:["snes","snes9x"],
+    gb:["gb","gambatte"],gbc:["gb","gambatte"],gba:["gba","mgba"],
+    gen:["segaMD","genesis_plus_gx"],md:["segaMD","genesis_plus_gx"],smd:["segaMD","genesis_plus_gx"],
+    sms:["segaMS","genesis_plus_gx"],gg:["segaGG","genesis_plus_gx"],
+    n64:["n64","mupen64plus_next"],z64:["n64","mupen64plus_next"],v64:["n64","mupen64plus_next"],
+    cue:["psx","pcsx_rearmed"],bin:["psx","pcsx_rearmed"],iso:["psx","pcsx_rearmed"],chd:["psx","pcsx_rearmed"]
   };
 
-  let data = loadStoredProject();
-  let activeTab = "load";
-  let captureStream = null;
-  let packageFiles = [];
+  let state = loadState();
+  let active = "home";
+  let lastRomFile = null;
+  let lastRomUrl = null;
+  let bootedEmulator = false;
 
-  const el = (id) => document.getElementById(id);
-  const main = el("main");
-  const readerStatus = el("readerStatus");
-
-  function announce(message) {
-    readerStatus.textContent = message;
+  function defaultState(){
+    return {
+      console:"Aurora One v0.1",
+      createdAt:new Date().toISOString(),
+      updatedAt:new Date().toISOString(),
+      library:[],
+      memoryCards:[],
+      drawers:[],
+      events:[{ts:new Date().toISOString(),type:"boot",msg:"Aurora One first boot"}],
+      settings:{runtimeUrl:"https://stackblitz.com/edit/web-platform?embed=1&file=index.html"}
+    };
+  }
+  function loadState(){
+    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState(); }catch(e){ return defaultState(); }
+  }
+  function saveState(){
+    state.updatedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+  function log(msg,type="info"){
+    state.events.unshift({ts:new Date().toISOString(),type,msg});
+    state.events = state.events.slice(0,200);
+    saveState();
+    const box = document.getElementById("logBox");
+    if(box) box.innerHTML = state.events.slice(0,40).map(e=>`<div>[${new Date(e.ts).toLocaleTimeString()}] ${escapeHtml(e.type)} · ${escapeHtml(e.msg)}</div>`).join("");
+  }
+  function uid(p){return p+"_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)}
+  function escAttr(s){return String(s||"").replaceAll("&","&amp;").replaceAll('"',"&quot;").replaceAll("<","&lt;").replaceAll(">","&gt;")}
+  function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+  function ext(name){const p=String(name||"").toLowerCase().split(".");return p.length>1?p.pop():""}
+  function detectCore(name){
+    const e = ext(name);
+    return coreMap[e] || ["nes","fceumm"];
+  }
+  function nav(){
+    document.getElementById("nav").innerHTML = pages.map(([id,label])=>`<button class="${active===id?"active":""}" data-page="${id}">${label}</button>`).join("");
+    document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{active=b.dataset.page; render();});
+  }
+  function render(){
+    nav();
+    ({home,library,play,memory,runtime,developer}[active]||home)();
+  }
+  function baseStats(){
+    return `
+      <span class="pill good">${state.library.length} GameCards</span>
+      <span class="pill blue">${state.memoryCards.length} Memory Cards</span>
+      <span class="pill">${state.drawers.length} Drawers</span>
+      <span class="pill">${state.events.length} Events</span>`;
+  }
+  function home(){
+    document.getElementById("main").innerHTML = `
+      <section class="grid home-grid">
+        <div class="panel hero">
+          <div>
+            <div class="pill good">Runnable now</div><div class="pill blue">Browser console</div><div class="pill">User-supplied ROMs only</div>
+            <h2 class="big-title">Boot. Load. Play. Save.</h2>
+            <p class="sub" style="max-width:760px;font-size:1.05rem">
+              Aurora One v0.1 is a real browser console shell. It mounts legally owned ROM files through EmulatorJS,
+              creates GameCards, stores session drawers, and provides a runtime bay for nested tools.
+            </p>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="loadRomHome">📦 Load ROM / Game File</button>
+            <button class="btn" id="continueBtn">▶ Continue Last</button>
+            <button class="btn" id="fullBtn">⛶ Fullscreen</button>
+          </div>
+        </div>
+        <aside class="panel">
+          <h2>Console State</h2>
+          <p>${baseStats()}</p>
+          <div class="tiles">
+            <div class="tile"><strong>Mario / Zelda</strong><span class="sub">NES, SNES, GB/GBA user ROMs</span></div>
+            <div class="tile"><strong>Sonic</strong><span class="sub">Mega Drive / Master System user ROMs</span></div>
+            <div class="tile"><strong>Final Fantasy</strong><span class="sub">NES/SNES/GBA/PS1 files, BIOS where legally required</span></div>
+          </div>
+          <h3>Event Log</h3>
+          <div class="log" id="logBox">${state.events.slice(0,30).map(e=>`<div>[${new Date(e.ts).toLocaleTimeString()}] ${escapeHtml(e.type)} · ${escapeHtml(e.msg)}</div>`).join("")}</div>
+        </aside>
+      </section>`;
+    document.getElementById("loadRomHome").onclick=()=>document.getElementById("romInput").click();
+    document.getElementById("continueBtn").onclick=()=>{active="library";render()};
+    document.getElementById("fullBtn").onclick=()=>toggleFullscreen();
+  }
+  function library(){
+    document.getElementById("main").innerHTML = `
+      <section class="grid">
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <div><h2>Game Library</h2><p class="sub">Load your own legal ROM/game files. The browser cannot permanently keep the actual ROM unless you load it again; GameCards preserve metadata.</p></div>
+            <button class="btn primary" id="loadRomLib">📦 Add GameCard</button>
+          </div>
+        </div>
+        <div class="library">
+          ${state.library.map(card=>`
+            <article class="gamecard">
+              <div>
+                <h3>${escapeHtml(card.title)}</h3>
+                <span class="pill good">${escapeHtml(card.system)}</span>
+                <span class="pill blue">${escapeHtml(card.core)}</span>
+                <p class="sub">${escapeHtml(card.fileName)} · ${escapeHtml(card.sizeLabel||"")}</p>
+              </div>
+              <div class="row">
+                <button class="btn primary" data-play-card="${escAttr(card.id)}">▶ Play</button>
+                <button class="btn" data-drawer-card="${escAttr(card.id)}">💾 Drawer</button>
+                <button class="btn danger" data-delete-card="${escAttr(card.id)}">✕</button>
+              </div>
+            </article>`).join("") || `<div class="panel"><h2>No games mounted yet</h2><p class="sub">Click Add GameCard and choose a ROM file you legally own.</p></div>`}
+        </div>
+      </section>`;
+    document.getElementById("loadRomLib").onclick=()=>document.getElementById("romInput").click();
+    document.querySelectorAll("[data-delete-card]").forEach(b=>b.onclick=()=>{state.library=state.library.filter(c=>c.id!==b.dataset.deleteCard);saveState();render();});
+    document.querySelectorAll("[data-drawer-card]").forEach(b=>b.onclick=()=>saveDrawer(b.dataset.drawerCard));
+    document.querySelectorAll("[data-play-card]").forEach(b=>b.onclick=()=>playCard(b.dataset.playCard));
+  }
+  function play(){
+    document.getElementById("main").innerHTML = `
+      <section class="grid">
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <div><h2>Player Screen</h2><p class="sub">Load a ROM file first. EmulatorJS starts inside the black console screen.</p></div>
+            <div class="row">
+              <button class="btn primary" id="loadRomPlay">📦 Load ROM</button>
+              <button class="btn" id="makeMemory">💾 Save Memory Card</button>
+              <button class="btn" id="resetScreen">↻ Reset Screen</button>
+            </div>
+          </div>
+        </div>
+        <div class="screen"><div id="game"></div></div>
+      </section>`;
+    document.getElementById("loadRomPlay").onclick=()=>document.getElementById("romInput").click();
+    document.getElementById("makeMemory").onclick=()=>createMemoryCard();
+    document.getElementById("resetScreen").onclick=()=>{document.getElementById("game").innerHTML="";bootedEmulator=false;log("Player screen reset")};
+    if(lastRomFile && !bootedEmulator) startEmulator(lastRomFile);
+  }
+  function memory(){
+    document.getElementById("main").innerHTML = `
+      <section class="grid home-grid">
+        <div class="panel">
+          <h2>Memory Cards</h2>
+          <p class="sub">These are Aurora-side metadata saves. Use EmulatorJS internal save states for emulator-native states, then use drawers to preserve console context.</p>
+          <div class="library">
+            ${state.memoryCards.map(m=>`
+              <article class="gamecard"><div><h3>${escapeHtml(m.title)}</h3><p class="sub">${escapeHtml(m.note)}</p><span class="pill">${new Date(m.createdAt).toLocaleString()}</span></div></article>`).join("") || `<p class="sub">No memory cards yet.</p>`}
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Drawers</h2>
+          <p class="sub">A drawer is a resumable console-state bookmark.</p>
+          ${state.drawers.map(d=>`<div class="tile"><strong>${escapeHtml(d.title)}</strong><div class="sub">${escapeHtml(d.detail)}</div><span class="pill">${new Date(d.createdAt).toLocaleString()}</span></div>`).join("") || `<p class="sub">No drawers yet.</p>`}
+          <div class="row" style="margin-top:14px">
+            <button class="btn primary" id="exportSession">⬇ Export Session</button>
+            <button class="btn" id="importSession">⬆ Import Session</button>
+          </div>
+        </div>
+      </section>`;
+    document.getElementById("exportSession").onclick=exportSession;
+    document.getElementById("importSession").onclick=()=>document.getElementById("sessionInput").click();
+  }
+  function runtime(){
+    document.getElementById("main").innerHTML = `
+      <section class="grid">
+        <div class="panel">
+          <h2>Runtime Bay</h2>
+          <p class="sub">Nested tool bay. This is where V86, StackBlitz, VS Code Nest, docs, or self-hosted tools can mount inside the console.</p>
+          <div class="row">
+            <button class="btn" data-runtime="https://copy.sh/v86/?profile=alpine">🐚 Alpine V86</button>
+            <button class="btn" data-runtime="https://webvm.io/?autostart=true">📀 WebVM</button>
+            <button class="btn" data-runtime="https://stackblitz.com/edit/web-platform?embed=1&file=index.html">⚡ StackBlitz</button>
+            <button class="btn" data-runtime="https://vscode.dev">💻 VS Code Web</button>
+          </div>
+          <div class="field"><label>Custom runtime URL</label><input id="runtimeUrl" value="${escAttr(state.settings.runtimeUrl)}"></div>
+          <button class="btn primary" id="launchRuntime">Launch Runtime</button>
+        </div>
+        <iframe id="runtimeFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" allow="clipboard-read; clipboard-write" src="${escAttr(state.settings.runtimeUrl)}"></iframe>
+      </section>`;
+    document.querySelectorAll("[data-runtime]").forEach(b=>b.onclick=()=>{state.settings.runtimeUrl=b.dataset.runtime;saveState();runtime();log("Runtime mounted: "+b.dataset.runtime,"runtime")});
+    document.getElementById("launchRuntime").onclick=()=>{let u=document.getElementById("runtimeUrl").value.trim(); if(u&&!/^https?:\/\//.test(u)) u="https://"+u; state.settings.runtimeUrl=u; saveState(); runtime();};
+  }
+  function developer(){
+    document.getElementById("main").innerHTML = `
+      <section class="grid home-grid">
+        <div class="panel">
+          <h2>Developer Mode</h2>
+          <p class="sub">Raw state, event log, and factory controls. This is hidden from the player path.</p>
+          <div class="row">
+            <button class="btn primary" id="exportJson">Export JSON</button>
+            <button class="btn danger" id="factoryReset">Factory Reset</button>
+          </div>
+          <h3>State</h3>
+          <pre class="log" style="white-space:pre-wrap">${escapeHtml(JSON.stringify(state,null,2))}</pre>
+        </div>
+        <div class="panel">
+          <h2>Legal Runtime Rule</h2>
+          <p class="sub">Aurora One supplies the console shell. The user supplies only games/BIOS files they legally own. No copyrighted ROMs are bundled.</p>
+          <h2>Engine</h2>
+          <p class="sub">EmulatorJS is loaded from its stable CDN data path. Some systems need browser power, correct file format, and legal BIOS files.</p>
+        </div>
+      </section>`;
+    document.getElementById("exportJson").onclick=exportSession;
+    document.getElementById("factoryReset").onclick=()=>{if(confirm("Reset Aurora One local state?")){localStorage.removeItem(STORAGE_KEY);state=defaultState();render();}};
   }
 
-  function uid(prefix) {
-    return prefix + "_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+  function formatBytes(n){n=Number(n||0); if(n<1024)return n+" B"; if(n<1048576)return(n/1024).toFixed(1)+" KB"; if(n<1073741824)return(n/1048576).toFixed(1)+" MB"; return(n/1073741824).toFixed(2)+" GB";}
+  function ingestRom(file){
+    if(!file) return;
+    lastRomFile = file;
+    const [system,core] = detectCore(file.name);
+    const card = {
+      id:uid("gamecard"), title:file.name.replace(/\.[^.]+$/,""), fileName:file.name, size:file.size, sizeLabel:formatBytes(file.size),
+      system, core, ext:ext(file.name), addedAt:new Date().toISOString()
+    };
+    state.library.unshift(card);
+    state.library = state.library.slice(0,60);
+    saveState();
+    log("GameCard mounted: "+file.name,"gamecard");
+    active = "play";
+    render();
+    startEmulator(file, card);
   }
-
-  function escapeHtml(value) {
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;");
+  function startEmulator(file, card){
+    active = "play";
+    if(!document.getElementById("game")) render();
+    const target = document.getElementById("game");
+    if(!target) return;
+    target.innerHTML = "";
+    if(lastRomUrl) URL.revokeObjectURL(lastRomUrl);
+    lastRomUrl = URL.createObjectURL(file);
+    const [system,core] = detectCore(file.name);
+    window.EJS_player = "#game";
+    window.EJS_core = system;
+    window.EJS_gameName = file.name.replace(/\.[^.]+$/,"");
+    window.EJS_gameUrl = lastRomUrl;
+    window.EJS_pathtodata = EJS_DATA;
+    window.EJS_startOnLoaded = true;
+    window.EJS_DEBUG_XX = false;
+    window.EJS_defaultOptions = {
+      "save-state-slot": 1,
+      "shader": "crt-easymode"
+    };
+    const old = document.getElementById("ejs_loader");
+    if(old) old.remove();
+    const s = document.createElement("script");
+    s.id = "ejs_loader";
+    s.src = EJS_DATA + "loader.js";
+    s.onload = ()=>{bootedEmulator=true;log("Emulator started: "+file.name+" using "+system,"play")};
+    s.onerror = ()=>{log("Could not load EmulatorJS loader. Check internet/CDN access.","error")};
+    document.body.appendChild(s);
   }
-
-  function ext(name) {
-    const parts = String(name || "").toLowerCase().split(".");
-    return parts.length > 1 ? parts.pop() : "";
+  function playCard(id){
+    const card = state.library.find(c=>c.id===id);
+    alert("Browser security requires re-selecting the ROM file each session. Choose the same file for: "+(card?.fileName||"this GameCard"));
+    document.getElementById("romInput").click();
   }
-
-  function slug(value) {
-    return String(value || "mem-palace")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "") || "mem-palace";
+  function createMemoryCard(){
+    const title = prompt("Memory card title:", lastRomFile ? lastRomFile.name+" memory" : "Aurora memory card");
+    if(!title) return;
+    const note = prompt("Note:", "Saved from Aurora One player screen") || "";
+    state.memoryCards.unshift({id:uid("mem"),title,note,game:lastRomFile?.name||"",createdAt:new Date().toISOString()});
+    saveState(); log("Memory Card created: "+title,"memory"); active="memory"; render();
   }
-
-  function formatBytes(bytes) {
-    const n = Number(bytes || 0);
-    if (n < 1024) return n + " B";
-    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
-    if (n < 1024 * 1024 * 1024) return (n / 1024 / 1024).toFixed(1) + " MB";
-    return (n / 1024 / 1024 / 1024).toFixed(1) + " GB";
+  function saveDrawer(cardId){
+    const card = state.library.find(c=>c.id===cardId);
+    state.drawers.unshift({id:uid("drawer"),title:(card?.title||"Aurora")+" drawer",detail:"Resume context for "+(card?.fileName||"unknown game"),cardId,createdAt:new Date().toISOString()});
+    saveState(); log("Drawer saved for "+(card?.title||"game"),"drawer"); active="memory"; render();
   }
-
-  function loadStoredProject() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
-    } catch {}
-    return structuredClone(seed);
-  }
-
-  function saveStoredProject() {
-    data.project.updatedAt = now();
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch {
-      announce("Local storage is full. Export a full session to keep this state.");
-    }
-  }
-
-  function downloadText(filename, text, type) {
-    const blob = new Blob([text], { type: type || "text/plain" });
-    const url = URL.createObjectURL(blob);
+  function exportSession(){
+    const payload = {format:"aurora-one-session-v0.1", exportedAt:new Date().toISOString(), state};
+    const blob = new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
     const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
+    a.href = URL.createObjectURL(blob);
+    a.download = "aurora-one-session.aurora-session.json";
     a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(a.href);
+    log("Session exported","export");
   }
-
-  function currentNode() {
-    return data.nodes.find(n => n.id === data.currentNodeId) || data.nodes[0];
-  }
-
-  function toneForRunMode(mode) {
-    if (mode === "browser-html") return "good";
-    if (mode === "native-runtime-required") return "bad";
-    if (mode === "shortcut-detected") return "bad";
-    if (mode === "inspect-only") return "blue";
-    return "purple";
-  }
-
-  function pill(text, tone) {
-    return `<span class="pill ${tone || ""}">${escapeHtml(text)}</span>`;
-  }
-
-  function renderShell() {
-    renderTabs();
-    renderStats();
-    renderActiveTab();
-  }
-
-  function renderTabs() {
-    el("tabs").innerHTML = tabs.map(([id, label]) => `
-      <button class="tab ${activeTab === id ? "active" : ""}" data-tab="${id}">${label}</button>
-    `).join("");
-
-    document.querySelectorAll("[data-tab]").forEach(button => {
-      button.addEventListener("click", () => {
-        activeTab = button.dataset.tab;
-        renderShell();
-        announce("Opened " + button.textContent.trim());
-      });
-    });
-  }
-
-  function renderStats() {
-    const node = currentNode();
-    el("statNodes").textContent = data.nodes.length;
-    el("statEvents").textContent = data.timeline.length;
-    el("statCaptures").textContent = data.captures.length;
-    el("statGameCards").textContent = data.memoryCards.gameCards.length;
-    el("statPalCards").textContent = data.memoryCards.palCards.length;
-    el("statPairs").textContent = data.memoryCards.pairs.length;
-    el("statDrawers").textContent = data.progressionDrawers.drawers.length;
-    el("currentRoomTitle").textContent = node?.title || "Unknown";
-    el("currentRoomType").textContent = node?.type || "unknown";
-    el("currentTags").innerHTML = (node?.tags || []).map(tag => pill(tag)).join("");
-    el("runtimePill").textContent = data.package.runMode || "single-file GitHub Pages console";
-    el("runtimePill").className = "pill " + toneForRunMode(data.package.runMode);
-
-    el("exportActiveDrawerBtn").disabled = !data.progressionDrawers.activeDrawerId;
-  }
-
-  function renderActiveTab() {
-    const renderer = {
-      load: renderLoad,
-      inspect: renderInspect,
-      run: renderRun,
-      cards: renderCards,
-      drawers: renderDrawers,
-      palace: renderPalace,
-      blueprint: renderBlueprint,
-      timeline: renderTimeline,
-      notes: renderNotes,
-      build: renderBuild
-    }[activeTab] || renderLoad;
-
-    renderer();
-  }
-
-  function renderLoad() {
-    main.innerHTML = `
-      <div class="grid">
-        <div class="card">
-          <h2>Load Package</h2>
-          <p class="muted">
-            Drag a file, a folder, a project folder, a game folder, a save file, or a MEM session file onto this box.
-            This terminal will inspect it, classify it, bind it to the memory palace, and decide the correct runtime route.
-          </p>
-
-          <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Drop files or folders here">
-            <h2>Drop files or folders here</h2>
-            <p class="muted">Or use the buttons below.</p>
-            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
-              <button class="btn primary" id="pickFilesBtn">Pick Files</button>
-              <button class="btn" id="pickFolderBtn">Pick Folder</button>
-              <button class="btn" id="pickMemBtn">Import MEM Session</button>
-            </div>
-            <input id="fileInput" class="hidden" type="file" multiple>
-            <input id="folderInput" class="hidden" type="file" multiple webkitdirectory directory>
-            <input id="memInput" class="hidden" type="file" accept=".json,.memsave,.memdrawer,.memsession">
-          </div>
-        </div>
-
-        <div class="columns two">
-          <div class="card">
-            <h2>Runtime Bay</h2>
-            <p class="muted">${escapeHtml(data.runtime.decision || "No package loaded yet.")}</p>
-            ${data.package.runMode ? pill(data.package.runMode, toneForRunMode(data.package.runMode)) : ""}
-          </div>
-          <div class="card">
-            <h2>Idiot-Proof Rule</h2>
-            <p class="muted">
-              A shortcut file ending in .lnk is not the actual game. A Windows EXE is the real native file,
-              but GitHub Pages cannot execute it directly. The terminal can still bind it, track it, capture it, and save the MEM Palace session.
-            </p>
-          </div>
-        </div>
-      </div>
-    `;
-
-    const dropzone = el("dropzone");
-
-    el("pickFilesBtn").addEventListener("click", () => el("fileInput").click());
-    el("pickFolderBtn").addEventListener("click", () => el("folderInput").click());
-    el("pickMemBtn").addEventListener("click", () => el("memInput").click());
-
-    el("fileInput").addEventListener("change", ev => handleFiles(Array.from(ev.target.files || []), "file-picker"));
-    el("folderInput").addEventListener("change", ev => handleFiles(Array.from(ev.target.files || []), "folder-picker"));
-    el("memInput").addEventListener("change", ev => importMemFile(ev.target.files?.[0]));
-
-    ["dragenter", "dragover"].forEach(name => {
-      dropzone.addEventListener(name, ev => {
-        ev.preventDefault();
-        dropzone.classList.add("dragover");
-      });
-    });
-
-    ["dragleave", "drop"].forEach(name => {
-      dropzone.addEventListener(name, ev => {
-        ev.preventDefault();
-        if (name === "drop") return;
-        dropzone.classList.remove("dragover");
-      });
-    });
-
-    dropzone.addEventListener("drop", async ev => {
-      ev.preventDefault();
-      dropzone.classList.remove("dragover");
-      const files = await extractDroppedFiles(ev.dataTransfer);
-      handleFiles(files, "drag-drop");
-    });
-  }
-
-  async function extractDroppedFiles(dataTransfer) {
-    const items = Array.from(dataTransfer.items || []);
-    const files = [];
-
-    async function walkEntry(entry, pathPrefix) {
-      return new Promise(resolve => {
-        if (!entry) return resolve();
-
-        if (entry.isFile) {
-          entry.file(file => {
-            Object.defineProperty(file, "relativePath", {
-              value: pathPrefix + file.name,
-              configurable: true
-            });
-            files.push(file);
-            resolve();
-          }, () => resolve());
-          return;
-        }
-
-        if (entry.isDirectory) {
-          const reader = entry.createReader();
-          const readBatch = () => {
-            reader.readEntries(async entries => {
-              if (!entries.length) return resolve();
-              for (const child of entries) {
-                await walkEntry(child, pathPrefix + entry.name + "/");
-              }
-              readBatch();
-            }, () => resolve());
-          };
-          readBatch();
-          return;
-        }
-
-        resolve();
-      });
-    }
-
-    if (items.length && items[0].webkitGetAsEntry) {
-      for (const item of items) {
-        const entry = item.webkitGetAsEntry();
-        if (entry) await walkEntry(entry, "");
-      }
-    }
-
-    if (!files.length) {
-      files.push(...Array.from(dataTransfer.files || []));
-    }
-
-    return files;
-  }
-
-  function inspectFiles(files, sourceType) {
-    const list = files.map(file => {
-      const path = file.relativePath || file.webkitRelativePath || file.name;
-      return {
-        name: file.name,
-        path,
-        size: file.size || 0,
-        type: file.type || "",
-        extension: ext(file.name),
-        lastModified: file.lastModified || 0
-      };
-    });
-
-    const folders = Array.from(new Set(
-      list.map(f => String(f.path).split("/").slice(0, -1).join("/")).filter(Boolean)
-    ));
-
-    const scripts = list.filter(f => ["js", "mjs", "jsx", "ts", "tsx"].includes(f.extension));
-    const assets = list.filter(f => ["png", "jpg", "jpeg", "webp", "gif", "svg", "mp3", "ogg", "wav", "mp4", "webm"].includes(f.extension));
-    const executables = list.filter(f => ["exe", "msi", "bat", "cmd", "com"].includes(f.extension));
-    const shortcuts = list.filter(f => f.extension === "lnk");
-    const htmlEntries = list.filter(f => f.name.toLowerCase() === "index.html" || f.extension === "html");
-    const saves = list.filter(f => ["ff7", "sav", "save", "dat", "memsave", "memsession"].includes(f.extension));
-    const gogFiles = list.filter(f => f.name.toLowerCase().includes("goggame") || f.name.toLowerCase().includes("galaxy"));
-
-    let runMode = "inspect-only";
-    const warnings = [];
-    let decision = "Package loaded for inspection, blueprint, memory cards, notes and session saves.";
-
-    if (shortcuts.length && list.length === shortcuts.length) {
-      runMode = "shortcut-detected";
-      warnings.push("Shortcut detected. A .lnk file is not the real game file. Use Open file location in Windows and load the real game folder or launcher EXE.");
-      decision = "Shortcut detected. This is only a pointer. Load the real Final Fantasy VII folder or the real EXE file instead.";
-    } else if (htmlEntries.length) {
-      runMode = "browser-html";
-      decision = "Browser-runnable HTML package detected. It can be mounted inside the terminal preview.";
-    } else if (executables.length) {
-      runMode = "native-runtime-required";
-      warnings.push("Native executable detected. GitHub Pages cannot directly execute Windows installers or EXE files. This console can bind, track, capture, save and resume the MEM Palace state. A desktop/native runtime core is required for direct EXE execution.");
-      decision = "Windows/native package detected. The terminal binds it as a PackageCard, tracks it, saves drawers and can attach to a running game window. Direct EXE launch from GitHub Pages requires a desktop/native runtime core.";
-    } else {
-      warnings.push("No browser-runnable HTML entry or native executable was detected. The package is available for blueprint inspection and memory binding.");
-    }
-
-    const rootName =
-      folders[0]?.split("/")[0] ||
-      list[0]?.path?.split("/")[0] ||
-      list[0]?.name ||
-      "Loaded Package";
-
-    return {
-      name: rootName,
-      sourceType,
-      runMode,
-      entryCandidates: [
-        ...htmlEntries.map(f => f.path),
-        ...executables.map(f => f.path),
-        ...gogFiles.map(f => f.path)
-      ],
-      detectedFolders: folders,
-      detectedFiles: list,
-      detectedScripts: scripts,
-      detectedAssets: assets,
-      detectedExecutables: executables,
-      detectedShortcuts: shortcuts,
-      detectedSaves: saves,
-      detectedGogFiles: gogFiles,
-      warnings,
-      importReport: {
-        filesFound: list.length,
-        foldersFound: folders.length,
-        assetsFound: assets.length,
-        scriptsFound: scripts.length,
-        executablesFound: executables.length,
-        shortcutsFound: shortcuts.length,
-        savesFound: saves.length,
-        generatedAt: now()
-      },
-      decision
+  function importSession(file){
+    const r = new FileReader();
+    r.onload = () => {
+      try{
+        const parsed = JSON.parse(String(r.result));
+        if(parsed.format==="aurora-one-session-v0.1" && parsed.state){
+          state = parsed.state; saveState(); log("Session imported","import"); active="home"; render();
+        } else alert("Not an Aurora One v0.1 session file.");
+      }catch(e){alert("Invalid JSON session file.");}
     };
+    r.readAsText(file);
   }
-
-  function handleFiles(files, sourceType) {
-    if (!files || !files.length) {
-      announce("No files were loaded.");
-      return;
-    }
-
-    packageFiles = files;
-    const pkg = inspectFiles(files, sourceType);
-    data.package = pkg;
-    data.runtime = {
-      status: "loaded",
-      runMode: pkg.runMode,
-      decision: pkg.decision
-    };
-
-    data.nodes = data.nodes.filter(n => n.source !== "package");
-    data.edges = data.edges.filter(e => e.source !== "package");
-
-    const rootNode = {
-      id: "pkg-root",
-      type: "package",
-      source: "package",
-      title: pkg.name,
-      description: pkg.decision,
-      connections: [],
-      notes: pkg.warnings,
-      tags: ["package", pkg.runMode, pkg.sourceType].filter(Boolean),
-      screenshots: [],
-      createdAt: now()
-    };
-    data.nodes.push(rootNode);
-
-    for (const file of pkg.detectedFiles.slice(0, 80)) {
-      const id = "file-" + slug(file.path);
-      data.nodes.push({
-        id,
-        type: file.extension || "file",
-        source: "package",
-        title: file.name,
-        description: file.path,
-        connections: ["pkg-root"],
-        notes: [],
-        tags: ["file", file.extension || "unknown"],
-        screenshots: [],
-        createdAt: now()
-      });
-      data.edges.push({
-        id: "edge-" + id,
-        from: "pkg-root",
-        to: id,
-        label: file.extension === "exe" ? "native entry candidate" : "contains"
-      });
-    }
-
-    data.timeline.unshift({
-      id: uid("evt"),
-      timestamp: now(),
-      nodeId: data.currentNodeId,
-      type: "load",
-      title: "Package loaded",
-      summary: pkg.name + " loaded with runtime mode " + pkg.runMode + ".",
-      tags: ["load", pkg.runMode]
-    });
-
-    if (pkg.runMode === "shortcut-detected") {
-      activeTab = "inspect";
-    } else if (pkg.runMode === "native-runtime-required") {
-      activeTab = "inspect";
-    } else {
-      activeTab = "inspect";
-    }
-
-    saveStoredProject();
-    renderShell();
-    announce("Package loaded. Runtime mode is " + pkg.runMode + ".");
-  }
-
-  function renderInspect() {
-    const pkg = data.package;
-    main.innerHTML = `
-      <div class="grid">
-        <div class="card">
-          <h2>Package Inspector</h2>
-          <h3>${escapeHtml(pkg.name)}</h3>
-          ${pill(pkg.runMode || "none", toneForRunMode(pkg.runMode))}
-          <p class="muted">${escapeHtml(pkg.decision || data.runtime.decision || "")}</p>
-          ${pkg.warnings?.length ? `<div class="warning">${pkg.warnings.map(w => `<p>${escapeHtml(w)}</p>`).join("")}</div>` : ""}
-        </div>
-
-        <div class="columns">
-          <div class="card"><div class="dim">Files</div><h2>${pkg.importReport?.filesFound || 0}</h2></div>
-          <div class="card"><div class="dim">Folders</div><h2>${pkg.importReport?.foldersFound || 0}</h2></div>
-          <div class="card"><div class="dim">Scripts</div><h2>${pkg.importReport?.scriptsFound || 0}</h2></div>
-          <div class="card"><div class="dim">Executables</div><h2>${pkg.importReport?.executablesFound || 0}</h2></div>
-          <div class="card"><div class="dim">Shortcuts</div><h2>${pkg.importReport?.shortcutsFound || 0}</h2></div>
-          <div class="card"><div class="dim">Saves</div><h2>${pkg.importReport?.savesFound || 0}</h2></div>
-        </div>
-
-        <div class="card">
-          <h2>Detected Entries</h2>
-          ${pkg.entryCandidates?.length ? pkg.entryCandidates.map(e => `<div class="file-row mono"><strong>entry candidate</strong><br>${escapeHtml(e)}</div>`).join("") : `<p class="muted">No entry candidates detected.</p>`}
-        </div>
-
-        <div class="card">
-          <h2>Runtime Console Decision</h2>
-          <p class="muted">${escapeHtml(pkg.decision || "")}</p>
-          <button class="btn primary" id="goRunBtn">▶ Go To Run / Attach</button>
-          <button class="btn" id="createGameCardFromPackageBtn">💳 Create GameCard From Package</button>
-        </div>
-
-        <div class="card">
-          <h2>File Tree</h2>
-          ${(pkg.detectedFiles || []).slice(0, 120).map(f => `
-            <div class="file-row">
-              <strong>${escapeHtml(f.name)}</strong>
-              <div class="dim">${escapeHtml(f.path)} · ${escapeHtml(f.extension || "file")} · ${formatBytes(f.size)}</div>
-            </div>
-          `).join("") || `<p class="muted">No files loaded.</p>`}
-        </div>
-      </div>
-    `;
-
-    el("goRunBtn").addEventListener("click", () => {
-      activeTab = "run";
-      renderShell();
-    });
-    el("createGameCardFromPackageBtn").addEventListener("click", createGameCardFromPackage);
-  }
-
-  function renderRun() {
-    const mode = data.package.runMode;
-    let message = "";
-
-    if (mode === "shortcut-detected") {
-      message = "Shortcut detected. A .lnk file is not the real game. Use Open file location in Windows, then load the real Final Fantasy VII game folder or launcher EXE.";
-    } else if (mode === "native-runtime-required") {
-      message = "Native Windows package detected. GitHub Pages cannot directly launch this EXE. Start the game normally in Windows, then press Attach Capture to bind the running game window to this MEM Palace terminal.";
-    } else if (mode === "browser-html") {
-      message = "Browser HTML package detected. If the entry file is self-contained, it can be previewed here. Asset rewriting is not used in this dependency-free build.";
-    } else {
-      message = "No runnable browser package is mounted. You can still attach screen capture and use the terminal as an observation and save surface.";
-    }
-
-    main.innerHTML = `
-      <div class="grid">
-        <div class="card">
-          <h2>Run / Attach View</h2>
-          <p class="muted">${escapeHtml(message)}</p>
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-            <button class="btn primary" id="attachCaptureBtn">📷 Attach Capture</button>
-            <button class="btn" id="captureMomentBtn">➕ Capture Moment</button>
-            <button class="btn" id="stopCaptureBtn">Stop Capture</button>
-            <button class="btn" id="makePALCardBtn">💳 Create PALCard From Current Room</button>
-          </div>
-          <video id="captureVideo" autoplay muted playsinline></video>
-        </div>
-
-        <div class="columns two">
-          <div class="card">
-            <h2>Runtime Bay</h2>
-            ${pill(data.package.runMode || "none", toneForRunMode(data.package.runMode))}
-            <p class="muted">${escapeHtml(data.runtime.decision || "")}</p>
-          </div>
-          <div class="card">
-            <h2>Console Meaning</h2>
-            <p class="muted">
-              In GitHub Pages mode this is the memory console and observation surface.
-              Direct native launch requires the same HTML shell wrapped by a desktop runtime core.
-            </p>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>Recent Captures</h2>
-          ${data.captures.slice(0, 8).map(c => `
-            <div class="file-row">
-              <strong>${escapeHtml(c.title)}</strong>
-              <div class="dim">${escapeHtml(c.createdAt)}</div>
-              <img class="capture-preview" src="${c.screenshot}" alt="${escapeHtml(c.title)}">
-            </div>
-          `).join("") || `<p class="muted">No captures yet.</p>`}
-        </div>
-      </div>
-    `;
-
-    el("attachCaptureBtn").addEventListener("click", startCapture);
-    el("captureMomentBtn").addEventListener("click", captureMoment);
-    el("stopCaptureBtn").addEventListener("click", stopCapture);
-    el("makePALCardBtn").addEventListener("click", createPALCardFromCurrentNode);
-
-    if (captureStream) {
-      const video = el("captureVideo");
-      video.srcObject = captureStream;
-    }
-  }
-
-  async function startCapture() {
-    if (!navigator.mediaDevices?.getDisplayMedia) {
-      alert("Screen capture is not available in this browser.");
-      return;
-    }
-
-    captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
-    const video = el("captureVideo");
-    if (video) video.srcObject = captureStream;
-
-    const [track] = captureStream.getVideoTracks();
-    if (track) {
-      track.onended = () => {
-        captureStream = null;
-        const v = el("captureVideo");
-        if (v) v.srcObject = null;
-      };
-    }
-
-    announce("Screen capture attached.");
-  }
-
-  function stopCapture() {
-    if (captureStream) {
-      captureStream.getTracks().forEach(track => track.stop());
-    }
-    captureStream = null;
-    const video = el("captureVideo");
-    if (video) video.srcObject = null;
-    announce("Screen capture stopped.");
-  }
-
-  function captureMoment() {
-    const video = el("captureVideo");
-    if (!video || !video.videoWidth) {
-      alert("Start Attach Capture first, then choose the running game window.");
-      return;
-    }
-
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0);
-    const screenshot = canvas.toDataURL("image/webp", 0.82);
-
-    const node = currentNode();
-    const capture = {
-      id: uid("cap"),
-      nodeId: node.id,
-      title: "Capture at " + node.title,
-      screenshot,
-      createdAt: now()
-    };
-
-    data.captures.unshift(capture);
-    node.screenshots = [capture.id, ...(node.screenshots || [])];
-
-    data.timeline.unshift({
-      id: uid("evt"),
-      timestamp: now(),
-      nodeId: node.id,
-      type: "capture",
-      title: "Captured moment",
-      summary: "Screenshot attached to " + node.title + ".",
-      tags: ["capture"]
-    });
-
-    saveStoredProject();
-    renderShell();
-    announce("Capture saved to " + node.title + ".");
-  }
-
-  function renderCards() {
-    const cards = data.memoryCards;
-
-    main.innerHTML = `
-      <div class="grid">
-        <div class="card">
-          <h2>Memory Card Bay</h2>
-          <p class="muted">
-            GameCard stores the package/save identity. PALCard stores the palace room context.
-            Together they form the MEM Save Pair.
-          </p>
-          <button class="btn primary" id="createGameCardBtn">💳 Create GameCard From Package</button>
-          <button class="btn" id="createPALCardBtn">💳 Create PALCard From Current Room</button>
-          <button class="btn" id="autoPairBtn">🔗 Auto-Pair Latest</button>
-        </div>
-
-        <div class="columns two">
-          <div class="card">
-            <h2>GameCards</h2>
-            ${cards.gameCards.map(card => `
-              <div class="file-row">
-                <strong>${escapeHtml(card.slotTitle)}</strong>
-                ${pill("GameCard", "blue")}
-                <div class="dim">${escapeHtml(card.packageName || card.gameTitle || "")}</div>
-                <div class="mono dim">${escapeHtml(card.packageHash || card.id)}</div>
-              </div>
-            `).join("") || `<p class="muted">No GameCards yet.</p>`}
-          </div>
-
-          <div class="card">
-            <h2>PALCards</h2>
-            ${cards.palCards.map(card => `
-              <div class="file-row">
-                <strong>${escapeHtml(card.title)}</strong>
-                ${pill("PALCard")}
-                <div class="dim">Room: ${escapeHtml(card.currentRoom)}</div>
-              </div>
-            `).join("") || `<p class="muted">No PALCards yet.</p>`}
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>MEM Save Pairs</h2>
-          ${cards.pairs.map(pair => `
-            <div class="file-row">
-              <strong>${escapeHtml(pair.title)}</strong>
-              ${pill(pair.status || "paired", "good")}
-              <div style="margin-top:8px;">
-                <button class="btn" data-loadpair="${pair.id}">Load Pair</button>
-                <button class="btn" data-exportpair="${pair.id}">Export Pair</button>
-                <button class="btn danger" data-deletepair="${pair.id}">Unpair</button>
-              </div>
-            </div>
-          `).join("") || `<p class="muted">No paired cards yet.</p>`}
-        </div>
-      </div>
-    `;
-
-    el("createGameCardBtn").addEventListener("click", createGameCardFromPackage);
-    el("createPALCardBtn").addEventListener("click", createPALCardFromCurrentNode);
-    el("autoPairBtn").addEventListener("click", autoPairLatest);
-
-    document.querySelectorAll("[data-loadpair]").forEach(btn => btn.addEventListener("click", () => loadPair(btn.dataset.loadpair)));
-    document.querySelectorAll("[data-exportpair]").forEach(btn => btn.addEventListener("click", () => exportPair(btn.dataset.exportpair)));
-    document.querySelectorAll("[data-deletepair]").forEach(btn => btn.addEventListener("click", () => deletePair(btn.dataset.deletepair)));
-  }
-
-  async function quickHashText(text) {
-    const buffer = new TextEncoder().encode(text);
-    const digest = await crypto.subtle.digest("SHA-256", buffer);
-    return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
-  }
-
-  async function createGameCardFromPackage() {
-    if (!data.package || data.package.name === "No package loaded") {
-      alert("Load a package first.");
-      return;
-    }
-
-    const hashBase = JSON.stringify({
-      name: data.package.name,
-      files: (data.package.detectedFiles || []).map(f => [f.path, f.size, f.lastModified])
-    });
-
-    const packageHash = await quickHashText(hashBase);
-
-    const card = {
-      cardType: "GameCard",
-      version: "0.2",
-      id: uid("gamecard"),
-      gameId: data.project.id,
-      gameTitle: data.project.title,
-      slotTitle: data.package.name,
-      packageName: data.package.name,
-      packageMode: data.package.runMode,
-      packageHash,
-      entryCandidates: data.package.entryCandidates || [],
-      createdAt: now(),
-      updatedAt: now()
-    };
-
-    data.memoryCards.gameCards.unshift(card);
-    data.timeline.unshift({
-      id: uid("evt"),
-      timestamp: now(),
-      nodeId: data.currentNodeId,
-      type: "card",
-      title: "GameCard created",
-      summary: "Package GameCard created for " + data.package.name + ".",
-      tags: ["GameCard"]
-    });
-
-    saveStoredProject();
-    activeTab = "cards";
-    renderShell();
-    announce("GameCard created.");
-  }
-
-  function createPALCardFromCurrentNode() {
-    const node = currentNode();
-    const capturesForNode = data.captures.filter(c => c.nodeId === node.id).map(c => c.id);
-
-    const card = {
-      cardType: "PALCard",
-      version: "0.2",
-      id: uid("palcard"),
-      gameId: data.project.id,
-      title: node.title + " Palace Context",
-      palaceNodeId: node.id,
-      currentRoom: node.title,
-      createdAt: now(),
-      updatedAt: now(),
-      context: {
-        summary: node.description,
-        tags: node.tags || [],
-        notes: node.notes || []
-      },
-      linkedAssets: {
-        captures: capturesForNode
-      }
-    };
-
-    data.memoryCards.palCards.unshift(card);
-    data.timeline.unshift({
-      id: uid("evt"),
-      timestamp: now(),
-      nodeId: node.id,
-      type: "card",
-      title: "PALCard created",
-      summary: "Palace Anchor Layer card created for " + node.title + ".",
-      tags: ["PALCard"]
-    });
-
-    saveStoredProject();
-    activeTab = "cards";
-    renderShell();
-    announce("PALCard created.");
-  }
-
-  function autoPairLatest() {
-    const game = data.memoryCards.gameCards[0];
-    const pal = data.memoryCards.palCards[0];
-
-    if (!game || !pal) {
-      alert("Create at least one GameCard and one PALCard first.");
-      return;
-    }
-
-    const pair = {
-      id: uid("pair"),
-      title: game.slotTitle + " plus " + pal.currentRoom,
-      gameCardId: game.id,
-      palCardId: pal.id,
-      status: "synced",
-      createdAt: now(),
-      updatedAt: now()
-    };
-
-    data.memoryCards.pairs.unshift(pair);
-    data.memoryCards.activePairId = pair.id;
-
-    saveStoredProject();
-    renderShell();
-    announce("Latest GameCard and PALCard paired.");
-  }
-
-  function loadPair(pairId) {
-    const pair = data.memoryCards.pairs.find(p => p.id === pairId);
-    const pal = data.memoryCards.palCards.find(p => p.id === pair?.palCardId);
-    if (pal?.palaceNodeId) data.currentNodeId = pal.palaceNodeId;
-    data.memoryCards.activePairId = pairId;
-    saveStoredProject();
-    activeTab = "blueprint";
-    renderShell();
-    announce("MEM Save Pair loaded.");
-  }
-
-  function exportPair(pairId) {
-    const pair = data.memoryCards.pairs.find(p => p.id === pairId);
-    if (!pair) return;
-    const payload = {
-      memSaveVersion: "0.2",
-      exportedAt: now(),
-      pair,
-      gameCard: data.memoryCards.gameCards.find(c => c.id === pair.gameCardId) || null,
-      palCard: data.memoryCards.palCards.find(c => c.id === pair.palCardId) || null,
-      palaceProject: data
-    };
-    downloadText(slug(pair.title) + ".memsave.json", JSON.stringify(payload, null, 2), "application/json");
-  }
-
-  function deletePair(pairId) {
-    data.memoryCards.pairs = data.memoryCards.pairs.filter(p => p.id !== pairId);
-    if (data.memoryCards.activePairId === pairId) data.memoryCards.activePairId = "";
-    saveStoredProject();
-    renderShell();
-  }
-
-  function renderDrawers() {
-    const drawers = data.progressionDrawers.drawers || [];
-    main.innerHTML = `
-      <div class="grid">
-        <div class="card">
-          <h2>Progression Drawers</h2>
-          <p class="muted">
-            A drawer saves how the workspace was left: package, room, active cards, runtime mode, captures, notes and layout.
-          </p>
-          <button class="btn primary" id="makeDrawerBtn">📦 Save Current Drawer</button>
-          <button class="btn" id="exportDrawersBtn">⬇️ Export All Drawers</button>
-        </div>
-
-        <div class="card">
-          <h2>Saved Drawers</h2>
-          ${drawers.map(drawer => `
-            <div class="file-row">
-              <strong>${escapeHtml(drawer.title)}</strong>
-              ${pill(drawer.status || "legacy", drawer.status === "legacy" ? "purple" : "good")}
-              <div class="dim">Room: ${escapeHtml(drawer.currentRoom)} · Runtime: ${escapeHtml(drawer.runtimeMode)} · Updated: ${escapeHtml(drawer.updatedAt)}</div>
-              <div style="margin-top:8px;">
-                <button class="btn" data-resumedrawer="${drawer.drawerId}">Resume</button>
-                <button class="btn" data-exportdrawer="${drawer.drawerId}">Export</button>
-                <button class="btn danger" data-deletedrawer="${drawer.drawerId}">Delete</button>
-              </div>
-            </div>
-          `).join("") || `<p class="muted">No drawers yet.</p>`}
-        </div>
-      </div>
-    `;
-
-    el("makeDrawerBtn").addEventListener("click", createProgressionDrawer);
-    el("exportDrawersBtn").addEventListener("click", exportAllDrawers);
-    document.querySelectorAll("[data-resumedrawer]").forEach(btn => btn.addEventListener("click", () => resumeDrawer(btn.dataset.resumedrawer)));
-    document.querySelectorAll("[data-exportdrawer]").forEach(btn => btn.addEventListener("click", () => exportDrawer(btn.dataset.exportdrawer)));
-    document.querySelectorAll("[data-deletedrawer]").forEach(btn => btn.addEventListener("click", () => deleteDrawer(btn.dataset.deletedrawer)));
-  }
-
-  function buildProgressionDrawer() {
-    const node = currentNode();
-    const pairId = data.memoryCards.activePairId || data.memoryCards.pairs[0]?.id || "";
-    const pair = data.memoryCards.pairs.find(p => p.id === pairId);
-
-    return {
-      drawerId: uid("drawer"),
-      title: (data.package.name !== "No package loaded" ? data.package.name : data.project.title) + " - " + node.title,
-      type: "progression-drawer",
-      status: pair ? (pair.status || "synced") : "legacy",
-      createdAt: now(),
-      updatedAt: now(),
-      packageId: data.project.id,
-      packageName: data.package.name,
-      runtimeMode: data.package.runMode,
-      activeTab,
-      currentNodeId: data.currentNodeId,
-      currentRoom: node.title,
-      activePairId: pairId,
-      lastCaptureId: data.captures[0]?.id || "",
-      timelineCursor: data.timeline[0]?.id || "",
-      summary: "Resume " + node.title + " with package, palace, card, and timeline context."
-    };
-  }
-
-  function createProgressionDrawer() {
-    const drawer = buildProgressionDrawer();
-    data.progressionDrawers.activeDrawerId = drawer.drawerId;
-    data.progressionDrawers.drawers.unshift(drawer);
-    data.timeline.unshift({
-      id: uid("evt"),
-      timestamp: now(),
-      nodeId: data.currentNodeId,
-      type: "checkpoint",
-      title: "Progression Drawer created",
-      summary: drawer.title + " saved as a resumable MEM Palace session drawer.",
-      tags: ["drawer"]
-    });
-    saveStoredProject();
-    activeTab = "drawers";
-    renderShell();
-    announce("Progression drawer saved.");
-  }
-
-  function resumeDrawer(drawerId) {
-    const drawer = data.progressionDrawers.drawers.find(d => d.drawerId === drawerId);
-    if (!drawer) return;
-    data.currentNodeId = drawer.currentNodeId || data.currentNodeId;
-    data.memoryCards.activePairId = drawer.activePairId || data.memoryCards.activePairId;
-    data.progressionDrawers.activeDrawerId = drawer.drawerId;
-    drawer.updatedAt = now();
-    saveStoredProject();
-    activeTab = drawer.activeTab && drawer.activeTab !== "drawers" ? drawer.activeTab : "palace";
-    renderShell();
-    announce("Progression drawer resumed.");
-  }
-
-  function exportDrawer(drawerIdOrObject) {
-    const drawer = typeof drawerIdOrObject === "string"
-      ? data.progressionDrawers.drawers.find(d => d.drawerId === drawerIdOrObject)
-      : drawerIdOrObject;
-
-    if (!drawer) return;
-
-    const payload = {
-      drawerVersion: "0.2",
-      exportedAt: now(),
-      drawer,
-      palaceSnapshot: data
-    };
-
-    downloadText(slug(drawer.title) + ".memdrawer.json", JSON.stringify(payload, null, 2), "application/json");
-  }
-
-  function deleteDrawer(drawerId) {
-    data.progressionDrawers.drawers = data.progressionDrawers.drawers.filter(d => d.drawerId !== drawerId);
-    if (data.progressionDrawers.activeDrawerId === drawerId) data.progressionDrawers.activeDrawerId = "";
-    saveStoredProject();
-    renderShell();
-  }
-
-  function exportAllDrawers() {
-    const payload = {
-      drawerArchiveVersion: "0.2",
-      title: data.project.title + " Progression Drawers",
-      exportedAt: now(),
-      progressionDrawers: data.progressionDrawers,
-      palaceSnapshot: data
-    };
-    downloadText(slug(data.project.title) + "-drawers.memdrawer.json", JSON.stringify(payload, null, 2), "application/json");
-  }
-
-  function renderPalace() {
-    const node = currentNode();
-    main.innerHTML = `
-      <div class="columns two">
-        <div class="card">
-          <h2>Palace Rooms</h2>
-          ${data.nodes.map(n => `
-            <button class="node-row" data-node="${n.id}" style="width:100%; text-align:left; color:var(--text); cursor:pointer; ${n.id === node.id ? "border-color: rgba(255,179,71,.58); background: rgba(255,179,71,.12);" : ""}">
-              <strong>${escapeHtml(n.title)}</strong>
-              ${pill(n.type)}
-              <div class="dim">${escapeHtml(n.description)}</div>
-            </button>
-          `).join("")}
-        </div>
-
-        <div class="card">
-          <h2>Current Room</h2>
-          <h3>${escapeHtml(node.title)}</h3>
-          <p class="muted">${escapeHtml(node.description)}</p>
-          <div>${(node.tags || []).map(tag => pill(tag)).join("")}</div>
-          <hr style="border-color:rgba(255,255,255,.08); margin:16px 0;">
-          <label class="dim">New node title</label>
-          <input id="newNodeTitle" type="text" placeholder="Example: Sector 7 train platform">
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-            <button class="btn primary" id="newLocationBtn">New Location</button>
-            <button class="btn" id="newBattleBtn">New Battle</button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.querySelectorAll("[data-node]").forEach(btn => btn.addEventListener("click", () => {
-      data.currentNodeId = btn.dataset.node;
-      saveStoredProject();
-      renderShell();
-    }));
-
-    el("newLocationBtn").addEventListener("click", () => addNode("location"));
-    el("newBattleBtn").addEventListener("click", () => addNode("battle"));
-  }
-
-  function addNode(type) {
-    const title = el("newNodeTitle").value.trim() || "New " + type;
-    const node = {
-      id: slug(type + "-" + title + "-" + Date.now()),
-      type,
-      title,
-      description: "Captured " + type + " node from the current session.",
-      connections: [data.currentNodeId],
-      notes: [],
-      tags: [type],
-      screenshots: [],
-      createdAt: now()
-    };
-    const oldNode = currentNode();
-    data.nodes.unshift(node);
-    data.edges.unshift({
-      id: uid("edge"),
-      from: oldNode.id,
-      to: node.id,
-      label: "observed route"
-    });
-    data.currentNodeId = node.id;
-    data.timeline.unshift({
-      id: uid("evt"),
-      timestamp: now(),
-      nodeId: node.id,
-      type,
-      title: "New " + type + ": " + title,
-      summary: "Created while mapping the loaded world.",
-      tags: [type, "manual"]
-    });
-    saveStoredProject();
-    renderShell();
-  }
-
-  function renderBlueprint() {
-    main.innerHTML = `
-      <div class="grid">
-        <div class="card">
-          <h2>Blueprint Graph</h2>
-          <div class="columns">
-            ${data.nodes.slice(0, 90).map(n => `
-              <div class="node-row">
-                <strong>${escapeHtml(n.title)}</strong>
-                ${pill(n.type, n.source === "package" ? "purple" : "")}
-                <div class="dim">${escapeHtml(n.description || "")}</div>
-              </div>
-            `).join("")}
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>Edges</h2>
-          ${data.edges.map(edge => `
-            <div class="file-row mono">${escapeHtml(edge.from)} → ${escapeHtml(edge.to)} · ${escapeHtml(edge.label)}</div>
-          `).join("") || `<p class="muted">No edges yet.</p>`}
-        </div>
-      </div>
-    `;
-  }
-
-  function renderTimeline() {
-    main.innerHTML = `
-      <div class="card">
-        <h2>Timeline</h2>
-        ${data.timeline.map(event => `
-          <div class="event-row">
-            <strong>${escapeHtml(event.title)}</strong>
-            ${pill(event.type, "blue")}
-            <p class="muted">${escapeHtml(event.summary)}</p>
-            <div class="dim">${escapeHtml(event.timestamp)} · ${escapeHtml(event.nodeId)}</div>
-          </div>
-        `).join("")}
-      </div>
-    `;
-  }
-
-  function renderNotes() {
-    const node = currentNode();
-    main.innerHTML = `
-      <div class="columns two">
-        <div class="card">
-          <h2>Add Note to ${escapeHtml(node.title)}</h2>
-          <textarea id="noteText" placeholder="What did the player learn here?"></textarea>
-          <button class="btn primary" id="saveNoteBtn">Save Note</button>
-        </div>
-        <div class="card">
-          <h2>Room Notes</h2>
-          ${(node.notes || []).map(note => `<div class="file-row">${escapeHtml(note)}</div>`).join("") || `<p class="muted">No notes yet.</p>`}
-        </div>
-      </div>
-    `;
-
-    el("saveNoteBtn").addEventListener("click", () => {
-      const note = el("noteText").value.trim();
-      if (!note) return;
-      node.notes = [note, ...(node.notes || [])];
-      data.timeline.unshift({
-        id: uid("evt"),
-        timestamp: now(),
-        nodeId: node.id,
-        type: "note",
-        title: "Manual note",
-        summary: note,
-        tags: ["note"]
-      });
-      saveStoredProject();
-      renderShell();
-    });
-  }
-
-  function renderBuild() {
-    main.innerHTML = `
-      <div class="columns">
-        <div class="card">
-          <h2>Export Project JSON</h2>
-          <p class="muted">Exports the raw palace state.</p>
-          <button class="btn primary" id="exportProjectBtn">Export JSON</button>
-        </div>
-
-        <div class="card">
-          <h2>Export HTML Guide</h2>
-          <p class="muted">Exports a readable HTML guide from the palace rooms and notes.</p>
-          <button class="btn" id="exportGuideBtn">Export HTML Guide</button>
-        </div>
-
-        <div class="card">
-          <h2>Save Full Session</h2>
-          <p class="muted">Exports a full MEM session file with drawers, cards, package binding and captures.</p>
-          <button class="btn primary" id="exportSessionBtn">Save Full Session</button>
-        </div>
-      </div>
-    `;
-
-    el("exportProjectBtn").addEventListener("click", exportProjectJson);
-    el("exportGuideBtn").addEventListener("click", exportHtmlGuide);
-    el("exportSessionBtn").addEventListener("click", saveFullSession);
-  }
-
-  function exportProjectJson() {
-    downloadText(slug(data.project.title) + ".mempalace.json", JSON.stringify(data, null, 2), "application/json");
-  }
-
-  function exportHtmlGuide() {
-    const sections = data.nodes.map(node => `
-      <section>
-        <h2>${escapeHtml(node.title)}</h2>
-        <p>${escapeHtml(node.description || "")}</p>
-        <p><code>${escapeHtml(node.type)}</code></p>
-        <ul>${(node.notes || []).map(note => `<li>${escapeHtml(note)}</li>`).join("")}</ul>
-      </section>
-    `).join("");
-
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(data.project.title)}</title><style>body{font-family:system-ui;background:#110905;color:#ffe8ce;padding:32px}section{border:1px solid #c87935;padding:16px;border-radius:16px;margin:16px 0}code{color:#ffb36b}</style></head><body><h1>${escapeHtml(data.project.title)}</h1><p>${escapeHtml(data.project.subtitle)}</p>${sections}</body></html>`;
-    downloadText(slug(data.project.title) + "-guide.html", html, "text/html");
-  }
-
-  function saveFullSession() {
-    const drawer = buildProgressionDrawer();
-    data.progressionDrawers.activeDrawerId = drawer.drawerId;
-    data.progressionDrawers.drawers.unshift(drawer);
-    data.timeline.unshift({
-      id: uid("evt"),
-      timestamp: now(),
-      nodeId: data.currentNodeId,
-      type: "checkpoint",
-      title: "Full Session saved",
-      summary: drawer.title + " saved as a full MEM Palace session.",
-      tags: ["drawer", "full-session"]
-    });
-    saveStoredProject();
-
-    const payload = {
-      sessionVersion: "0.2",
-      exportedAt: now(),
-      activeDrawer: drawer,
-      palaceSnapshot: data,
-      browserBetaNote: "This single-file GitHub Pages build saves MEM Palace context, cards, drawers, captures, notes, package inspection and blueprint state. It does not directly execute native Windows EXE files without a desktop/native runtime core."
-    };
-
-    downloadText(slug(data.project.title) + "-full-session.memsession.json", JSON.stringify(payload, null, 2), "application/json");
-    activeTab = "drawers";
-    renderShell();
-  }
-
-  function importMemFile(file) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const parsed = JSON.parse(String(reader.result));
-        if (parsed.sessionVersion && parsed.palaceSnapshot) {
-          data = parsed.palaceSnapshot;
-          saveStoredProject();
-          activeTab = "drawers";
-          renderShell();
-          announce("Full MEM session imported.");
-          return;
-        }
-
-        if (parsed.drawerVersion && parsed.drawer) {
-          data.progressionDrawers.drawers.unshift(parsed.drawer);
-          data.progressionDrawers.activeDrawerId = parsed.drawer.drawerId;
-          saveStoredProject();
-          activeTab = "drawers";
-          renderShell();
-          announce("Drawer imported.");
-          return;
-        }
-
-        if (parsed.drawerArchiveVersion && parsed.progressionDrawers) {
-          data.progressionDrawers = parsed.progressionDrawers;
-          saveStoredProject();
-          activeTab = "drawers";
-          renderShell();
-          announce("Drawer archive imported.");
-          return;
-        }
-
-        if (parsed.memSaveVersion && parsed.palaceProject) {
-          data = parsed.palaceProject;
-          saveStoredProject();
-          activeTab = "cards";
-          renderShell();
-          announce("MEM save imported.");
-          return;
-        }
-
-        if (parsed.nodes || parsed.project) {
-          data = parsed;
-          saveStoredProject();
-          activeTab = "palace";
-          renderShell();
-          announce("Project JSON imported.");
-          return;
-        }
-
-        alert("This JSON file was read, but it is not a recognised MEM Palace file.");
-      } catch {
-        alert("Could not import this file. It is not valid JSON.");
-      }
-    };
-    reader.readAsText(file);
-  }
-
-  document.addEventListener("click", ev => {
-    if (ev.target?.id === "saveDrawerBtn") createProgressionDrawer();
-    if (ev.target?.id === "exportActiveDrawerBtn") {
-      const active = data.progressionDrawers.drawers.find(d => d.drawerId === data.progressionDrawers.activeDrawerId);
-      if (active) exportDrawer(active);
-    }
-    if (ev.target?.id === "saveFullSessionBtn") saveFullSession();
+  function toggleFullscreen(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+
+  document.getElementById("romInput").addEventListener("change",e=>{const f=e.target.files?.[0]; e.target.value=""; ingestRom(f);});
+  document.getElementById("sessionInput").addEventListener("change",e=>{const f=e.target.files?.[0]; e.target.value=""; if(f) importSession(f);});
+
+  document.addEventListener("dragover",e=>{e.preventDefault();});
+  document.addEventListener("drop",e=>{
+    e.preventDefault();
+    const f = e.dataTransfer.files?.[0];
+    if(!f) return;
+    if(f.name.endsWith(".json") || f.name.endsWith(".aurora-session")) importSession(f);
+    else ingestRom(f);
   });
 
-  renderShell();
+  const bootLines = [
+    "checking display bus...",
+    "mounting MEM drawer...",
+    "loading cartridge shell...",
+    "binding EmulatorJS runtime...",
+    "controller path: keyboard / gamepad / browser...",
+    "AURORA ONE READY"
+  ];
+  let i=0;
+  const bl = document.getElementById("bootLines");
+  const timer = setInterval(()=>{
+    bl.innerHTML += `<div>&gt; ${bootLines[i]||"ready"}</div>`;
+    i++;
+    if(i>=bootLines.length){clearInterval(timer);setTimeout(()=>document.getElementById("boot").classList.add("hide"),650);}
+  },280);
+
+  render();
 })();
 </script>
 </body>
