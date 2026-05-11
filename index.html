@@ -149,7 +149,6 @@
   <script type="module">
     import React, { useEffect, useMemo, useRef, useState } from "https://esm.sh/react@18.2.0";
     import { createRoot } from "https://esm.sh/react-dom@18.2.0/client";
-    import { motion } from "https://esm.sh/framer-motion@10.18.0";
     import JSZip from "https://esm.sh/jszip@3.10.1";
 
     const h = React.createElement;
@@ -359,7 +358,7 @@
     function Card({ children, className = "" }) { return h("div", { className: cls("card", className) }, children); }
     function Pill({ children, tone = "orange" }) { return h("span", { className: cls("pill", tone !== "orange" && tone) }, children); }
     function MotionWrap({ children, className = "" }) {
-      return h(motion.div, { initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.18 }, className }, children);
+      return h("div", { className }, children);
     }
 
     function PairCreator({ gameCards, palCards, onPair }) {
