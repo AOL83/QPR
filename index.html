@@ -1,217 +1,384 @@
-from pathlib import Path
-html = r'''<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>MEM Palace Game Terminal - Single File Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MEM Palace Game Terminal - Single File</title>
   <style>
-    :root{
-      --bg:#030201;
-      --panel:rgba(0,0,0,.42);
-      --panel2:rgba(255,255,255,.045);
-      --line:rgba(255,187,99,.22);
-      --line2:rgba(255,255,255,.09);
-      --text:#fff3df;
-      --muted:rgba(255,235,205,.64);
-      --soft:rgba(255,235,205,.42);
-      --orange:#ffad42;
-      --orange2:#ff7a1a;
-      --green:#63ff99;
-      --red:#ff6b6b;
-      --blue:#71d7ff;
-      --purple:#d8a2ff;
-      --shadow:0 22px 70px rgba(0,0,0,.38);
-      --radius:22px;
+    :root {
+      --bg: #040201;
+      --panel: rgba(0, 0, 0, 0.36);
+      --panel2: rgba(0, 0, 0, 0.52);
+      --line: rgba(255, 186, 92, 0.22);
+      --line2: rgba(255, 186, 92, 0.38);
+      --text: #fff3df;
+      --muted: rgba(255, 232, 205, 0.68);
+      --dim: rgba(255, 232, 205, 0.45);
+      --hot: #ffb347;
+      --hot2: #ff7b22;
+      --good: #6dff9f;
+      --bad: #ff6b6b;
+      --blue: #83d9ff;
+      --purple: #d7a4ff;
+      --radius: 20px;
     }
-    *{box-sizing:border-box}
-    html,body{min-height:100%;margin:0}
-    body{
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 12% 0%,rgba(255,122,26,.24),transparent 34%),
-        radial-gradient(circle at 100% 20%,rgba(255,174,66,.11),transparent 28%),
-        radial-gradient(circle at 50% 100%,rgba(113,215,255,.08),transparent 34%),
-        linear-gradient(135deg,#130806,#030201 55%,#010101);
-      color:var(--text);
-      overflow-x:hidden;
+        radial-gradient(circle at top left, #472008 0, #120703 34%, #040201 72%),
+        linear-gradient(135deg, #090301, #000);
     }
-    button,input,textarea,select{font:inherit}
-    button{cursor:pointer}
-    .app{width:min(1480px,100%);margin:0 auto;padding:16px}
-    .hero,.nav,.card{
-      border:1px solid var(--line);
-      background:linear-gradient(180deg,rgba(0,0,0,.48),rgba(0,0,0,.28));
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(12px);
+
+    button, input, textarea, select {
+      font: inherit;
     }
-    .hero{padding:18px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{
-      width:48px;height:48px;border-radius:16px;
-      display:grid;place-items:center;
-      background:radial-gradient(circle,#ffcf75,#ff7a1a 52%,#3b1502);
-      box-shadow:0 0 28px rgba(255,154,42,.45);
-      color:#140800;font-size:26px;font-weight:900;
+
+    .wrap {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 16px;
     }
-    h1,h2,h3,p{margin:0}
-    h1{font-size:clamp(22px,3vw,34px);line-height:1.05}
-    .sub{margin-top:6px;color:var(--muted);font-size:14px}
-    .pill{
-      display:inline-flex;align-items:center;gap:6px;
-      border:1px solid rgba(255,173,66,.28);
-      background:rgba(255,173,66,.11);
-      color:#ffe8bd;
-      border-radius:999px;padding:6px 10px;font-size:12px;
-      white-space:nowrap;
+
+    .header, .nav, .card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: calc(var(--radius) + 8px);
+      box-shadow: 0 18px 55px rgba(0,0,0,0.28);
+      backdrop-filter: blur(8px);
     }
-    .pill.green{border-color:rgba(99,255,153,.3);background:rgba(99,255,153,.1);color:#caffdc}
-    .pill.red{border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.11);color:#ffd3d3}
-    .pill.blue{border-color:rgba(113,215,255,.35);background:rgba(113,215,255,.1);color:#d4f5ff}
-    .pill.purple{border-color:rgba(216,162,255,.35);background:rgba(216,162,255,.1);color:#edd8ff}
-    .nav{margin-top:12px;padding:8px;display:flex;gap:8px;flex-wrap:wrap}
-    .tab{
-      border:0;border-radius:16px;background:transparent;color:var(--text);
-      display:inline-flex;align-items:center;gap:8px;padding:10px 12px;font-weight:800;font-size:13px;
+
+    .header {
+      padding: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
     }
-    .tab.active{background:linear-gradient(135deg,var(--orange),#ffd18a);color:#140800}
-    .layout{margin-top:12px;display:grid;grid-template-columns:320px 1fr;gap:12px}
-    .side{display:flex;flex-direction:column;gap:12px}
-    .card{padding:16px}
-    .card h2{font-size:18px;margin-bottom:10px}
-    .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .stat{border:1px solid var(--line2);background:var(--panel2);border-radius:16px;padding:12px}
-    .stat .k{font-size:12px;color:var(--soft)}
-    .stat .v{font-size:26px;font-weight:900}
-    .btn{
-      border:1px solid rgba(255,173,66,.26);
-      background:linear-gradient(135deg,var(--orange),#ffd18a);
-      color:#160900;border-radius:16px;padding:10px 12px;font-weight:900;
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      min-height:42px;
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    .btn.ghost{background:rgba(0,0,0,.18);color:#ffe8bd}
-    .btn.red{background:rgba(255,107,107,.14);color:#ffd8d8;border-color:rgba(255,107,107,.3)}
-    .btn:disabled{opacity:.45;cursor:not-allowed}
-    .stack{display:flex;flex-direction:column;gap:10px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .grow{flex:1}
-    .drop{
-      border:2px dashed rgba(255,173,66,.45);
-      background:rgba(255,173,66,.08);
-      border-radius:24px;padding:26px;text-align:center;
-      transition:.2s ease;
+
+    .brand-icon {
+      font-size: 34px;
+      line-height: 1;
     }
-    .drop.drag{background:rgba(99,255,153,.12);border-color:rgba(99,255,153,.6);transform:scale(1.01)}
-    .drop strong{display:block;font-size:20px;margin-bottom:8px}
-    .drop p{color:var(--muted);line-height:1.5}
-    .hidden{display:none!important}
-    .panelgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    .fileitem,.nodeitem,.eventitem{
-      border:1px solid var(--line2);background:rgba(0,0,0,.24);
-      border-radius:16px;padding:12px;min-width:0;
+
+    h1, h2, h3, p {
+      margin-top: 0;
     }
-    .fileitem b,.nodeitem b,.eventitem b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .muted{color:var(--muted)}
-    .tiny{font-size:12px;color:var(--soft)}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-    .screen{
-      min-height:440px;border:1px solid var(--line);border-radius:22px;
-      background:#000;overflow:hidden;display:grid;place-items:center;
+
+    h1 {
+      margin-bottom: 4px;
+      font-size: clamp(1.35rem, 3.2vw, 2rem);
+      letter-spacing: -0.03em;
     }
-    iframe,.video{width:100%;height:520px;border:0;background:#000;display:block}
-    .video{object-fit:contain}
-    textarea,input,select{
-      width:100%;border:1px solid var(--line);border-radius:14px;
-      background:rgba(0,0,0,.32);color:var(--text);padding:12px;
-      outline:none;
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: 1.12rem;
     }
-    textarea{min-height:150px;resize:vertical}
-    .console{
-      border:1px solid var(--line2);background:rgba(0,0,0,.36);
-      border-radius:18px;padding:12px;white-space:pre-wrap;line-height:1.45;
-      min-height:160px;max-height:320px;overflow:auto;
+
+    h3 {
+      margin-bottom: 8px;
+      color: #ffd29b;
     }
-    .nodebutton{
-      width:100%;text-align:left;border:1px solid var(--line2);
-      background:rgba(0,0,0,.24);color:var(--text);
-      border-radius:16px;padding:12px;
+
+    .muted {
+      color: var(--muted);
     }
-    .nodebutton.active{border-color:rgba(255,173,66,.7);background:rgba(255,173,66,.12)}
-    .notice{
-      border:1px solid rgba(113,215,255,.28);background:rgba(113,215,255,.08);
-      border-radius:18px;padding:14px;color:#e2f8ff;line-height:1.5;
+
+    .dim {
+      color: var(--dim);
+      font-size: 0.9rem;
     }
-    .danger{
-      border:1px solid rgba(255,107,107,.32);background:rgba(255,107,107,.10);
-      border-radius:18px;padding:14px;color:#ffe1e1;line-height:1.5;
+
+    .nav {
+      margin-top: 14px;
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      position: sticky;
+      top: 8px;
+      z-index: 10;
     }
-    .ok{
-      border:1px solid rgba(99,255,153,.32);background:rgba(99,255,153,.10);
-      border-radius:18px;padding:14px;color:#dcffe8;line-height:1.5;
+
+    .tab, .btn {
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.25);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor: pointer;
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      text-decoration: none;
     }
-    @media(max-width:980px){
-      .layout{grid-template-columns:1fr}
-      .panelgrid{grid-template-columns:1fr}
-      .grid2{grid-template-columns:repeat(2,1fr)}
-      .tab{flex:1;justify-content:center}
+
+    .tab:hover, .btn:hover {
+      background: rgba(255, 179, 71, 0.12);
+      border-color: var(--line2);
+      transform: translateY(-1px);
     }
-    @media(max-width:560px){
-      .app{padding:10px}
-      .hero{border-radius:18px}
-      .grid2{grid-template-columns:1fr}
-      iframe,.video{height:360px}
+
+    .tab.active, .btn.primary {
+      background: var(--hot);
+      color: #120703;
+      font-weight: 800;
+      border-color: rgba(255,255,255,.15);
+    }
+
+    .btn.danger {
+      border-color: rgba(255, 107, 107, 0.42);
+      color: #ffd1d1;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .layout {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .card {
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat {
+      background: rgba(0,0,0,0.32);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .stat .value {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: #fff0d0;
+      line-height: 1.1;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line2);
+      background: rgba(255, 179, 71, 0.1);
+      color: #ffe2b7;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 0.78rem;
+      margin: 3px 5px 3px 0;
+      white-space: nowrap;
+    }
+
+    .pill.good { border-color: rgba(109,255,159,.35); background: rgba(109,255,159,.1); color: #c8ffd8; }
+    .pill.bad { border-color: rgba(255,107,107,.42); background: rgba(255,107,107,.1); color: #ffd4d4; }
+    .pill.blue { border-color: rgba(131,217,255,.35); background: rgba(131,217,255,.1); color: #d8f4ff; }
+    .pill.purple { border-color: rgba(215,164,255,.35); background: rgba(215,164,255,.1); color: #ecd8ff; }
+
+    .dropzone {
+      border: 2px dashed rgba(255, 179, 71, 0.45);
+      background: rgba(255, 179, 71, 0.08);
+      border-radius: 24px;
+      padding: 28px;
+      text-align: center;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .dropzone.dragover {
+      background: rgba(255, 179, 71, 0.18);
+      border-color: #ffd29b;
+    }
+
+    .hidden { display: none !important; }
+
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .columns.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .file-row, .event-row, .node-row {
+      border: 1px solid rgba(255, 186, 92, 0.14);
+      background: rgba(0,0,0,0.28);
+      border-radius: 16px;
+      padding: 12px;
+      margin: 8px 0;
+      word-break: break-word;
+    }
+
+    .file-row strong, .event-row strong, .node-row strong {
+      color: #ffe3b4;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.88rem;
+    }
+
+    textarea, input[type="text"], select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.35);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 11px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    video, canvas, iframe {
+      width: 100%;
+      min-height: 420px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #000;
+    }
+
+    .capture-preview {
+      max-width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      margin-top: 10px;
+    }
+
+    .warning {
+      border: 1px solid rgba(255,107,107,.38);
+      background: rgba(255,107,107,.1);
+      border-radius: 18px;
+      padding: 14px;
+      color: #ffe0e0;
+    }
+
+    .ok {
+      border: 1px solid rgba(109,255,159,.32);
+      background: rgba(109,255,159,.08);
+      border-radius: 18px;
+      padding: 14px;
+      color: #d8ffe3;
+    }
+
+    .sr-status {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .columns, .columns.two {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        position: static;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="hero">
-      <div class="brand">
-        <div class="logo">🎮</div>
-        <div>
-          <h1>MEM Palace Game Terminal</h1>
-          <p class="sub">Load. Detect. Mount. Attach. Observe. Save. Resume.</p>
+  <div class="wrap">
+    <div id="readerStatus" class="sr-status" aria-live="polite"></div>
+
+    <header class="header">
+      <div>
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">🎮</div>
+          <div>
+            <h1>MEM Palace Game Terminal</h1>
+            <p class="muted">Load. Detect. Mount. Attach. Observe. Save. Resume.</p>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <span class="pill purple">Single-file GitHub Pages console</span>
-        <span id="runtimePill" class="pill blue">Runtime Bay ready</span>
+      <div>
+        <span class="pill purple" id="runtimePill">single-file GitHub Pages console</span>
       </div>
     </header>
 
-    <nav class="nav" id="tabs"></nav>
+    <nav class="nav" aria-label="Main terminal tabs" id="tabs"></nav>
 
     <section class="layout">
-      <aside class="side">
+      <aside class="grid">
         <div class="card">
           <h2>Project Stats</h2>
-          <div class="grid2">
-            <div class="stat"><div class="k">Nodes</div><div class="v" id="statNodes">0</div></div>
-            <div class="stat"><div class="k">Events</div><div class="v" id="statEvents">0</div></div>
-            <div class="stat"><div class="k">Captures</div><div class="v" id="statCaptures">0</div></div>
-            <div class="stat"><div class="k">GameCards</div><div class="v" id="statGameCards">0</div></div>
-            <div class="stat"><div class="k">PALCards</div><div class="v" id="statPALCards">0</div></div>
-            <div class="stat"><div class="k">Drawers</div><div class="v" id="statDrawers">0</div></div>
+          <div class="stats">
+            <div class="stat"><div class="dim">Nodes</div><div class="value" id="statNodes">0</div></div>
+            <div class="stat"><div class="dim">Events</div><div class="value" id="statEvents">0</div></div>
+            <div class="stat"><div class="dim">Captures</div><div class="value" id="statCaptures">0</div></div>
+            <div class="stat"><div class="dim">GameCards</div><div class="value" id="statGameCards">0</div></div>
+            <div class="stat"><div class="dim">PALCards</div><div class="value" id="statPalCards">0</div></div>
+            <div class="stat"><div class="dim">Pairs</div><div class="value" id="statPairs">0</div></div>
+            <div class="stat"><div class="dim">Drawers</div><div class="value" id="statDrawers">0</div></div>
           </div>
         </div>
 
         <div class="card">
           <h2>Current Room</h2>
-          <b id="sideRoom">Midgar</b>
-          <p id="sideType" class="muted" style="margin-top:6px">location</p>
-          <div id="sideTags" class="row" style="margin-top:12px"></div>
-          <div class="stack" style="margin-top:14px">
-            <button class="btn ghost" id="saveDrawerBtn">📦 Save Drawer</button>
-            <button class="btn ghost" id="exportActiveDrawerBtn">⬇️ Export Active Drawer</button>
-            <button class="btn" id="saveSessionBtn">⬇️ Save Full Session</button>
-          </div>
+          <h3 id="currentRoomTitle">Midgar</h3>
+          <p class="muted" id="currentRoomType">location</p>
+          <div id="currentTags"></div>
+
+          <button class="btn" id="saveDrawerBtn">📦 Save Drawer</button>
+          <button class="btn" id="exportActiveDrawerBtn">⬇️ Export Active Drawer</button>
+          <button class="btn primary" id="saveFullSessionBtn">⬇️ Save Full Session</button>
         </div>
 
         <div class="card">
-          <h2>Runtime Bay</h2>
-          <div id="runtimeDecision" class="notice">No package loaded yet. Drop a file, folder, save, HTML page, or game package.</div>
+          <h2>Native Runtime Rule</h2>
+          <p class="muted">
+            GitHub Pages can inspect files, bind packages, capture a running window, and save the MEM Palace state.
+            It cannot directly execute Windows EXE files by itself.
+          </p>
         </div>
       </aside>
 
@@ -219,33 +386,206 @@ html = r'''<!doctype html>
     </section>
   </div>
 
-  <input id="fileInput" type="file" multiple class="hidden" />
-  <input id="folderInput" type="file" multiple webkitdirectory directory class="hidden" />
-  <input id="saveInput" type="file" class="hidden" />
-  <input id="memInput" type="file" accept=".json,.memsave,.memdrawer,.memsession,.mempalace" class="hidden" />
-
 <script>
-(function(){
+(function () {
   "use strict";
 
+  const STORAGE_KEY = "mem-palace-game-terminal-single-file-v2";
+
   const now = () => new Date().toISOString();
-  const uid = (p="id") => `${p}_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
-  const ext = name => {
-    const parts = String(name||"").toLowerCase().split(".");
-    return parts.length > 1 ? parts.pop() : "";
-  };
-  const slug = input => String(input||"mem-palace").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "mem-palace";
-  const escapeHtml = value => String(value ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
-  const fmtBytes = n => {
-    n = Number(n||0);
-    if(n < 1024) return `${n} bytes`;
-    if(n < 1024*1024) return `${(n/1024).toFixed(1)} KB`;
-    if(n < 1024*1024*1024) return `${(n/1024/1024).toFixed(1)} MB`;
-    return `${(n/1024/1024/1024).toFixed(2)} GB`;
+
+  const tabs = [
+    ["load", "📦 Load"],
+    ["inspect", "🔎 Inspect"],
+    ["run", "▶ Run / Attach"],
+    ["cards", "💳 Memory Cards"],
+    ["drawers", "🗄 Drawers"],
+    ["palace", "🗺 Palace"],
+    ["blueprint", "🧬 Blueprint"],
+    ["timeline", "📝 Timeline"],
+    ["notes", "📖 Notes"],
+    ["build", "🪄 Build"]
+  ];
+
+  const seed = {
+    project: {
+      id: "ff7-pc-beta",
+      title: "Final Fantasy VII PC Beta Map",
+      subtitle: "Game Load Test Console",
+      createdAt: now(),
+      updatedAt: now()
+    },
+    package: {
+      name: "No package loaded",
+      sourceType: "none",
+      runMode: "none",
+      entryCandidates: [],
+      detectedFolders: [],
+      detectedFiles: [],
+      detectedScripts: [],
+      detectedAssets: [],
+      detectedExecutables: [],
+      detectedShortcuts: [],
+      warnings: [],
+      importReport: null
+    },
+    runtime: {
+      status: "idle",
+      runMode: "none",
+      decision: "No package loaded yet."
+    },
+    currentNodeId: "midgar",
+    nodes: [
+      {
+        id: "midgar",
+        type: "location",
+        title: "Midgar",
+        description: "Central city hub and opening region.",
+        connections: ["sector-7", "reactor-1", "shinra-building"],
+        notes: ["Use this as the first palace wing for the beta test."],
+        tags: ["city", "opening", "hub"],
+        screenshots: [],
+        createdAt: now()
+      },
+      {
+        id: "reactor-1",
+        type: "location",
+        title: "Mako Reactor 1",
+        description: "Opening bombing mission area.",
+        connections: ["midgar", "guard-scorpion"],
+        notes: [],
+        tags: ["reactor", "mission", "midgar"],
+        screenshots: [],
+        createdAt: now()
+      },
+      {
+        id: "sector-7",
+        type: "location",
+        title: "Sector 7",
+        description: "Avalanche base area and early story hub.",
+        connections: ["midgar"],
+        notes: [],
+        tags: ["slums", "avalanche"],
+        screenshots: [],
+        createdAt: now()
+      },
+      {
+        id: "shinra-building",
+        type: "location",
+        title: "Shinra Building",
+        description: "Major Midgar infiltration sequence.",
+        connections: ["midgar"],
+        notes: [],
+        tags: ["midgar", "shinra", "infiltration"],
+        screenshots: [],
+        createdAt: now()
+      },
+      {
+        id: "guard-scorpion",
+        type: "battle",
+        title: "Guard Scorpion",
+        description: "First boss encounter. Watch the tail warning.",
+        connections: ["reactor-1"],
+        notes: ["Capture battle timing and tutorial dialogue."],
+        tags: ["boss", "tutorial", "reactor-1"],
+        screenshots: [],
+        createdAt: now()
+      }
+    ],
+    edges: [
+      { id: "edge-midgar-reactor", from: "midgar", to: "reactor-1", label: "mission route" },
+      { id: "edge-reactor-boss", from: "reactor-1", to: "guard-scorpion", label: "boss trigger" },
+      { id: "edge-midgar-sector", from: "midgar", to: "sector-7", label: "hub path" }
+    ],
+    timeline: [
+      {
+        id: "evt-opening",
+        timestamp: now(),
+        nodeId: "midgar",
+        type: "story",
+        title: "Opening sequence",
+        summary: "Begin mapping the first FF7 run as a memory palace.",
+        tags: ["opening"]
+      }
+    ],
+    captures: [],
+    memoryCards: {
+      gameCards: [],
+      palCards: [],
+      pairs: [],
+      activePairId: ""
+    },
+    progressionDrawers: {
+      drawers: [],
+      activeDrawerId: "",
+      pinnedDrawerIds: []
+    }
   };
 
-  function downloadText(filename,text,type="application/json"){
-    const blob = new Blob([text],{type});
+  let data = loadStoredProject();
+  let activeTab = "load";
+  let captureStream = null;
+  let packageFiles = [];
+
+  const el = (id) => document.getElementById(id);
+  const main = el("main");
+  const readerStatus = el("readerStatus");
+
+  function announce(message) {
+    readerStatus.textContent = message;
+  }
+
+  function uid(prefix) {
+    return prefix + "_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  }
+
+  function ext(name) {
+    const parts = String(name || "").toLowerCase().split(".");
+    return parts.length > 1 ? parts.pop() : "";
+  }
+
+  function slug(value) {
+    return String(value || "mem-palace")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "mem-palace";
+  }
+
+  function formatBytes(bytes) {
+    const n = Number(bytes || 0);
+    if (n < 1024) return n + " B";
+    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+    if (n < 1024 * 1024 * 1024) return (n / 1024 / 1024).toFixed(1) + " MB";
+    return (n / 1024 / 1024 / 1024).toFixed(1) + " GB";
+  }
+
+  function loadStoredProject() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return structuredClone(seed);
+  }
+
+  function saveStoredProject() {
+    data.project.updatedAt = now();
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      announce("Local storage is full. Export a full session to keep this state.");
+    }
+  }
+
+  function downloadText(filename, text, type) {
+    const blob = new Blob([text], { type: type || "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -256,738 +596,1200 @@ html = r'''<!doctype html>
     URL.revokeObjectURL(url);
   }
 
-  async function sha256File(file){
-    if(!crypto.subtle) return "sha256-unavailable";
-    const buffer = await file.arrayBuffer();
-    const digest = await crypto.subtle.digest("SHA-256",buffer);
-    return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  function currentNode() {
+    return data.nodes.find(n => n.id === data.currentNodeId) || data.nodes[0];
   }
 
-  const seed = {
-    project:{id:"ff7-pc-beta",title:"Final Fantasy VII PC Beta Map",subtitle:"Game Load Test Console",type:"game-companion",createdAt:now(),updatedAt:now()},
-    package:{name:"No package loaded",sourceType:"none",runMode:"none",entryCandidates:[],detectedFolders:[],detectedFiles:[],detectedScripts:[],detectedAssets:[],detectedExecutables:[],detectedHtml:[],warnings:[],importReport:null},
-    runtime:{status:"idle",runMode:"none",internalHtml:"",internalEntry:"",mountedFiles:[],externalInstructions:[]},
-    currentNodeId:"midgar",
-    nodes:[
-      {id:"midgar",type:"location",title:"Midgar",description:"Central city hub and opening region.",connections:["sector-7","reactor-1","shinra-building"],characters:["cloud","barret","tifa","aerith"],items:[],events:["evt-opening"],screenshots:[],notes:["Use this as the first palace wing for the beta test."],tags:["city","opening","hub"],createdAt:now()},
-      {id:"reactor-1",type:"location",title:"Mako Reactor 1",description:"Opening bombing mission area.",connections:["midgar","guard-scorpion"],characters:["cloud","barret","biggs","wedge","jessie"],items:[],events:["evt-bombing-mission"],screenshots:[],notes:[],tags:["reactor","mission","midgar"],createdAt:now()},
-      {id:"sector-7",type:"location",title:"Sector 7",description:"Avalanche base area and early story hub.",connections:["midgar","seventh-heaven"],characters:["cloud","barret","tifa"],items:[],events:[],screenshots:[],notes:[],tags:["slums","avalanche"],createdAt:now()},
-      {id:"shinra-building",type:"location",title:"Shinra Building",description:"Major Midgar infiltration sequence.",connections:["midgar"],characters:["cloud","barret","tifa","aerith","red-xiii"],items:[],events:[],screenshots:[],notes:[],tags:["midgar","shinra","infiltration"],createdAt:now()},
-      {id:"guard-scorpion",type:"battle",title:"Guard Scorpion",description:"First boss encounter. Watch the tail warning.",connections:["reactor-1"],characters:["cloud","barret"],items:[],events:[],screenshots:[],notes:["Capture battle timing and tutorial dialogue."],tags:["boss","tutorial","reactor-1"],createdAt:now()}
-    ],
-    edges:[
-      {id:"edge-midgar-reactor",from:"midgar",to:"reactor-1",label:"mission route"},
-      {id:"edge-reactor-boss",from:"reactor-1",to:"guard-scorpion",label:"boss trigger"},
-      {id:"edge-midgar-sector",from:"midgar",to:"sector-7",label:"hub path"}
-    ],
-    timeline:[
-      {id:"evt-opening",timestamp:now(),nodeId:"midgar",type:"story",title:"Opening sequence",summary:"Begin mapping the first FF7 run as a memory palace.",tags:["opening"]},
-      {id:"evt-bombing-mission",timestamp:now(),nodeId:"reactor-1",type:"story",title:"Bombing mission begins",summary:"Cloud joins Avalanche during the Reactor 1 mission.",tags:["mission","reactor"]}
-    ],
-    captures:[],
-    memoryCards:{gameCards:[],palCards:[],pairs:[],activePairId:""},
-    progressionDrawers:{drawers:[],activeDrawerId:"",pinnedDrawerIds:[]}
-  };
+  function toneForRunMode(mode) {
+    if (mode === "browser-html") return "good";
+    if (mode === "native-runtime-required") return "bad";
+    if (mode === "shortcut-detected") return "bad";
+    if (mode === "inspect-only") return "blue";
+    return "purple";
+  }
 
-  const tabs = [
-    ["load","📦 Load"],["inspect","🔎 Inspect"],["play","▶ Run / Attach"],["cards","💳 Memory Cards"],
-    ["history","🗄 Drawers"],["palace","🗺 Palace"],["blueprint","🧬 Blueprint"],["timeline","📝 Timeline"],
-    ["notes","📖 Notes"],["build","🪄 Build"]
-  ];
+  function pill(text, tone) {
+    return `<span class="pill ${tone || ""}">${escapeHtml(text)}</span>`;
+  }
 
-  let state = loadStored();
-  let activeTab = "load";
-  let captureStream = null;
+  function renderShell() {
+    renderTabs();
+    renderStats();
+    renderActiveTab();
+  }
 
-  function loadStored(){
-    try{
-      const raw = localStorage.getItem("mem-palace-single-html-v2");
-      return raw ? JSON.parse(raw) : structuredClone(seed);
-    }catch(e){
-      return structuredClone(seed);
+  function renderTabs() {
+    el("tabs").innerHTML = tabs.map(([id, label]) => `
+      <button class="tab ${activeTab === id ? "active" : ""}" data-tab="${id}">${label}</button>
+    `).join("");
+
+    document.querySelectorAll("[data-tab]").forEach(button => {
+      button.addEventListener("click", () => {
+        activeTab = button.dataset.tab;
+        renderShell();
+        announce("Opened " + button.textContent.trim());
+      });
+    });
+  }
+
+  function renderStats() {
+    const node = currentNode();
+    el("statNodes").textContent = data.nodes.length;
+    el("statEvents").textContent = data.timeline.length;
+    el("statCaptures").textContent = data.captures.length;
+    el("statGameCards").textContent = data.memoryCards.gameCards.length;
+    el("statPalCards").textContent = data.memoryCards.palCards.length;
+    el("statPairs").textContent = data.memoryCards.pairs.length;
+    el("statDrawers").textContent = data.progressionDrawers.drawers.length;
+    el("currentRoomTitle").textContent = node?.title || "Unknown";
+    el("currentRoomType").textContent = node?.type || "unknown";
+    el("currentTags").innerHTML = (node?.tags || []).map(tag => pill(tag)).join("");
+    el("runtimePill").textContent = data.package.runMode || "single-file GitHub Pages console";
+    el("runtimePill").className = "pill " + toneForRunMode(data.package.runMode);
+
+    el("exportActiveDrawerBtn").disabled = !data.progressionDrawers.activeDrawerId;
+  }
+
+  function renderActiveTab() {
+    const renderer = {
+      load: renderLoad,
+      inspect: renderInspect,
+      run: renderRun,
+      cards: renderCards,
+      drawers: renderDrawers,
+      palace: renderPalace,
+      blueprint: renderBlueprint,
+      timeline: renderTimeline,
+      notes: renderNotes,
+      build: renderBuild
+    }[activeTab] || renderLoad;
+
+    renderer();
+  }
+
+  function renderLoad() {
+    main.innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <h2>Load Package</h2>
+          <p class="muted">
+            Drag a file, a folder, a project folder, a game folder, a save file, or a MEM session file onto this box.
+            This terminal will inspect it, classify it, bind it to the memory palace, and decide the correct runtime route.
+          </p>
+
+          <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Drop files or folders here">
+            <h2>Drop files or folders here</h2>
+            <p class="muted">Or use the buttons below.</p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+              <button class="btn primary" id="pickFilesBtn">Pick Files</button>
+              <button class="btn" id="pickFolderBtn">Pick Folder</button>
+              <button class="btn" id="pickMemBtn">Import MEM Session</button>
+            </div>
+            <input id="fileInput" class="hidden" type="file" multiple>
+            <input id="folderInput" class="hidden" type="file" multiple webkitdirectory directory>
+            <input id="memInput" class="hidden" type="file" accept=".json,.memsave,.memdrawer,.memsession">
+          </div>
+        </div>
+
+        <div class="columns two">
+          <div class="card">
+            <h2>Runtime Bay</h2>
+            <p class="muted">${escapeHtml(data.runtime.decision || "No package loaded yet.")}</p>
+            ${data.package.runMode ? pill(data.package.runMode, toneForRunMode(data.package.runMode)) : ""}
+          </div>
+          <div class="card">
+            <h2>Idiot-Proof Rule</h2>
+            <p class="muted">
+              A shortcut file ending in .lnk is not the actual game. A Windows EXE is the real native file,
+              but GitHub Pages cannot execute it directly. The terminal can still bind it, track it, capture it, and save the MEM Palace session.
+            </p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const dropzone = el("dropzone");
+
+    el("pickFilesBtn").addEventListener("click", () => el("fileInput").click());
+    el("pickFolderBtn").addEventListener("click", () => el("folderInput").click());
+    el("pickMemBtn").addEventListener("click", () => el("memInput").click());
+
+    el("fileInput").addEventListener("change", ev => handleFiles(Array.from(ev.target.files || []), "file-picker"));
+    el("folderInput").addEventListener("change", ev => handleFiles(Array.from(ev.target.files || []), "folder-picker"));
+    el("memInput").addEventListener("change", ev => importMemFile(ev.target.files?.[0]));
+
+    ["dragenter", "dragover"].forEach(name => {
+      dropzone.addEventListener(name, ev => {
+        ev.preventDefault();
+        dropzone.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach(name => {
+      dropzone.addEventListener(name, ev => {
+        ev.preventDefault();
+        if (name === "drop") return;
+        dropzone.classList.remove("dragover");
+      });
+    });
+
+    dropzone.addEventListener("drop", async ev => {
+      ev.preventDefault();
+      dropzone.classList.remove("dragover");
+      const files = await extractDroppedFiles(ev.dataTransfer);
+      handleFiles(files, "drag-drop");
+    });
+  }
+
+  async function extractDroppedFiles(dataTransfer) {
+    const items = Array.from(dataTransfer.items || []);
+    const files = [];
+
+    async function walkEntry(entry, pathPrefix) {
+      return new Promise(resolve => {
+        if (!entry) return resolve();
+
+        if (entry.isFile) {
+          entry.file(file => {
+            Object.defineProperty(file, "relativePath", {
+              value: pathPrefix + file.name,
+              configurable: true
+            });
+            files.push(file);
+            resolve();
+          }, () => resolve());
+          return;
+        }
+
+        if (entry.isDirectory) {
+          const reader = entry.createReader();
+          const readBatch = () => {
+            reader.readEntries(async entries => {
+              if (!entries.length) return resolve();
+              for (const child of entries) {
+                await walkEntry(child, pathPrefix + entry.name + "/");
+              }
+              readBatch();
+            }, () => resolve());
+          };
+          readBatch();
+          return;
+        }
+
+        resolve();
+      });
     }
+
+    if (items.length && items[0].webkitGetAsEntry) {
+      for (const item of items) {
+        const entry = item.webkitGetAsEntry();
+        if (entry) await walkEntry(entry, "");
+      }
+    }
+
+    if (!files.length) {
+      files.push(...Array.from(dataTransfer.files || []));
+    }
+
+    return files;
   }
 
-  function saveStored(){
-    try{ localStorage.setItem("mem-palace-single-html-v2",JSON.stringify(state)); }
-    catch(e){ log("Local storage is full. Export a full session, then clear older captures or imported data."); }
-  }
+  function inspectFiles(files, sourceType) {
+    const list = files.map(file => {
+      const path = file.relativePath || file.webkitRelativePath || file.name;
+      return {
+        name: file.name,
+        path,
+        size: file.size || 0,
+        type: file.type || "",
+        extension: ext(file.name),
+        lastModified: file.lastModified || 0
+      };
+    });
 
-  function update(mutator){
-    const next = typeof mutator === "function" ? mutator(structuredClone(state)) : mutator;
-    next.project = {...next.project,updatedAt:now()};
-    state = next;
-    saveStored();
-    render();
-  }
+    const folders = Array.from(new Set(
+      list.map(f => String(f.path).split("/").slice(0, -1).join("/")).filter(Boolean)
+    ));
 
-  function currentNode(){
-    return state.nodes.find(n=>n.id===state.currentNodeId) || state.nodes[0];
-  }
-
-  function log(message){
-    state.timeline.unshift({id:uid("evt"),timestamp:now(),nodeId:state.currentNodeId,type:"console",title:"Console message",summary:message,tags:["console"]});
-    saveStored();
-  }
-
-  function inspectFiles(files,sourceType="drag-drop",packageName="Loaded Package"){
-    const fileList = Array.from(files||[]).map(file=>({
-      name:file.name || String(file.path||"unknown"),
-      path:file.webkitRelativePath || file.path || file.name || "unknown",
-      size:file.size || 0,
-      type:file.type || "",
-      extension:ext(file.name || file.path || "")
-    }));
-
-    const folders = Array.from(new Set(fileList.map(f=>String(f.path).split("/").slice(0,-1).join("/")).filter(Boolean)));
-    const scripts = fileList.filter(f=>["js","mjs","jsx","ts","tsx"].includes(f.extension));
-    const assets = fileList.filter(f=>["png","jpg","jpeg","webp","gif","svg","mp3","ogg","wav","mp4","webm","glb","gltf"].includes(f.extension));
-    const executables = fileList.filter(f=>["exe","msi","bat","cmd","app"].includes(f.extension));
-    const html = fileList.filter(f=>f.extension==="html" || f.name.toLowerCase()==="index.html");
-    const archives = fileList.filter(f=>["zip","7z","rar"].includes(f.extension));
-    const saves = fileList.filter(f=>["sav","ff7","memsave","memdrawer","memsession","json"].includes(f.extension));
+    const scripts = list.filter(f => ["js", "mjs", "jsx", "ts", "tsx"].includes(f.extension));
+    const assets = list.filter(f => ["png", "jpg", "jpeg", "webp", "gif", "svg", "mp3", "ogg", "wav", "mp4", "webm"].includes(f.extension));
+    const executables = list.filter(f => ["exe", "msi", "bat", "cmd", "com"].includes(f.extension));
+    const shortcuts = list.filter(f => f.extension === "lnk");
+    const htmlEntries = list.filter(f => f.name.toLowerCase() === "index.html" || f.extension === "html");
+    const saves = list.filter(f => ["ff7", "sav", "save", "dat", "memsave", "memsession"].includes(f.extension));
+    const gogFiles = list.filter(f => f.name.toLowerCase().includes("goggame") || f.name.toLowerCase().includes("galaxy"));
 
     let runMode = "inspect-only";
     const warnings = [];
-    const runtimeRoutes = [];
+    let decision = "Package loaded for inspection, blueprint, memory cards, notes and session saves.";
 
-    if(html.length){
-      runMode = "internal-html";
-      runtimeRoutes.push("Browser HTML runtime");
-    }
-    if(executables.length){
-      if(runMode === "inspect-only") runMode = "native-runtime-required";
-      runtimeRoutes.push("Native Windows runtime");
-      runtimeRoutes.push("Attach running game window");
+    if (shortcuts.length && list.length === shortcuts.length) {
+      runMode = "shortcut-detected";
+      warnings.push("Shortcut detected. A .lnk file is not the real game file. Use Open file location in Windows and load the real game folder or launcher EXE.");
+      decision = "Shortcut detected. This is only a pointer. Load the real Final Fantasy VII folder or the real EXE file instead.";
+    } else if (htmlEntries.length) {
+      runMode = "browser-html";
+      decision = "Browser-runnable HTML package detected. It can be mounted inside the terminal preview.";
+    } else if (executables.length) {
+      runMode = "native-runtime-required";
       warnings.push("Native executable detected. GitHub Pages cannot directly execute Windows installers or EXE files. This console can bind, track, capture, save and resume the MEM Palace state. A desktop/native runtime core is required for direct EXE execution.");
-    }
-    if(archives.length){
-      runtimeRoutes.push("Archive/package route");
-      warnings.push("Archive detected. This single-file version records the ZIP/package as a PackageCard. Browser-native inspection of ZIP internals requires an embedded ZIP parser or an expanded folder.");
-    }
-    if(!html.length && !executables.length && !archives.length){
-      runtimeRoutes.push("Inspection route");
+      decision = "Windows/native package detected. The terminal binds it as a PackageCard, tracks it, saves drawers and can attach to a running game window. Direct EXE launch from GitHub Pages requires a desktop/native runtime core.";
+    } else {
       warnings.push("No browser-runnable HTML entry or native executable was detected. The package is available for blueprint inspection and memory binding.");
     }
 
+    const rootName =
+      folders[0]?.split("/")[0] ||
+      list[0]?.path?.split("/")[0] ||
+      list[0]?.name ||
+      "Loaded Package";
+
     return {
-      name: packageName,
+      name: rootName,
       sourceType,
       runMode,
-      entryCandidates:[...html.map(f=>f.path),...executables.map(f=>f.path),...archives.map(f=>f.path)],
-      detectedFolders:folders,
-      detectedFiles:fileList,
-      detectedScripts:scripts,
-      detectedAssets:assets,
-      detectedExecutables:executables,
-      detectedHtml:html,
-      detectedArchives:archives,
-      detectedSaves:saves,
-      runtimeRoutes,
+      entryCandidates: [
+        ...htmlEntries.map(f => f.path),
+        ...executables.map(f => f.path),
+        ...gogFiles.map(f => f.path)
+      ],
+      detectedFolders: folders,
+      detectedFiles: list,
+      detectedScripts: scripts,
+      detectedAssets: assets,
+      detectedExecutables: executables,
+      detectedShortcuts: shortcuts,
+      detectedSaves: saves,
+      detectedGogFiles: gogFiles,
       warnings,
-      importReport:{filesFound:fileList.length,foldersFound:folders.length,assetsFound:assets.length,scriptsFound:scripts.length,executablesFound:executables.length,htmlFound:html.length,archivesFound:archives.length,generatedAt:now()}
+      importReport: {
+        filesFound: list.length,
+        foldersFound: folders.length,
+        assetsFound: assets.length,
+        scriptsFound: scripts.length,
+        executablesFound: executables.length,
+        shortcutsFound: shortcuts.length,
+        savesFound: saves.length,
+        generatedAt: now()
+      },
+      decision
     };
   }
 
-  function createBlueprint(pkg){
-    const nodes=[{id:"pkg-root",type:"package",source:"package",title:pkg.name,description:`Source: ${pkg.sourceType}. Run mode: ${pkg.runMode}.`,tags:["package",pkg.sourceType,pkg.runMode].filter(Boolean)}];
-    const edges=[];
-    for(const folder of pkg.detectedFolders || []){
-      const id=`folder-${slug(folder)}`;
-      nodes.push({id,type:"folder",source:"package",title:folder,description:"Detected package folder.",tags:["folder"]});
-      edges.push({id:`edge-root-${id}`,from:"pkg-root",to:id,label:"contains",source:"package"});
-    }
-    for(const f of pkg.detectedExecutables || []){
-      const id=`exe-${slug(f.path)}`;
-      nodes.push({id,type:"executable",source:"package",title:f.name,description:f.path,tags:["executable",f.extension]});
-      edges.push({id:`edge-root-${id}`,from:"pkg-root",to:id,label:"native runtime candidate",source:"package"});
-    }
-    for(const f of pkg.detectedHtml || []){
-      const id=`html-${slug(f.path)}`;
-      nodes.push({id,type:"html-entry",source:"package",title:f.name,description:f.path,tags:["html","browser-runtime"]});
-      edges.push({id:`edge-root-${id}`,from:"pkg-root",to:id,label:"browser entry",source:"package"});
-    }
-    for(const f of (pkg.detectedAssets || []).slice(0,50)){
-      const id=`asset-${slug(f.path)}`;
-      nodes.push({id,type:"asset",source:"package",title:f.name,description:f.path,tags:["asset",f.extension]});
-      edges.push({id:`edge-root-${id}`,from:"pkg-root",to:id,label:"asset",source:"package"});
-    }
-    return {nodes,edges};
-  }
-
-  async function handleFiles(files,sourceType="drag-drop"){
-    const list = Array.from(files||[]);
-    if(!list.length) return;
-    const first = list[0];
-    const root = first.webkitRelativePath ? first.webkitRelativePath.split("/")[0] : first.name || "Dropped Package";
-    const pkg = inspectFiles(list,sourceType,root);
-    let runtime = {status:"loaded",runMode:pkg.runMode,internalHtml:"",internalEntry:pkg.entryCandidates[0] || "",mountedFiles:pkg.detectedFiles,externalInstructions:pkg.warnings};
-
-    if(pkg.runMode === "internal-html"){
-      const entryName = pkg.detectedHtml.find(f=>String(f.name).toLowerCase()==="index.html") || pkg.detectedHtml[0];
-      const original = list.find(file => (file.webkitRelativePath || file.name) === entryName.path || file.name === entryName.name);
-      if(original){
-        runtime.internalHtml = await original.text();
-        runtime.internalEntry = entryName.path;
-      }
+  function handleFiles(files, sourceType) {
+    if (!files || !files.length) {
+      announce("No files were loaded.");
+      return;
     }
 
-    const blueprint = createBlueprint(pkg);
-    update(prev=>{
-      prev.package = pkg;
-      prev.runtime = runtime;
-      prev.nodes = [...prev.nodes.filter(n=>n.source!=="package"),...blueprint.nodes];
-      prev.edges = [...prev.edges.filter(e=>e.source!=="package"),...blueprint.edges];
-      prev.timeline.unshift({id:uid("evt"),timestamp:now(),nodeId:prev.currentNodeId,type:"load",title:`Loaded package: ${pkg.name}`,summary:`Detected ${pkg.importReport.filesFound} file(s). Runtime decision: ${pkg.runMode}.`,tags:["load",pkg.runMode]});
-      return prev;
-    });
-    activeTab = pkg.runMode === "internal-html" ? "play" : "inspect";
-    render();
-  }
-
-  function buildRouteFromNode(nodeId){
-    const node = state.nodes.find(n=>n.id===nodeId);
-    if(!node) return [];
-    const route=[node.id];
-    for(const c of node.connections || []){
-      if(!route.includes(c)) route.unshift(c);
-      if(route.length>=8) break;
-    }
-    return [...new Set(route)];
-  }
-
-  function createPALCard(){
-    const node = currentNode();
-    const captureIds = state.captures.filter(c=>c.nodeId===node.id).map(c=>c.id);
-    const eventIds = state.timeline.filter(e=>e.nodeId===node.id).map(e=>e.id);
-    const card = {
-      cardType:"PALCard",version:"0.1",id:uid("palcard"),gameId:state.project.id,
-      title:`${node.title} Palace Context`,palaceNodeId:node.id,currentRoom:node.title,
-      createdAt:now(),updatedAt:now(),thumbnail:captureIds[0]||null,
-      context:{summary:node.description,route:buildRouteFromNode(node.id),tags:node.tags||[],notes:node.notes||[]},
-      linkedAssets:{captures:captureIds,blueprints:["world-blueprint-v0"],timelineEvents:eventIds},
-      pairing:{gameCardId:null,gameSaveHash:null,pairStatus:"unpaired"}
+    packageFiles = files;
+    const pkg = inspectFiles(files, sourceType);
+    data.package = pkg;
+    data.runtime = {
+      status: "loaded",
+      runMode: pkg.runMode,
+      decision: pkg.decision
     };
-    update(prev=>{
-      prev.memoryCards.palCards.unshift(card);
-      prev.timeline.unshift({id:uid("evt"),timestamp:now(),nodeId:node.id,type:"note",title:`PALCard created: ${card.title}`,summary:"Created Palace Anchor Layer card from the current room.",tags:["PALCard"]});
-      return prev;
-    });
-    activeTab="cards";
-  }
 
-  async function createGameCard(file){
-    if(!file) return;
-    const hash = await sha256File(file);
-    const card = {
-      cardType:"GameCard",version:"0.1",id:uid("gamecard"),gameId:state.project.id,gameTitle:state.project.title,
-      slotId:slug(file.name.replace(/\.[^.]+$/,"")),slotTitle:file.name,createdAt:now(),updatedAt:now(),
-      saveMode:"file-import-fingerprint",
-      saveFile:{name:file.name,relativePath:file.name,hash,sizeBytes:file.size,lastModified:file.lastModified ? new Date(file.lastModified).toISOString() : now()},
-      gameRuntime:{runMode:state.package.runMode,executableName:state.package.detectedExecutables?.[0]?.name || "unknown",packageId:state.project.id}
+    data.nodes = data.nodes.filter(n => n.source !== "package");
+    data.edges = data.edges.filter(e => e.source !== "package");
+
+    const rootNode = {
+      id: "pkg-root",
+      type: "package",
+      source: "package",
+      title: pkg.name,
+      description: pkg.decision,
+      connections: [],
+      notes: pkg.warnings,
+      tags: ["package", pkg.runMode, pkg.sourceType].filter(Boolean),
+      screenshots: [],
+      createdAt: now()
     };
-    update(prev=>{
-      prev.memoryCards.gameCards.unshift(card);
-      prev.timeline.unshift({id:uid("evt"),timestamp:now(),nodeId:prev.currentNodeId,type:"load",title:`GameCard created: ${file.name}`,summary:"Imported save/package file fingerprint.",tags:["GameCard"]});
-      return prev;
+    data.nodes.push(rootNode);
+
+    for (const file of pkg.detectedFiles.slice(0, 80)) {
+      const id = "file-" + slug(file.path);
+      data.nodes.push({
+        id,
+        type: file.extension || "file",
+        source: "package",
+        title: file.name,
+        description: file.path,
+        connections: ["pkg-root"],
+        notes: [],
+        tags: ["file", file.extension || "unknown"],
+        screenshots: [],
+        createdAt: now()
+      });
+      data.edges.push({
+        id: "edge-" + id,
+        from: "pkg-root",
+        to: id,
+        label: file.extension === "exe" ? "native entry candidate" : "contains"
+      });
+    }
+
+    data.timeline.unshift({
+      id: uid("evt"),
+      timestamp: now(),
+      nodeId: data.currentNodeId,
+      type: "load",
+      title: "Package loaded",
+      summary: pkg.name + " loaded with runtime mode " + pkg.runMode + ".",
+      tags: ["load", pkg.runMode]
     });
-    activeTab="cards";
+
+    if (pkg.runMode === "shortcut-detected") {
+      activeTab = "inspect";
+    } else if (pkg.runMode === "native-runtime-required") {
+      activeTab = "inspect";
+    } else {
+      activeTab = "inspect";
+    }
+
+    saveStoredProject();
+    renderShell();
+    announce("Package loaded. Runtime mode is " + pkg.runMode + ".");
   }
 
-  function getPairStatus(game,pal){
-    if(!game && !pal) return "unpaired";
-    if(!game) return "missing-gamecard";
-    if(!pal) return "missing-palcard";
-    const pairing = pal.pairing || {};
-    if(!pairing.gameCardId || pairing.gameCardId !== game.id) return "unpaired";
-    if(pairing.gameSaveHash && game.saveFile?.hash && pairing.gameSaveHash !== game.saveFile.hash) return "out-of-sync";
-    return "synced";
-  }
+  function renderInspect() {
+    const pkg = data.package;
+    main.innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <h2>Package Inspector</h2>
+          <h3>${escapeHtml(pkg.name)}</h3>
+          ${pill(pkg.runMode || "none", toneForRunMode(pkg.runMode))}
+          <p class="muted">${escapeHtml(pkg.decision || data.runtime.decision || "")}</p>
+          ${pkg.warnings?.length ? `<div class="warning">${pkg.warnings.map(w => `<p>${escapeHtml(w)}</p>`).join("")}</div>` : ""}
+        </div>
 
-  function pairCards(gameId,palId){
-    const game = state.memoryCards.gameCards.find(c=>c.id===gameId);
-    const pal = state.memoryCards.palCards.find(c=>c.id===palId);
-    if(!game || !pal) return;
-    const pairId = uid("pair");
-    update(prev=>{
-      prev.memoryCards.palCards = prev.memoryCards.palCards.map(card=>card.id===palId ? {...card,updatedAt:now(),pairing:{gameCardId:gameId,gameSaveHash:game.saveFile?.hash || null,pairStatus:"synced"}} : card);
-      prev.memoryCards.pairs.unshift({id:pairId,title:`${game.slotTitle} + ${pal.currentRoom}`,gameCardId:gameId,palCardId:palId,status:"synced",createdAt:now(),updatedAt:now()});
-      prev.memoryCards.activePairId = pairId;
-      prev.timeline.unshift({id:uid("evt"),timestamp:now(),nodeId:pal.palaceNodeId,type:"note",title:"MEM Save Pair created",summary:`${game.slotTitle} paired with ${pal.currentRoom}.`,tags:["MEM Save Pair"]});
-      return prev;
+        <div class="columns">
+          <div class="card"><div class="dim">Files</div><h2>${pkg.importReport?.filesFound || 0}</h2></div>
+          <div class="card"><div class="dim">Folders</div><h2>${pkg.importReport?.foldersFound || 0}</h2></div>
+          <div class="card"><div class="dim">Scripts</div><h2>${pkg.importReport?.scriptsFound || 0}</h2></div>
+          <div class="card"><div class="dim">Executables</div><h2>${pkg.importReport?.executablesFound || 0}</h2></div>
+          <div class="card"><div class="dim">Shortcuts</div><h2>${pkg.importReport?.shortcutsFound || 0}</h2></div>
+          <div class="card"><div class="dim">Saves</div><h2>${pkg.importReport?.savesFound || 0}</h2></div>
+        </div>
+
+        <div class="card">
+          <h2>Detected Entries</h2>
+          ${pkg.entryCandidates?.length ? pkg.entryCandidates.map(e => `<div class="file-row mono"><strong>entry candidate</strong><br>${escapeHtml(e)}</div>`).join("") : `<p class="muted">No entry candidates detected.</p>`}
+        </div>
+
+        <div class="card">
+          <h2>Runtime Console Decision</h2>
+          <p class="muted">${escapeHtml(pkg.decision || "")}</p>
+          <button class="btn primary" id="goRunBtn">▶ Go To Run / Attach</button>
+          <button class="btn" id="createGameCardFromPackageBtn">💳 Create GameCard From Package</button>
+        </div>
+
+        <div class="card">
+          <h2>File Tree</h2>
+          ${(pkg.detectedFiles || []).slice(0, 120).map(f => `
+            <div class="file-row">
+              <strong>${escapeHtml(f.name)}</strong>
+              <div class="dim">${escapeHtml(f.path)} · ${escapeHtml(f.extension || "file")} · ${formatBytes(f.size)}</div>
+            </div>
+          `).join("") || `<p class="muted">No files loaded.</p>`}
+        </div>
+      </div>
+    `;
+
+    el("goRunBtn").addEventListener("click", () => {
+      activeTab = "run";
+      renderShell();
     });
+    el("createGameCardFromPackageBtn").addEventListener("click", createGameCardFromPackage);
   }
 
-  function pairViews(){
-    return state.memoryCards.pairs.map(pair=>{
-      const gameCard = state.memoryCards.gameCards.find(c=>c.id===pair.gameCardId);
-      const palCard = state.memoryCards.palCards.find(c=>c.id===pair.palCardId);
-      return {...pair,gameCard,palCard,status:getPairStatus(gameCard,palCard)};
-    });
-  }
+  function renderRun() {
+    const mode = data.package.runMode;
+    let message = "";
 
-  function buildDrawer(titleOverride=""){
-    const pairs=pairViews();
-    const activePair = pairs.find(p=>p.id===state.memoryCards.activePairId) || pairs[0] || null;
-    const node=currentNode();
-    return {
-      drawerId:uid("drawer"),title:titleOverride.trim() || `${state.package.name !== "No package loaded" ? state.package.name : state.project.title} - ${node.title}`,
-      type:"progression-drawer",status:activePair ? activePair.status : "legacy",createdAt:now(),updatedAt:now(),
-      packageId:state.project.id,packageName:state.package.name,runtimeMode:state.runtime.runMode,activeTab,
-      currentNodeId:state.currentNodeId,currentRoom:node.title,activePairId:activePair?.id || state.memoryCards.activePairId || "",
-      gameCardId:activePair?.gameCardId || "",palCardId:activePair?.palCardId || "",
-      lastCaptureId:state.captures?.[0]?.id || "",timelineCursor:state.timeline?.[0]?.id || "",
-      layout:{leftPanel:state.runtime.runMode==="internal-html" ? "internal-html" : "capture",rightPanel:"blueprint",sidePanel:"memoryCards"},
-      summary:`Resume ${node.title} with package, palace, card and timeline context.`
-    };
-  }
+    if (mode === "shortcut-detected") {
+      message = "Shortcut detected. A .lnk file is not the real game. Use Open file location in Windows, then load the real Final Fantasy VII game folder or launcher EXE.";
+    } else if (mode === "native-runtime-required") {
+      message = "Native Windows package detected. GitHub Pages cannot directly launch this EXE. Start the game normally in Windows, then press Attach Capture to bind the running game window to this MEM Palace terminal.";
+    } else if (mode === "browser-html") {
+      message = "Browser HTML package detected. If the entry file is self-contained, it can be previewed here. Asset rewriting is not used in this dependency-free build.";
+    } else {
+      message = "No runnable browser package is mounted. You can still attach screen capture and use the terminal as an observation and save surface.";
+    }
 
-  function saveDrawer(){
-    const drawer=buildDrawer();
-    update(prev=>{
-      prev.progressionDrawers.activeDrawerId=drawer.drawerId;
-      prev.progressionDrawers.drawers.unshift(drawer);
-      prev.timeline.unshift({id:uid("evt"),timestamp:now(),nodeId:prev.currentNodeId,type:"checkpoint",title:"Progression Drawer created",summary:`${drawer.title} saved as a resumable MEM Palace session drawer.`,tags:["drawer"]});
-      return prev;
-    });
-    activeTab="history";
-  }
+    main.innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <h2>Run / Attach View</h2>
+          <p class="muted">${escapeHtml(message)}</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+            <button class="btn primary" id="attachCaptureBtn">📷 Attach Capture</button>
+            <button class="btn" id="captureMomentBtn">➕ Capture Moment</button>
+            <button class="btn" id="stopCaptureBtn">Stop Capture</button>
+            <button class="btn" id="makePALCardBtn">💳 Create PALCard From Current Room</button>
+          </div>
+          <video id="captureVideo" autoplay muted playsinline></video>
+        </div>
 
-  function saveFullSession(){
-    const drawer=buildDrawer();
-    const next = structuredClone(state);
-    next.progressionDrawers.activeDrawerId = drawer.drawerId;
-    next.progressionDrawers.drawers.unshift(drawer);
-    next.timeline.unshift({id:uid("evt"),timestamp:now(),nodeId:next.currentNodeId,type:"checkpoint",title:"Full Session saved",summary:`${drawer.title} saved as a full MEM Palace session.`,tags:["drawer","full-session"]});
-    next.project.updatedAt=now();
-    state=next;
-    saveStored();
-    const payload={sessionVersion:"0.1",exportedAt:now(),project:state.project,package:state.package,runtime:state.runtime,currentNode:currentNode(),memoryCards:state.memoryCards,progressionDrawers:state.progressionDrawers,activeDrawer:drawer,palaceSnapshot:state,browserBetaNote:"Single-file MEM Palace session export."};
-    downloadText(`${slug(state.project.title)}-full-session.memsession.json`,JSON.stringify(payload,null,2));
-    activeTab="history";
-    render();
-  }
+        <div class="columns two">
+          <div class="card">
+            <h2>Runtime Bay</h2>
+            ${pill(data.package.runMode || "none", toneForRunMode(data.package.runMode))}
+            <p class="muted">${escapeHtml(data.runtime.decision || "")}</p>
+          </div>
+          <div class="card">
+            <h2>Console Meaning</h2>
+            <p class="muted">
+              In GitHub Pages mode this is the memory console and observation surface.
+              Direct native launch requires the same HTML shell wrapped by a desktop runtime core.
+            </p>
+          </div>
+        </div>
 
-  function exportDrawer(drawer){
-    if(!drawer) return;
-    const payload={drawerVersion:"0.1",exportedAt:now(),drawer,linkedPair:pairViews().find(p=>p.id===drawer.activePairId)||null,palaceSnapshot:state};
-    downloadText(`${slug(drawer.title)}.memdrawer.json`,JSON.stringify(payload,null,2));
-  }
+        <div class="card">
+          <h2>Recent Captures</h2>
+          ${data.captures.slice(0, 8).map(c => `
+            <div class="file-row">
+              <strong>${escapeHtml(c.title)}</strong>
+              <div class="dim">${escapeHtml(c.createdAt)}</div>
+              <img class="capture-preview" src="${c.screenshot}" alt="${escapeHtml(c.title)}">
+            </div>
+          `).join("") || `<p class="muted">No captures yet.</p>`}
+        </div>
+      </div>
+    `;
 
-  function exportAllDrawers(){
-    const payload={drawerArchiveVersion:"0.1",title:`${state.project.title} Progression Drawers`,exportedAt:now(),progressionDrawers:state.progressionDrawers,project:state.project,palaceSnapshot:state};
-    downloadText(`${slug(state.project.title)}-drawers.memdrawer.json`,JSON.stringify(payload,null,2));
-  }
+    el("attachCaptureBtn").addEventListener("click", startCapture);
+    el("captureMomentBtn").addEventListener("click", captureMoment);
+    el("stopCaptureBtn").addEventListener("click", stopCapture);
+    el("makePALCardBtn").addEventListener("click", createPALCardFromCurrentNode);
 
-  function resumeDrawer(drawer){
-    update(prev=>{
-      prev.currentNodeId = drawer.currentNodeId || prev.currentNodeId;
-      prev.memoryCards.activePairId = drawer.activePairId || prev.memoryCards.activePairId || "";
-      prev.progressionDrawers.activeDrawerId = drawer.drawerId;
-      prev.progressionDrawers.drawers = prev.progressionDrawers.drawers.map(d=>d.drawerId===drawer.drawerId ? {...d,updatedAt:now()} : d);
-      prev.timeline.unshift({id:uid("evt"),timestamp:now(),nodeId:prev.currentNodeId,type:"load",title:"Progression Drawer resumed",summary:`Restored workspace drawer: ${drawer.title}.`,tags:["drawer","resume"]});
-      return prev;
-    });
-    activeTab = drawer.activeTab && drawer.activeTab !== "history" ? drawer.activeTab : "palace";
-  }
-
-  async function importMemFile(file){
-    if(!file) return;
-    try{
-      const parsed = JSON.parse(await file.text());
-      if(parsed.sessionVersion && parsed.palaceSnapshot?.nodes){
-        state = parsed.palaceSnapshot;
-        saveStored();
-        activeTab="history";
-        render();
-        return;
-      }
-      if(parsed.drawerArchiveVersion && parsed.progressionDrawers){
-        update(prev=>{prev.progressionDrawers=parsed.progressionDrawers;return prev;});
-        activeTab="history"; render(); return;
-      }
-      if(parsed.drawerVersion && parsed.drawer){
-        update(prev=>{
-          prev.progressionDrawers.activeDrawerId=parsed.drawer.drawerId;
-          prev.progressionDrawers.drawers.unshift(parsed.drawer);
-          return prev;
-        });
-        activeTab="history"; render(); return;
-      }
-      if(parsed.palaceProject?.nodes || parsed.palaceSnapshot?.nodes){
-        state = parsed.palaceProject || parsed.palaceSnapshot;
-        saveStored(); render(); return;
-      }
-      if(parsed.memoryCards){
-        update(prev=>{prev.memoryCards=parsed.memoryCards;return prev;});
-        activeTab="cards"; render(); return;
-      }
-      alert("MEM file loaded, but no known MEM Palace structure was found.");
-    }catch(e){
-      alert("Could not import this MEM file. It is not valid JSON.");
+    if (captureStream) {
+      const video = el("captureVideo");
+      video.srcObject = captureStream;
     }
   }
 
-  async function startCapture(){
-    if(!navigator.mediaDevices?.getDisplayMedia){
+  async function startCapture() {
+    if (!navigator.mediaDevices?.getDisplayMedia) {
       alert("Screen capture is not available in this browser.");
       return;
     }
-    const stream = await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});
-    captureStream = stream;
-    const video = document.getElementById("captureVideo");
-    if(video) video.srcObject = stream;
-    const track = stream.getVideoTracks()[0];
-    if(track){
+
+    captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+    const video = el("captureVideo");
+    if (video) video.srcObject = captureStream;
+
+    const [track] = captureStream.getVideoTracks();
+    if (track) {
       track.onended = () => {
         captureStream = null;
-        const v = document.getElementById("captureVideo");
-        if(v) v.srcObject = null;
-        render();
+        const v = el("captureVideo");
+        if (v) v.srcObject = null;
       };
     }
+
+    announce("Screen capture attached.");
   }
 
-  function stopCapture(){
-    if(captureStream) captureStream.getTracks().forEach(t=>t.stop());
-    captureStream=null;
-    const video = document.getElementById("captureVideo");
-    if(video) video.srcObject = null;
+  function stopCapture() {
+    if (captureStream) {
+      captureStream.getTracks().forEach(track => track.stop());
+    }
+    captureStream = null;
+    const video = el("captureVideo");
+    if (video) video.srcObject = null;
+    announce("Screen capture stopped.");
   }
 
-  function captureMoment(){
-    const video = document.getElementById("captureVideo");
-    if(!video || !video.videoWidth){
-      alert("Start Attach Capture first, then press Capture Moment.");
+  function captureMoment() {
+    const video = el("captureVideo");
+    if (!video || !video.videoWidth) {
+      alert("Start Attach Capture first, then choose the running game window.");
       return;
     }
-    const canvas=document.createElement("canvas");
-    canvas.width=video.videoWidth;
-    canvas.height=video.videoHeight;
-    const ctx=canvas.getContext("2d");
-    ctx.drawImage(video,0,0);
-    const dataUrl=canvas.toDataURL("image/webp",.82);
-    const node=currentNode();
-    const captureId=uid("cap");
-    update(prev=>{
-      prev.captures.unshift({id:captureId,nodeId:prev.currentNodeId,screenshot:dataUrl,createdAt:now(),title:`Capture at ${node.title}`});
-      prev.nodes=prev.nodes.map(n=>n.id===prev.currentNodeId ? {...n,screenshots:[captureId,...(n.screenshots||[])]} : n);
-      prev.timeline.unshift({id:uid("evt"),timestamp:now(),nodeId:prev.currentNodeId,type:"capture",title:"Captured moment",summary:`Screenshot attached to ${node.title}.`,tags:["capture"]});
-      return prev;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+    const screenshot = canvas.toDataURL("image/webp", 0.82);
+
+    const node = currentNode();
+    const capture = {
+      id: uid("cap"),
+      nodeId: node.id,
+      title: "Capture at " + node.title,
+      screenshot,
+      createdAt: now()
+    };
+
+    data.captures.unshift(capture);
+    node.screenshots = [capture.id, ...(node.screenshots || [])];
+
+    data.timeline.unshift({
+      id: uid("evt"),
+      timestamp: now(),
+      nodeId: node.id,
+      type: "capture",
+      title: "Captured moment",
+      summary: "Screenshot attached to " + node.title + ".",
+      tags: ["capture"]
     });
+
+    saveStoredProject();
+    renderShell();
+    announce("Capture saved to " + node.title + ".");
   }
 
-  function addNode(type){
-    const input=document.getElementById("newNodeTitle");
-    const title=(input?.value||"").trim() || `New ${type}`;
-    const node=currentNode();
-    const id=slug(`${type}-${title}-${Date.now()}`);
-    update(prev=>{
-      prev.nodes.unshift({id,type,title,description:`Captured ${type} node from the current session.`,connections:node?[node.id]:[],characters:[],items:[],events:[],screenshots:[],notes:[],tags:[type],createdAt:now()});
-      prev.edges.unshift({id:uid("edge"),from:node.id,to:id,label:"observed route"});
-      prev.currentNodeId=id;
-      prev.timeline.unshift({id:uid("evt"),timestamp:now(),nodeId:id,type,title:`New ${type}: ${title}`,summary:"Created while mapping the loaded world.",tags:[type,"manual"]});
-      return prev;
+  function renderCards() {
+    const cards = data.memoryCards;
+
+    main.innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <h2>Memory Card Bay</h2>
+          <p class="muted">
+            GameCard stores the package/save identity. PALCard stores the palace room context.
+            Together they form the MEM Save Pair.
+          </p>
+          <button class="btn primary" id="createGameCardBtn">💳 Create GameCard From Package</button>
+          <button class="btn" id="createPALCardBtn">💳 Create PALCard From Current Room</button>
+          <button class="btn" id="autoPairBtn">🔗 Auto-Pair Latest</button>
+        </div>
+
+        <div class="columns two">
+          <div class="card">
+            <h2>GameCards</h2>
+            ${cards.gameCards.map(card => `
+              <div class="file-row">
+                <strong>${escapeHtml(card.slotTitle)}</strong>
+                ${pill("GameCard", "blue")}
+                <div class="dim">${escapeHtml(card.packageName || card.gameTitle || "")}</div>
+                <div class="mono dim">${escapeHtml(card.packageHash || card.id)}</div>
+              </div>
+            `).join("") || `<p class="muted">No GameCards yet.</p>`}
+          </div>
+
+          <div class="card">
+            <h2>PALCards</h2>
+            ${cards.palCards.map(card => `
+              <div class="file-row">
+                <strong>${escapeHtml(card.title)}</strong>
+                ${pill("PALCard")}
+                <div class="dim">Room: ${escapeHtml(card.currentRoom)}</div>
+              </div>
+            `).join("") || `<p class="muted">No PALCards yet.</p>`}
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>MEM Save Pairs</h2>
+          ${cards.pairs.map(pair => `
+            <div class="file-row">
+              <strong>${escapeHtml(pair.title)}</strong>
+              ${pill(pair.status || "paired", "good")}
+              <div style="margin-top:8px;">
+                <button class="btn" data-loadpair="${pair.id}">Load Pair</button>
+                <button class="btn" data-exportpair="${pair.id}">Export Pair</button>
+                <button class="btn danger" data-deletepair="${pair.id}">Unpair</button>
+              </div>
+            </div>
+          `).join("") || `<p class="muted">No paired cards yet.</p>`}
+        </div>
+      </div>
+    `;
+
+    el("createGameCardBtn").addEventListener("click", createGameCardFromPackage);
+    el("createPALCardBtn").addEventListener("click", createPALCardFromCurrentNode);
+    el("autoPairBtn").addEventListener("click", autoPairLatest);
+
+    document.querySelectorAll("[data-loadpair]").forEach(btn => btn.addEventListener("click", () => loadPair(btn.dataset.loadpair)));
+    document.querySelectorAll("[data-exportpair]").forEach(btn => btn.addEventListener("click", () => exportPair(btn.dataset.exportpair)));
+    document.querySelectorAll("[data-deletepair]").forEach(btn => btn.addEventListener("click", () => deletePair(btn.dataset.deletepair)));
+  }
+
+  async function quickHashText(text) {
+    const buffer = new TextEncoder().encode(text);
+    const digest = await crypto.subtle.digest("SHA-256", buffer);
+    return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function createGameCardFromPackage() {
+    if (!data.package || data.package.name === "No package loaded") {
+      alert("Load a package first.");
+      return;
+    }
+
+    const hashBase = JSON.stringify({
+      name: data.package.name,
+      files: (data.package.detectedFiles || []).map(f => [f.path, f.size, f.lastModified])
     });
-  }
 
-  function addNote(){
-    const area=document.getElementById("noteText");
-    const text=(area?.value||"").trim();
-    if(!text) return;
-    update(prev=>{
-      prev.nodes=prev.nodes.map(n=>n.id===prev.currentNodeId ? {...n,notes:[text,...(n.notes||[])]} : n);
-      prev.timeline.unshift({id:uid("evt"),timestamp:now(),nodeId:prev.currentNodeId,type:"note",title:"Manual note",summary:text,tags:["note"]});
-      return prev;
+    const packageHash = await quickHashText(hashBase);
+
+    const card = {
+      cardType: "GameCard",
+      version: "0.2",
+      id: uid("gamecard"),
+      gameId: data.project.id,
+      gameTitle: data.project.title,
+      slotTitle: data.package.name,
+      packageName: data.package.name,
+      packageMode: data.package.runMode,
+      packageHash,
+      entryCandidates: data.package.entryCandidates || [],
+      createdAt: now(),
+      updatedAt: now()
+    };
+
+    data.memoryCards.gameCards.unshift(card);
+    data.timeline.unshift({
+      id: uid("evt"),
+      timestamp: now(),
+      nodeId: data.currentNodeId,
+      type: "card",
+      title: "GameCard created",
+      summary: "Package GameCard created for " + data.package.name + ".",
+      tags: ["GameCard"]
     });
+
+    saveStoredProject();
+    activeTab = "cards";
+    renderShell();
+    announce("GameCard created.");
   }
 
-  function exportProject(){
-    downloadText(`${slug(state.project.title)}.mempalace.json`,JSON.stringify(state,null,2));
+  function createPALCardFromCurrentNode() {
+    const node = currentNode();
+    const capturesForNode = data.captures.filter(c => c.nodeId === node.id).map(c => c.id);
+
+    const card = {
+      cardType: "PALCard",
+      version: "0.2",
+      id: uid("palcard"),
+      gameId: data.project.id,
+      title: node.title + " Palace Context",
+      palaceNodeId: node.id,
+      currentRoom: node.title,
+      createdAt: now(),
+      updatedAt: now(),
+      context: {
+        summary: node.description,
+        tags: node.tags || [],
+        notes: node.notes || []
+      },
+      linkedAssets: {
+        captures: capturesForNode
+      }
+    };
+
+    data.memoryCards.palCards.unshift(card);
+    data.timeline.unshift({
+      id: uid("evt"),
+      timestamp: now(),
+      nodeId: node.id,
+      type: "card",
+      title: "PALCard created",
+      summary: "Palace Anchor Layer card created for " + node.title + ".",
+      tags: ["PALCard"]
+    });
+
+    saveStoredProject();
+    activeTab = "cards";
+    renderShell();
+    announce("PALCard created.");
   }
 
-  function exportHtmlGuide(){
-    const body = state.nodes.map(node=>`<section><h2>${escapeHtml(node.title)}</h2><p>${escapeHtml(node.description||"")}</p><p><code>${escapeHtml(node.type)}</code> · ${(node.tags||[]).map(escapeHtml).join(", ")}</p><ul>${(node.notes||[]).map(n=>`<li>${escapeHtml(n)}</li>`).join("")}</ul></section>`).join("");
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(state.project.title)}</title><style>body{font-family:system-ui;background:#110905;color:#ffe8ce;padding:32px}section{border:1px solid #c87935;padding:16px;border-radius:16px;margin:16px 0}code{color:#ffb36b}</style></head><body><h1>${escapeHtml(state.project.title)}</h1><p>${escapeHtml(state.project.subtitle)}</p>${body}</body></html>`;
-    downloadText(`${slug(state.project.title)}-guide.html`,html,"text/html");
+  function autoPairLatest() {
+    const game = data.memoryCards.gameCards[0];
+    const pal = data.memoryCards.palCards[0];
+
+    if (!game || !pal) {
+      alert("Create at least one GameCard and one PALCard first.");
+      return;
+    }
+
+    const pair = {
+      id: uid("pair"),
+      title: game.slotTitle + " plus " + pal.currentRoom,
+      gameCardId: game.id,
+      palCardId: pal.id,
+      status: "synced",
+      createdAt: now(),
+      updatedAt: now()
+    };
+
+    data.memoryCards.pairs.unshift(pair);
+    data.memoryCards.activePairId = pair.id;
+
+    saveStoredProject();
+    renderShell();
+    announce("Latest GameCard and PALCard paired.");
   }
 
-  function activePair(){
-    return pairViews().find(p=>p.id===state.memoryCards.activePairId) || pairViews()[0] || null;
+  function loadPair(pairId) {
+    const pair = data.memoryCards.pairs.find(p => p.id === pairId);
+    const pal = data.memoryCards.palCards.find(p => p.id === pair?.palCardId);
+    if (pal?.palaceNodeId) data.currentNodeId = pal.palaceNodeId;
+    data.memoryCards.activePairId = pairId;
+    saveStoredProject();
+    activeTab = "blueprint";
+    renderShell();
+    announce("MEM Save Pair loaded.");
   }
 
-  function runtimeMessage(){
-    const pkg=state.package;
-    if(pkg.name==="No package loaded") return "No package loaded yet. Drop a file, folder, save, HTML page, or game package.";
-    if(pkg.runMode==="internal-html") return "Browser-runnable HTML entry detected. The terminal can boot it inside the Run screen.";
-    if(pkg.runMode==="native-runtime-required") return "Windows/native package detected. The terminal binds it as a PackageCard, tracks it, saves drawers and can attach to a running game window. Direct EXE launch from GitHub Pages requires a desktop/native runtime core.";
-    return "Package loaded for inspection, blueprint, memory cards, notes and session saves.";
+  function exportPair(pairId) {
+    const pair = data.memoryCards.pairs.find(p => p.id === pairId);
+    if (!pair) return;
+    const payload = {
+      memSaveVersion: "0.2",
+      exportedAt: now(),
+      pair,
+      gameCard: data.memoryCards.gameCards.find(c => c.id === pair.gameCardId) || null,
+      palCard: data.memoryCards.palCards.find(c => c.id === pair.palCardId) || null,
+      palaceProject: data
+    };
+    downloadText(slug(pair.title) + ".memsave.json", JSON.stringify(payload, null, 2), "application/json");
   }
 
-  function renderTabs(){
-    document.getElementById("tabs").innerHTML = tabs.map(([id,label])=>`<button class="tab ${activeTab===id?"active":""}" data-tab="${id}">${label}</button>`).join("");
-    document.querySelectorAll(".tab").forEach(btn=>btn.onclick=()=>{activeTab=btn.dataset.tab;render();});
+  function deletePair(pairId) {
+    data.memoryCards.pairs = data.memoryCards.pairs.filter(p => p.id !== pairId);
+    if (data.memoryCards.activePairId === pairId) data.memoryCards.activePairId = "";
+    saveStoredProject();
+    renderShell();
   }
 
-  function renderSide(){
-    const node=currentNode();
-    document.getElementById("statNodes").textContent=state.nodes.length;
-    document.getElementById("statEvents").textContent=state.timeline.length;
-    document.getElementById("statCaptures").textContent=state.captures.length;
-    document.getElementById("statGameCards").textContent=state.memoryCards.gameCards.length;
-    document.getElementById("statPALCards").textContent=state.memoryCards.palCards.length;
-    document.getElementById("statDrawers").textContent=state.progressionDrawers.drawers.length;
-    document.getElementById("sideRoom").textContent=node.title;
-    document.getElementById("sideType").textContent=node.type;
-    document.getElementById("sideTags").innerHTML=(node.tags||[]).map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join("");
-    document.getElementById("runtimeDecision").textContent=runtimeMessage();
-    const pill=document.getElementById("runtimePill");
-    pill.textContent=state.package.runMode==="none" ? "Runtime Bay ready" : state.package.runMode;
-    pill.className = "pill " + (state.package.runMode==="internal-html"?"green":state.package.runMode==="native-runtime-required"?"red":"blue");
-    document.getElementById("saveDrawerBtn").onclick=saveDrawer;
-    document.getElementById("saveSessionBtn").onclick=saveFullSession;
-    document.getElementById("exportActiveDrawerBtn").onclick=()=>{
-      const drawer=state.progressionDrawers.drawers.find(d=>d.drawerId===state.progressionDrawers.activeDrawerId);
-      if(drawer) exportDrawer(drawer);
+  function renderDrawers() {
+    const drawers = data.progressionDrawers.drawers || [];
+    main.innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <h2>Progression Drawers</h2>
+          <p class="muted">
+            A drawer saves how the workspace was left: package, room, active cards, runtime mode, captures, notes and layout.
+          </p>
+          <button class="btn primary" id="makeDrawerBtn">📦 Save Current Drawer</button>
+          <button class="btn" id="exportDrawersBtn">⬇️ Export All Drawers</button>
+        </div>
+
+        <div class="card">
+          <h2>Saved Drawers</h2>
+          ${drawers.map(drawer => `
+            <div class="file-row">
+              <strong>${escapeHtml(drawer.title)}</strong>
+              ${pill(drawer.status || "legacy", drawer.status === "legacy" ? "purple" : "good")}
+              <div class="dim">Room: ${escapeHtml(drawer.currentRoom)} · Runtime: ${escapeHtml(drawer.runtimeMode)} · Updated: ${escapeHtml(drawer.updatedAt)}</div>
+              <div style="margin-top:8px;">
+                <button class="btn" data-resumedrawer="${drawer.drawerId}">Resume</button>
+                <button class="btn" data-exportdrawer="${drawer.drawerId}">Export</button>
+                <button class="btn danger" data-deletedrawer="${drawer.drawerId}">Delete</button>
+              </div>
+            </div>
+          `).join("") || `<p class="muted">No drawers yet.</p>`}
+        </div>
+      </div>
+    `;
+
+    el("makeDrawerBtn").addEventListener("click", createProgressionDrawer);
+    el("exportDrawersBtn").addEventListener("click", exportAllDrawers);
+    document.querySelectorAll("[data-resumedrawer]").forEach(btn => btn.addEventListener("click", () => resumeDrawer(btn.dataset.resumedrawer)));
+    document.querySelectorAll("[data-exportdrawer]").forEach(btn => btn.addEventListener("click", () => exportDrawer(btn.dataset.exportdrawer)));
+    document.querySelectorAll("[data-deletedrawer]").forEach(btn => btn.addEventListener("click", () => deleteDrawer(btn.dataset.deletedrawer)));
+  }
+
+  function buildProgressionDrawer() {
+    const node = currentNode();
+    const pairId = data.memoryCards.activePairId || data.memoryCards.pairs[0]?.id || "";
+    const pair = data.memoryCards.pairs.find(p => p.id === pairId);
+
+    return {
+      drawerId: uid("drawer"),
+      title: (data.package.name !== "No package loaded" ? data.package.name : data.project.title) + " - " + node.title,
+      type: "progression-drawer",
+      status: pair ? (pair.status || "synced") : "legacy",
+      createdAt: now(),
+      updatedAt: now(),
+      packageId: data.project.id,
+      packageName: data.package.name,
+      runtimeMode: data.package.runMode,
+      activeTab,
+      currentNodeId: data.currentNodeId,
+      currentRoom: node.title,
+      activePairId: pairId,
+      lastCaptureId: data.captures[0]?.id || "",
+      timelineCursor: data.timeline[0]?.id || "",
+      summary: "Resume " + node.title + " with package, palace, card, and timeline context."
     };
   }
 
-  function renderLoad(){
-    return `<div class="stack">
-      <div id="dropzone" class="drop">
-        <strong>Drop files or folders here</strong>
-        <p>This terminal accepts dropped EXE, HTML, save files, folders, assets and MEM exports. It will detect the runtime route, create the blueprint, and bind the package to the memory palace.</p>
-        <div class="row" style="justify-content:center;margin-top:14px">
-          <button class="btn" id="chooseFiles">📁 Choose Files</button>
-          <button class="btn ghost" id="chooseFolder">📂 Choose Folder</button>
-          <button class="btn ghost" id="importMem">📄 Import MEM File</button>
-        </div>
-      </div>
-      <div class="card">
-        <h2>Runtime Rule</h2>
-        <div class="notice">This is a single-file GitHub Pages console. It can boot browser-native HTML packages inside the screen. It can inspect, bind and attach to native Windows packages. Direct Windows EXE launch from GitHub Pages needs a desktop/native runtime core because the browser sandbox does not expose operating-system process launch.</div>
-      </div>
-    </div>`;
+  function createProgressionDrawer() {
+    const drawer = buildProgressionDrawer();
+    data.progressionDrawers.activeDrawerId = drawer.drawerId;
+    data.progressionDrawers.drawers.unshift(drawer);
+    data.timeline.unshift({
+      id: uid("evt"),
+      timestamp: now(),
+      nodeId: data.currentNodeId,
+      type: "checkpoint",
+      title: "Progression Drawer created",
+      summary: drawer.title + " saved as a resumable MEM Palace session drawer.",
+      tags: ["drawer"]
+    });
+    saveStoredProject();
+    activeTab = "drawers";
+    renderShell();
+    announce("Progression drawer saved.");
   }
 
-  function renderInspect(){
-    const pkg=state.package;
-    const rows=(pkg.entryCandidates||[]).map(e=>`<div class="fileitem"><b>${escapeHtml(e)}</b><span class="tiny">entry candidate</span></div>`).join("") || `<p class="muted">No entry candidates detected.</p>`;
-    const files=(pkg.detectedFiles||[]).map(f=>`<div class="fileitem"><b>${escapeHtml(f.name)}</b><p class="tiny">${escapeHtml(f.path)} · ${escapeHtml(f.extension||"file")} · ${fmtBytes(f.size)}</p></div>`).join("") || `<p class="muted">No files loaded.</p>`;
-    const warning=(pkg.warnings||[]).map(w=>`<div class="danger">${escapeHtml(w)}</div>`).join("");
-    return `<div class="stack">
-      <div class="card">
-        <div class="row" style="justify-content:space-between">
-          <div><h2>Package Inspector</h2><p class="muted">${escapeHtml(pkg.name)}</p></div>
-          <span class="pill ${pkg.runMode==="internal-html"?"green":pkg.runMode==="native-runtime-required"?"red":"blue"}">${escapeHtml(pkg.runMode)}</span>
-        </div>
-      </div>
-      ${warning}
-      <div class="panelgrid">
-        <div class="stat"><div class="k">Files</div><div class="v">${pkg.importReport?.filesFound || 0}</div></div>
-        <div class="stat"><div class="k">Folders</div><div class="v">${pkg.importReport?.foldersFound || 0}</div></div>
-        <div class="stat"><div class="k">Scripts</div><div class="v">${pkg.importReport?.scriptsFound || 0}</div></div>
-      </div>
-      <div class="card">
-        <h2>Detected Entries</h2>
-        <div class="stack">${rows}</div>
-      </div>
-      <div class="card">
-        <h2>File Tree</h2>
-        <div class="stack">${files}</div>
-      </div>
-      <div class="card">
-        <h2>Runtime Console Decision</h2>
-        <div class="${pkg.runMode==="internal-html"?"ok":pkg.runMode==="native-runtime-required"?"danger":"notice"}">${escapeHtml(runtimeMessage())}</div>
-        <div class="row" style="margin-top:12px">
-          <button class="btn" id="goPlay">▶ Go To Run / Attach</button>
-          <button class="btn ghost" id="createPackageCard">💳 Create GameCard From Package</button>
-        </div>
-      </div>
-    </div>`;
+  function resumeDrawer(drawerId) {
+    const drawer = data.progressionDrawers.drawers.find(d => d.drawerId === drawerId);
+    if (!drawer) return;
+    data.currentNodeId = drawer.currentNodeId || data.currentNodeId;
+    data.memoryCards.activePairId = drawer.activePairId || data.memoryCards.activePairId;
+    data.progressionDrawers.activeDrawerId = drawer.drawerId;
+    drawer.updatedAt = now();
+    saveStoredProject();
+    activeTab = drawer.activeTab && drawer.activeTab !== "drawers" ? drawer.activeTab : "palace";
+    renderShell();
+    announce("Progression drawer resumed.");
   }
 
-  function renderPlay(){
-    const htmlMode = state.runtime.runMode==="internal-html" && state.runtime.internalHtml;
-    return `<div class="stack">
-      <div class="card">
-        <div class="row" style="justify-content:space-between">
-          <h2>Run / Attach Screen</h2>
-          <div class="row">
-            <button class="btn ghost" id="attachCapture">📷 Attach Capture</button>
-            <button class="btn ghost" id="stopCapture">Stop Capture</button>
-            <button class="btn" id="captureMoment">➕ Capture Moment</button>
+  function exportDrawer(drawerIdOrObject) {
+    const drawer = typeof drawerIdOrObject === "string"
+      ? data.progressionDrawers.drawers.find(d => d.drawerId === drawerIdOrObject)
+      : drawerIdOrObject;
+
+    if (!drawer) return;
+
+    const payload = {
+      drawerVersion: "0.2",
+      exportedAt: now(),
+      drawer,
+      palaceSnapshot: data
+    };
+
+    downloadText(slug(drawer.title) + ".memdrawer.json", JSON.stringify(payload, null, 2), "application/json");
+  }
+
+  function deleteDrawer(drawerId) {
+    data.progressionDrawers.drawers = data.progressionDrawers.drawers.filter(d => d.drawerId !== drawerId);
+    if (data.progressionDrawers.activeDrawerId === drawerId) data.progressionDrawers.activeDrawerId = "";
+    saveStoredProject();
+    renderShell();
+  }
+
+  function exportAllDrawers() {
+    const payload = {
+      drawerArchiveVersion: "0.2",
+      title: data.project.title + " Progression Drawers",
+      exportedAt: now(),
+      progressionDrawers: data.progressionDrawers,
+      palaceSnapshot: data
+    };
+    downloadText(slug(data.project.title) + "-drawers.memdrawer.json", JSON.stringify(payload, null, 2), "application/json");
+  }
+
+  function renderPalace() {
+    const node = currentNode();
+    main.innerHTML = `
+      <div class="columns two">
+        <div class="card">
+          <h2>Palace Rooms</h2>
+          ${data.nodes.map(n => `
+            <button class="node-row" data-node="${n.id}" style="width:100%; text-align:left; color:var(--text); cursor:pointer; ${n.id === node.id ? "border-color: rgba(255,179,71,.58); background: rgba(255,179,71,.12);" : ""}">
+              <strong>${escapeHtml(n.title)}</strong>
+              ${pill(n.type)}
+              <div class="dim">${escapeHtml(n.description)}</div>
+            </button>
+          `).join("")}
+        </div>
+
+        <div class="card">
+          <h2>Current Room</h2>
+          <h3>${escapeHtml(node.title)}</h3>
+          <p class="muted">${escapeHtml(node.description)}</p>
+          <div>${(node.tags || []).map(tag => pill(tag)).join("")}</div>
+          <hr style="border-color:rgba(255,255,255,.08); margin:16px 0;">
+          <label class="dim">New node title</label>
+          <input id="newNodeTitle" type="text" placeholder="Example: Sector 7 train platform">
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+            <button class="btn primary" id="newLocationBtn">New Location</button>
+            <button class="btn" id="newBattleBtn">New Battle</button>
           </div>
         </div>
-        <div class="screen" style="margin-top:12px">
-          ${htmlMode ? `<iframe id="runtimeFrame" title="Browser runtime" sandbox="allow-scripts allow-same-origin" srcdoc="${escapeHtml(state.runtime.internalHtml)}"></iframe>` : `<video id="captureVideo" class="video" autoplay muted playsinline></video>`}
+      </div>
+    `;
+
+    document.querySelectorAll("[data-node]").forEach(btn => btn.addEventListener("click", () => {
+      data.currentNodeId = btn.dataset.node;
+      saveStoredProject();
+      renderShell();
+    }));
+
+    el("newLocationBtn").addEventListener("click", () => addNode("location"));
+    el("newBattleBtn").addEventListener("click", () => addNode("battle"));
+  }
+
+  function addNode(type) {
+    const title = el("newNodeTitle").value.trim() || "New " + type;
+    const node = {
+      id: slug(type + "-" + title + "-" + Date.now()),
+      type,
+      title,
+      description: "Captured " + type + " node from the current session.",
+      connections: [data.currentNodeId],
+      notes: [],
+      tags: [type],
+      screenshots: [],
+      createdAt: now()
+    };
+    const oldNode = currentNode();
+    data.nodes.unshift(node);
+    data.edges.unshift({
+      id: uid("edge"),
+      from: oldNode.id,
+      to: node.id,
+      label: "observed route"
+    });
+    data.currentNodeId = node.id;
+    data.timeline.unshift({
+      id: uid("evt"),
+      timestamp: now(),
+      nodeId: node.id,
+      type,
+      title: "New " + type + ": " + title,
+      summary: "Created while mapping the loaded world.",
+      tags: [type, "manual"]
+    });
+    saveStoredProject();
+    renderShell();
+  }
+
+  function renderBlueprint() {
+    main.innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <h2>Blueprint Graph</h2>
+          <div class="columns">
+            ${data.nodes.slice(0, 90).map(n => `
+              <div class="node-row">
+                <strong>${escapeHtml(n.title)}</strong>
+                ${pill(n.type, n.source === "package" ? "purple" : "")}
+                <div class="dim">${escapeHtml(n.description || "")}</div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Edges</h2>
+          ${data.edges.map(edge => `
+            <div class="file-row mono">${escapeHtml(edge.from)} → ${escapeHtml(edge.to)} · ${escapeHtml(edge.label)}</div>
+          `).join("") || `<p class="muted">No edges yet.</p>`}
         </div>
       </div>
+    `;
+  }
+
+  function renderTimeline() {
+    main.innerHTML = `
       <div class="card">
-        <h2>Console Operation</h2>
-        <div class="${htmlMode?"ok":"notice"}">${htmlMode ? "Browser HTML runtime mounted inside the terminal." : "Attach mode is ready. When a native game is running on the machine, use Attach Capture to bind the visible game window to this terminal and then create captures, PALCards and drawers."}</div>
+        <h2>Timeline</h2>
+        ${data.timeline.map(event => `
+          <div class="event-row">
+            <strong>${escapeHtml(event.title)}</strong>
+            ${pill(event.type, "blue")}
+            <p class="muted">${escapeHtml(event.summary)}</p>
+            <div class="dim">${escapeHtml(event.timestamp)} · ${escapeHtml(event.nodeId)}</div>
+          </div>
+        `).join("")}
       </div>
-    </div>`;
+    `;
   }
 
-  function renderCards(){
-    const games=state.memoryCards.gameCards;
-    const pals=state.memoryCards.palCards;
-    const pairs=pairViews();
-    const gameList=games.map(c=>`<div class="fileitem"><b>${escapeHtml(c.slotTitle)}</b><p class="tiny">${escapeHtml(c.saveFile.name)} · ${fmtBytes(c.saveFile.sizeBytes)}</p><p class="tiny mono">${escapeHtml(c.saveFile.hash)}</p></div>`).join("") || `<p class="muted">No GameCards yet.</p>`;
-    const palList=pals.map(c=>`<div class="fileitem"><b>${escapeHtml(c.title)}</b><p class="tiny">Room: ${escapeHtml(c.currentRoom)}</p><p class="tiny">Pair: ${escapeHtml(c.pairing?.pairStatus || "unpaired")}</p></div>`).join("") || `<p class="muted">No PALCards yet.</p>`;
-    const pairList=pairs.map(p=>`<div class="fileitem">
-      <div class="row" style="justify-content:space-between"><b>${escapeHtml(p.title)}</b><span class="pill ${p.status==="synced"?"green":p.status.includes("missing")?"red":"blue"}">${escapeHtml(p.status)}</span></div>
-      <p class="tiny">Game: ${escapeHtml(p.gameCard?.slotTitle || "missing")} · PAL: ${escapeHtml(p.palCard?.currentRoom || "missing")}</p>
-      <div class="row" style="margin-top:8px">
-        <button class="btn ghost loadPair" data-id="${p.id}">Load Pair</button>
-        <button class="btn ghost exportPair" data-id="${p.id}">Export</button>
+  function renderNotes() {
+    const node = currentNode();
+    main.innerHTML = `
+      <div class="columns two">
+        <div class="card">
+          <h2>Add Note to ${escapeHtml(node.title)}</h2>
+          <textarea id="noteText" placeholder="What did the player learn here?"></textarea>
+          <button class="btn primary" id="saveNoteBtn">Save Note</button>
+        </div>
+        <div class="card">
+          <h2>Room Notes</h2>
+          ${(node.notes || []).map(note => `<div class="file-row">${escapeHtml(note)}</div>`).join("") || `<p class="muted">No notes yet.</p>`}
+        </div>
       </div>
-    </div>`).join("") || `<p class="muted">No paired cards yet.</p>`;
-    return `<div class="stack">
-      <div class="card"><h2>Memory Card Bay</h2><p class="muted">GameCard stores package/save identity. PALCard stores room context. Pair them to make a MEM Save Pair.</p></div>
-      <div class="panelgrid">
-        <div class="card"><h2>Create GameCard</h2><button class="btn" id="importSaveFile">⬆️ Import Save or Package File</button></div>
-        <div class="card"><h2>Create PALCard</h2><button class="btn" id="createPAL">➕ Create From Current Room</button></div>
-        <div class="card"><h2>Auto Pair</h2><button class="btn ghost" id="autoPair">Pair Latest Cards</button></div>
-      </div>
-      <div class="panelgrid">
-        <div class="card"><h2>GameCards</h2><div class="stack">${gameList}</div></div>
-        <div class="card"><h2>PALCards</h2><div class="stack">${palList}</div></div>
-        <div class="card"><h2>MEM Save Pairs</h2><div class="stack">${pairList}</div></div>
-      </div>
-    </div>`;
-  }
+    `;
 
-  function renderHistory(){
-    const pinned=state.progressionDrawers.pinnedDrawerIds || [];
-    const drawers=[...(state.progressionDrawers.drawers||[])].sort((a,b)=>{
-      const ap=pinned.includes(a.drawerId)?1:0, bp=pinned.includes(b.drawerId)?1:0;
-      if(ap!==bp) return bp-ap;
-      return String(b.updatedAt||b.createdAt).localeCompare(String(a.updatedAt||a.createdAt));
+    el("saveNoteBtn").addEventListener("click", () => {
+      const note = el("noteText").value.trim();
+      if (!note) return;
+      node.notes = [note, ...(node.notes || [])];
+      data.timeline.unshift({
+        id: uid("evt"),
+        timestamp: now(),
+        nodeId: node.id,
+        type: "note",
+        title: "Manual note",
+        summary: note,
+        tags: ["note"]
+      });
+      saveStoredProject();
+      renderShell();
     });
-    const list=drawers.map(d=>`<div class="fileitem">
-      <div class="row" style="justify-content:space-between"><b>${escapeHtml(d.title)}</b><span class="pill ${d.status==="synced"?"green":d.status==="legacy"?"purple":"blue"}">${escapeHtml(d.status)}</span></div>
-      <p class="tiny">Room: ${escapeHtml(d.currentRoom)} · Runtime: ${escapeHtml(d.runtimeMode)} · Tab: ${escapeHtml(d.activeTab)}</p>
-      <p class="tiny">Updated: ${escapeHtml(d.updatedAt || d.createdAt)}</p>
-      <div class="row" style="margin-top:8px">
-        <button class="btn ghost resumeDrawer" data-id="${d.drawerId}">Resume</button>
-        <button class="btn ghost exportDrawer" data-id="${d.drawerId}">Export</button>
-        <button class="btn red deleteDrawer" data-id="${d.drawerId}">Delete</button>
+  }
+
+  function renderBuild() {
+    main.innerHTML = `
+      <div class="columns">
+        <div class="card">
+          <h2>Export Project JSON</h2>
+          <p class="muted">Exports the raw palace state.</p>
+          <button class="btn primary" id="exportProjectBtn">Export JSON</button>
+        </div>
+
+        <div class="card">
+          <h2>Export HTML Guide</h2>
+          <p class="muted">Exports a readable HTML guide from the palace rooms and notes.</p>
+          <button class="btn" id="exportGuideBtn">Export HTML Guide</button>
+        </div>
+
+        <div class="card">
+          <h2>Save Full Session</h2>
+          <p class="muted">Exports a full MEM session file with drawers, cards, package binding and captures.</p>
+          <button class="btn primary" id="exportSessionBtn">Save Full Session</button>
+        </div>
       </div>
-    </div>`).join("") || `<p class="muted">No drawers yet.</p>`;
-    return `<div class="stack">
-      <div class="card"><h2>Progression History Drawers</h2><p class="muted">A drawer stores the loaded package, current room, active pair, runtime mode, layout and timeline cursor.</p></div>
-      <div class="row">
-        <button class="btn" id="createDrawer">➕ Save Current Drawer</button>
-        <button class="btn ghost" id="exportDrawers">⬇️ Export Drawers</button>
-      </div>
-      <div class="card"><div class="stack">${list}</div></div>
-    </div>`;
+    `;
+
+    el("exportProjectBtn").addEventListener("click", exportProjectJson);
+    el("exportGuideBtn").addEventListener("click", exportHtmlGuide);
+    el("exportSessionBtn").addEventListener("click", saveFullSession);
   }
 
-  function renderPalace(){
-    const node=currentNode();
-    const rooms=state.nodes.map(n=>`<button class="nodebutton ${n.id===node.id?"active":""}" data-node="${n.id}"><b>${escapeHtml(n.title)}</b><p class="tiny">${escapeHtml(n.type)} · ${escapeHtml(n.description||"")}</p></button>`).join("");
-    return `<div class="panelgrid" style="grid-template-columns:1fr 1fr">
-      <div class="card"><h2>Palace Rooms</h2><div class="stack">${rooms}</div></div>
-      <div class="card"><h2>Current Room</h2><h3>${escapeHtml(node.title)}</h3><p class="muted" style="margin-top:8px">${escapeHtml(node.description||"")}</p><div class="row" style="margin-top:12px">${(node.tags||[]).map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join("")}</div><div class="row" style="margin-top:14px"><input id="newNodeTitle" class="grow" placeholder="New node title"><button class="btn" id="newLocation">New Location</button><button class="btn ghost" id="newBattle">New Battle</button></div></div>
-    </div>`;
+  function exportProjectJson() {
+    downloadText(slug(data.project.title) + ".mempalace.json", JSON.stringify(data, null, 2), "application/json");
   }
 
-  function renderBlueprint(){
-    const nodes=state.nodes.slice(0,80).map(n=>`<div class="nodeitem"><div class="row" style="justify-content:space-between"><b>${escapeHtml(n.title)}</b><span class="pill ${n.source==="package"?"purple":""}">${escapeHtml(n.type)}</span></div><p class="tiny">${(n.connections||[]).length} connection(s)</p></div>`).join("");
-    const edges=state.edges.map(e=>`<div class="fileitem mono">${escapeHtml(e.from)} → ${escapeHtml(e.to)} · ${escapeHtml(e.label)}</div>`).join("");
-    return `<div class="stack"><div class="card"><h2>Blueprint Graph</h2><div class="panelgrid">${nodes}</div></div><div class="card"><h2>Edges</h2><div class="stack">${edges}</div></div></div>`;
+  function exportHtmlGuide() {
+    const sections = data.nodes.map(node => `
+      <section>
+        <h2>${escapeHtml(node.title)}</h2>
+        <p>${escapeHtml(node.description || "")}</p>
+        <p><code>${escapeHtml(node.type)}</code></p>
+        <ul>${(node.notes || []).map(note => `<li>${escapeHtml(note)}</li>`).join("")}</ul>
+      </section>
+    `).join("");
+
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(data.project.title)}</title><style>body{font-family:system-ui;background:#110905;color:#ffe8ce;padding:32px}section{border:1px solid #c87935;padding:16px;border-radius:16px;margin:16px 0}code{color:#ffb36b}</style></head><body><h1>${escapeHtml(data.project.title)}</h1><p>${escapeHtml(data.project.subtitle)}</p>${sections}</body></html>`;
+    downloadText(slug(data.project.title) + "-guide.html", html, "text/html");
   }
 
-  function renderTimeline(){
-    return `<div class="stack">${state.timeline.map(e=>`<div class="eventitem"><div class="row" style="justify-content:space-between"><b>${escapeHtml(e.title)}</b><span class="pill blue">${escapeHtml(e.type)}</span></div><p class="muted" style="margin-top:6px">${escapeHtml(e.summary)}</p><p class="tiny">${escapeHtml(e.timestamp)} · ${escapeHtml(e.nodeId)}</p></div>`).join("")}</div>`;
+  function saveFullSession() {
+    const drawer = buildProgressionDrawer();
+    data.progressionDrawers.activeDrawerId = drawer.drawerId;
+    data.progressionDrawers.drawers.unshift(drawer);
+    data.timeline.unshift({
+      id: uid("evt"),
+      timestamp: now(),
+      nodeId: data.currentNodeId,
+      type: "checkpoint",
+      title: "Full Session saved",
+      summary: drawer.title + " saved as a full MEM Palace session.",
+      tags: ["drawer", "full-session"]
+    });
+    saveStoredProject();
+
+    const payload = {
+      sessionVersion: "0.2",
+      exportedAt: now(),
+      activeDrawer: drawer,
+      palaceSnapshot: data,
+      browserBetaNote: "This single-file GitHub Pages build saves MEM Palace context, cards, drawers, captures, notes, package inspection and blueprint state. It does not directly execute native Windows EXE files without a desktop/native runtime core."
+    };
+
+    downloadText(slug(data.project.title) + "-full-session.memsession.json", JSON.stringify(payload, null, 2), "application/json");
+    activeTab = "drawers";
+    renderShell();
   }
 
-  function renderNotes(){
-    const node=currentNode();
-    const notes=(node.notes||[]).map(n=>`<div class="fileitem">${escapeHtml(n)}</div>`).join("") || `<p class="muted">No notes for this room yet.</p>`;
-    return `<div class="panelgrid" style="grid-template-columns:1fr 1fr"><div class="card"><h2>Add Note to ${escapeHtml(node.title)}</h2><textarea id="noteText" placeholder="What did the player learn here?"></textarea><button class="btn" id="saveNote" style="margin-top:10px">Save Note</button></div><div class="card"><h2>Room Notes</h2><div class="stack">${notes}</div></div></div>`;
+  function importMemFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result));
+        if (parsed.sessionVersion && parsed.palaceSnapshot) {
+          data = parsed.palaceSnapshot;
+          saveStoredProject();
+          activeTab = "drawers";
+          renderShell();
+          announce("Full MEM session imported.");
+          return;
+        }
+
+        if (parsed.drawerVersion && parsed.drawer) {
+          data.progressionDrawers.drawers.unshift(parsed.drawer);
+          data.progressionDrawers.activeDrawerId = parsed.drawer.drawerId;
+          saveStoredProject();
+          activeTab = "drawers";
+          renderShell();
+          announce("Drawer imported.");
+          return;
+        }
+
+        if (parsed.drawerArchiveVersion && parsed.progressionDrawers) {
+          data.progressionDrawers = parsed.progressionDrawers;
+          saveStoredProject();
+          activeTab = "drawers";
+          renderShell();
+          announce("Drawer archive imported.");
+          return;
+        }
+
+        if (parsed.memSaveVersion && parsed.palaceProject) {
+          data = parsed.palaceProject;
+          saveStoredProject();
+          activeTab = "cards";
+          renderShell();
+          announce("MEM save imported.");
+          return;
+        }
+
+        if (parsed.nodes || parsed.project) {
+          data = parsed;
+          saveStoredProject();
+          activeTab = "palace";
+          renderShell();
+          announce("Project JSON imported.");
+          return;
+        }
+
+        alert("This JSON file was read, but it is not a recognised MEM Palace file.");
+      } catch {
+        alert("Could not import this file. It is not valid JSON.");
+      }
+    };
+    reader.readAsText(file);
   }
 
-  function renderBuild(){
-    return `<div class="panelgrid">
-      <div class="card"><h2>Export Project JSON</h2><button class="btn" id="exportProject">⬇️ Export JSON</button></div>
-      <div class="card"><h2>Export HTML Guide</h2><button class="btn" id="exportGuide">⬇️ Export HTML</button></div>
-      <div class="card"><h2>Export Full Session</h2><button class="btn" id="exportSession">⬇️ Save Full Session</button></div>
-      <div class="card"><h2>Reset Local Console</h2><button class="btn red" id="resetLocal">Clear Local Storage</button><p class="tiny" style="margin-top:8px">Export your session first if you need to keep it.</p></div>
-    </div>`;
-  }
-
-  function wireCommon(){
-    document.getElementById("fileInput").onchange=e=>handleFiles(e.target.files,"file-picker");
-    document.getElementById("folderInput").onchange=e=>handleFiles(e.target.files,"folder");
-    document.getElementById("saveInput").onchange=e=>createGameCard(e.target.files?.[0]);
-    document.getElementById("memInput").onchange=e=>importMemFile(e.target.files?.[0]);
-
-    const main=document.getElementById("main");
-
-    const dz=document.getElementById("dropzone");
-    if(dz){
-      ["dragenter","dragover"].forEach(evt=>dz.addEventListener(evt,e=>{e.preventDefault();dz.classList.add("drag");}));
-      ["dragleave","drop"].forEach(evt=>dz.addEventListener(evt,e=>{e.preventDefault();dz.classList.remove("drag");}));
-      dz.addEventListener("drop",e=>handleFiles(e.dataTransfer.files,"drag-drop"));
+  document.addEventListener("click", ev => {
+    if (ev.target?.id === "saveDrawerBtn") createProgressionDrawer();
+    if (ev.target?.id === "exportActiveDrawerBtn") {
+      const active = data.progressionDrawers.drawers.find(d => d.drawerId === data.progressionDrawers.activeDrawerId);
+      if (active) exportDrawer(active);
     }
+    if (ev.target?.id === "saveFullSessionBtn") saveFullSession();
+  });
 
-    const bind=(id,fn)=>{const el=document.getElementById(id); if(el) el.onclick=fn;};
-    bind("chooseFiles",()=>document.getElementById("fileInput").click());
-    bind("chooseFolder",()=>document.getElementById("folderInput").click());
-    bind("importMem",()=>document.getElementById("memInput").click());
-    bind("goPlay",()=>{activeTab="play";render();});
-    bind("createPackageCard",async()=>{const fake = new File([JSON.stringify(state.package,null,2)],`${slug(state.package.name)}.packagecard.json`,{type:"application/json"}); await createGameCard(fake);});
-    bind("attachCapture",startCapture);
-    bind("stopCapture",stopCapture);
-    bind("captureMoment",captureMoment);
-    bind("importSaveFile",()=>document.getElementById("saveInput").click());
-    bind("createPAL",createPALCard);
-    bind("autoPair",()=>{const g=state.memoryCards.gameCards[0];const p=state.memoryCards.palCards[0];if(g&&p) pairCards(g.id,p.id);});
-    bind("createDrawer",saveDrawer);
-    bind("exportDrawers",exportAllDrawers);
-    bind("newLocation",()=>addNode("location"));
-    bind("newBattle",()=>addNode("battle"));
-    bind("saveNote",addNote);
-    bind("exportProject",exportProject);
-    bind("exportGuide",exportHtmlGuide);
-    bind("exportSession",saveFullSession);
-    bind("resetLocal",()=>{if(confirm("Clear this console's local storage? Export a session first if you need it.")){localStorage.removeItem("mem-palace-single-html-v2");state=structuredClone(seed);activeTab="load";render();}});
-
-    main.querySelectorAll(".nodebutton").forEach(b=>b.onclick=()=>update(prev=>{prev.currentNodeId=b.dataset.node;return prev;}));
-    main.querySelectorAll(".resumeDrawer").forEach(b=>b.onclick=()=>{const d=state.progressionDrawers.drawers.find(x=>x.drawerId===b.dataset.id);resumeDrawer(d);});
-    main.querySelectorAll(".exportDrawer").forEach(b=>b.onclick=()=>{const d=state.progressionDrawers.drawers.find(x=>x.drawerId===b.dataset.id);exportDrawer(d);});
-    main.querySelectorAll(".deleteDrawer").forEach(b=>b.onclick=()=>update(prev=>{prev.progressionDrawers.drawers=prev.progressionDrawers.drawers.filter(d=>d.drawerId!==b.dataset.id);prev.progressionDrawers.pinnedDrawerIds=prev.progressionDrawers.pinnedDrawerIds.filter(id=>id!==b.dataset.id);if(prev.progressionDrawers.activeDrawerId===b.dataset.id) prev.progressionDrawers.activeDrawerId="";return prev;}));
-    main.querySelectorAll(".loadPair").forEach(b=>b.onclick=()=>{const p=pairViews().find(x=>x.id===b.dataset.id); if(p?.palCard?.palaceNodeId){update(prev=>{prev.currentNodeId=p.palCard.palaceNodeId;prev.memoryCards.activePairId=p.id;return prev;});activeTab="blueprint";render();}});
-    main.querySelectorAll(".exportPair").forEach(b=>b.onclick=()=>{const p=pairViews().find(x=>x.id===b.dataset.id); if(p) downloadText(`${slug(p.title)}.memsave.json`,JSON.stringify({memSaveVersion:"0.1",savePairId:p.id,title:p.title,createdAt:p.createdAt,updatedAt:now(),gameCard:p.gameCard,palCard:p.palCard,pairing:{status:p.status,gameSaveHash:p.gameCard?.saveFile?.hash||null,palaceNodeId:p.palCard?.palaceNodeId||null},palaceProject:state},null,2));});
-  }
-
-  function render(){
-    renderTabs();
-    renderSide();
-    const main=document.getElementById("main");
-    if(activeTab==="load") main.innerHTML=renderLoad();
-    else if(activeTab==="inspect") main.innerHTML=renderInspect();
-    else if(activeTab==="play") main.innerHTML=renderPlay();
-    else if(activeTab==="cards") main.innerHTML=renderCards();
-    else if(activeTab==="history") main.innerHTML=renderHistory();
-    else if(activeTab==="palace") main.innerHTML=renderPalace();
-    else if(activeTab==="blueprint") main.innerHTML=renderBlueprint();
-    else if(activeTab==="timeline") main.innerHTML=renderTimeline();
-    else if(activeTab==="notes") main.innerHTML=renderNotes();
-    else main.innerHTML=renderBuild();
-    wireCommon();
-  }
-
-  render();
+  renderShell();
 })();
 </script>
 </body>
 </html>
-'''
-path = Path('/mnt/data/mem_palace_game_terminal_single_file.html')
-path.write_text(html, encoding='utf-8')
-path
