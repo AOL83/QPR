@@ -2,119 +2,182 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MEM Palace Game Terminal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MEM Palace Game Terminal — Browser Console</title>
+
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
   <style>
     :root {
-      --bg0: #030201;
-      --bg1: #120704;
-      --panel: rgba(0, 0, 0, 0.48);
-      --panel2: rgba(255, 145, 55, 0.07);
-      --border: rgba(255, 166, 80, 0.28);
-      --border2: rgba(255, 166, 80, 0.48);
-      --text: #fff2df;
-      --muted: rgba(255, 232, 207, 0.62);
-      --faint: rgba(255, 232, 207, 0.38);
-      --orange: #ff9838;
-      --orange2: #ffc278;
-      --green: #4ade80;
-      --red: #fb7185;
+      --bg: #030201;
+      --panel: rgba(0, 0, 0, 0.36);
+      --panel-strong: rgba(0, 0, 0, 0.56);
+      --border: rgba(255, 174, 77, 0.22);
+      --border-hot: rgba(255, 174, 77, 0.55);
+      --text: #fff1dc;
+      --muted: rgba(255, 241, 220, 0.64);
+      --faint: rgba(255, 241, 220, 0.42);
+      --orange: #fb923c;
+      --orange2: #fdba74;
+      --green: #86efac;
+      --red: #fca5a5;
       --blue: #7dd3fc;
       --purple: #d8b4fe;
-      --shadow: rgba(0, 0, 0, 0.45);
+      --shadow: rgba(0,0,0,0.35);
+      --radius: 22px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    html, body { margin: 0; min-height: 100%; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(251, 146, 60, 0.22), transparent 30%),
+        radial-gradient(circle at 88% 12%, rgba(253, 186, 116, 0.08), transparent 32%),
+        radial-gradient(circle at 30% 90%, rgba(120, 53, 15, 0.34), transparent 36%),
+        #030201;
+      color: var(--text);
+      font-family: var(--font);
+    }
 
     body {
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top left, #3b1d0b, #080403 45%, #030201);
-      color: var(--text);
+      padding: 16px;
     }
 
-    button, input, textarea, select { font: inherit; }
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
 
     .app {
-      min-height: 100vh;
-      padding: 18px;
-    }
-
-    .shell {
-      width: min(1500px, 100%);
+      width: min(1480px, 100%);
       margin: 0 auto;
       display: grid;
       gap: 16px;
     }
 
-    .header, .nav, .card {
+    .header, .nav, .card, .dropzone {
       border: 1px solid var(--border);
       background: var(--panel);
-      box-shadow: 0 18px 40px var(--shadow);
-      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 55px var(--shadow);
+      backdrop-filter: blur(14px);
     }
 
     .header {
-      border-radius: 28px;
-      padding: 24px;
+      border-radius: 30px;
+      padding: 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
+      gap: 14px;
+      flex-wrap: wrap;
     }
 
-    .brand { display: flex; align-items: center; gap: 14px; }
-    .brand-icon { font-size: 34px; filter: drop-shadow(0 0 14px rgba(255,152,56,0.55)); }
-    h1, h2, h3, p { margin: 0; }
-    h1 { font-size: clamp(26px, 4vw, 42px); line-height: 1; letter-spacing: -0.04em; }
-    .subtitle { margin-top: 8px; color: var(--muted); font-weight: 700; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 17px;
+      border: 1px solid var(--border-hot);
+      background: linear-gradient(135deg, rgba(251,146,60,0.95), rgba(253,186,116,0.65));
+      color: #0b0502;
+      font-size: 26px;
+      box-shadow: 0 0 28px rgba(251,146,60,0.25);
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(1.35rem, 2.6vw, 2.25rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      font-size: 1.12rem;
+    }
+
+    h3 {
+      font-size: 1.35rem;
+      color: var(--orange2);
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
 
     .pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      border: 1px solid var(--border);
+      background: rgba(251, 146, 60, 0.1);
+      color: var(--text);
       border-radius: 999px;
-      border: 1px solid rgba(216,180,254,0.36);
-      background: rgba(216,180,254,0.1);
-      color: #ead7ff;
-      padding: 7px 11px;
-      font-size: 12px;
+      padding: 5px 10px;
+      font-size: 0.77rem;
       white-space: nowrap;
     }
-    .pill.orange { border-color: rgba(255,194,120,0.35); background: rgba(255,152,56,0.12); color: #ffe1bd; }
-    .pill.green { border-color: rgba(74,222,128,0.35); background: rgba(74,222,128,0.11); color: #bbf7d0; }
-    .pill.red { border-color: rgba(251,113,133,0.35); background: rgba(251,113,133,0.11); color: #fecdd3; }
-    .pill.blue { border-color: rgba(125,211,252,0.35); background: rgba(125,211,252,0.11); color: #bae6fd; }
-    .pill.purple { border-color: rgba(216,180,254,0.35); background: rgba(216,180,254,0.11); color: #ead7ff; }
+
+    .pill.green { border-color: rgba(134,239,172,0.35); background: rgba(134,239,172,0.09); color: var(--green); }
+    .pill.red { border-color: rgba(252,165,165,0.35); background: rgba(252,165,165,0.09); color: var(--red); }
+    .pill.blue { border-color: rgba(125,211,252,0.35); background: rgba(125,211,252,0.09); color: var(--blue); }
+    .pill.purple { border-color: rgba(216,180,254,0.35); background: rgba(216,180,254,0.09); color: var(--purple); }
 
     .nav {
-      border-radius: 18px;
+      border-radius: 26px;
       padding: 8px;
       display: flex;
-      flex-wrap: wrap;
       gap: 8px;
+      flex-wrap: wrap;
       position: sticky;
-      top: 8px;
-      z-index: 10;
+      top: 10px;
+      z-index: 20;
     }
 
-    .tab-btn, .btn {
+    .tab {
       border: 0;
-      border-radius: 14px;
-      padding: 10px 13px;
-      cursor: pointer;
-      transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
-      font-weight: 800;
+      border-radius: 18px;
+      padding: 10px 12px;
+      background: transparent;
+      color: var(--text);
+      font-weight: 750;
+      transition: 0.2s ease;
     }
 
-    .tab-btn {
-      color: var(--text);
-      background: transparent;
+    .tab:hover {
+      background: rgba(251,146,60,0.12);
     }
-    .tab-btn:hover { background: rgba(255,152,56,0.1); transform: translateY(-1px); }
-    .tab-btn.active { color: #130702; background: var(--orange); }
+
+    .tab.active {
+      background: var(--orange);
+      color: #0b0502;
+      box-shadow: 0 0 24px rgba(251,146,60,0.25);
+    }
 
     .layout {
       display: grid;
@@ -123,225 +186,380 @@
       align-items: start;
     }
 
-    .aside { display: grid; gap: 16px; }
-    .card { border-radius: 22px; padding: 18px; }
-    .card h2 { font-size: 19px; margin-bottom: 12px; }
-    .card h3 { font-size: 24px; margin-bottom: 8px; color: var(--orange2); }
-    .muted { color: var(--muted); }
-    .faint { color: var(--faint); }
-    .small { font-size: 13px; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .side {
+      display: grid;
+      gap: 16px;
+      position: sticky;
+      top: 86px;
+    }
 
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .stat { border-radius: 15px; background: rgba(0,0,0,0.32); padding: 12px; }
-    .stat .num { font-size: 26px; font-weight: 950; margin-top: 4px; }
+    .card {
+      border-radius: var(--radius);
+      padding: 16px;
+    }
 
-    .main { min-width: 0; }
-    .view { display: none; animation: fade 180ms ease both; }
-    .view.active { display: block; }
-    @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .card.hot {
+      border-color: var(--border-hot);
+    }
 
-    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-    .stack { display: grid; gap: 14px; }
-    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid.cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid.cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat {
+      border-radius: 16px;
+      background: rgba(0,0,0,0.25);
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .stat small {
+      color: var(--faint);
+      display: block;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 1.55rem;
+      margin-top: 2px;
+      color: var(--text);
+    }
 
     .btn {
+      border: 0;
+      border-radius: 15px;
+      padding: 10px 12px;
+      background: var(--orange);
+      color: #0b0502;
+      font-weight: 850;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      color: #140700;
-      background: var(--orange);
+      transition: 0.2s ease;
+      min-height: 42px;
     }
-    .btn:hover { background: #ffb366; transform: translateY(-1px); }
-    .btn.ghost { color: var(--text); background: rgba(0,0,0,0.24); border: 1px solid var(--border); }
-    .btn.ghost:hover { background: rgba(255,152,56,0.1); border-color: var(--border2); }
-    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
-    .btn.full { width: 100%; }
 
-    .drop-zone {
-      border: 2px dashed rgba(255,152,56,0.6);
-      background: linear-gradient(135deg, rgba(255,152,56,0.15), rgba(216,180,254,0.08));
-      border-radius: 24px;
-      padding: 26px;
-      min-height: 170px;
+    .btn:hover {
+      transform: translateY(-1px);
+      background: var(--orange2);
+    }
+
+    .btn.ghost {
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.22);
+      color: var(--text);
+    }
+
+    .btn.ghost:hover {
+      background: rgba(251,146,60,0.11);
+    }
+
+    .btn.full {
+      width: 100%;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .faint {
+      color: var(--faint);
+    }
+
+    .mono {
+      font-family: var(--mono);
+    }
+
+    .dropzone {
+      border-radius: 26px;
+      padding: 28px;
+      min-height: 190px;
       display: grid;
       place-items: center;
       text-align: center;
-      position: relative;
-      overflow: hidden;
+      border-style: dashed;
+      transition: 0.2s ease;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(251,146,60,0.16), transparent 50%),
+        rgba(0,0,0,0.24);
     }
-    .drop-zone::before {
-      content: "";
-      position: absolute;
-      inset: -70px;
-      background: radial-gradient(circle, rgba(255,152,56,.18), transparent 60%);
-      opacity: .65;
-      pointer-events: none;
+
+    .dropzone.drag {
+      border-color: var(--orange2);
+      transform: scale(1.01);
+      box-shadow: 0 0 45px rgba(251,146,60,0.2);
     }
-    .drop-zone.dragging {
-      border-color: #fff;
-      background: rgba(255,152,56,0.22);
+
+    .dropzone .big {
+      font-size: 2.35rem;
+      margin-bottom: 10px;
     }
-    .drop-inner { position: relative; z-index: 1; display: grid; gap: 8px; }
-    .drop-icon { font-size: 42px; }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
 
     .item {
-      border: 1px solid rgba(255,166,80,0.18);
-      background: rgba(0,0,0,0.28);
+      border: 1px solid rgba(255, 174, 77, 0.14);
+      background: rgba(0,0,0,0.25);
       border-radius: 16px;
-      padding: 13px;
-      min-width: 0;
+      padding: 12px;
+      overflow: hidden;
     }
-    .item.active { border-color: rgba(255,152,56,0.82); background: rgba(255,152,56,0.12); }
-    .item-title { font-weight: 900; overflow-wrap: anywhere; }
-    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .item-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .truncate {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
 
     input, textarea, select {
       width: 100%;
       border: 1px solid var(--border);
-      background: rgba(0,0,0,0.42);
-      color: var(--text);
       border-radius: 14px;
+      background: rgba(0,0,0,0.32);
+      color: var(--text);
       padding: 10px 12px;
       outline: none;
     }
-    textarea { min-height: 150px; resize: vertical; }
-    label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
-    select option { background: #130702; }
 
-    .iframe, .video {
+    textarea {
+      min-height: 145px;
+      resize: vertical;
+    }
+
+    video, iframe {
       width: 100%;
       height: 520px;
-      border-radius: 18px;
       border: 1px solid var(--border);
       background: #000;
+      border-radius: 18px;
+      object-fit: contain;
     }
-    .iframe { background: #fff; }
-    .video { object-fit: contain; }
 
-    .hidden { display: none; }
-    .notice {
-      border: 1px solid rgba(125,211,252,0.3);
-      background: rgba(125,211,252,0.08);
-      color: #dff6ff;
+    iframe {
+      background: white;
+    }
+
+    .tree {
+      max-height: 440px;
+      overflow: auto;
       border-radius: 16px;
+      border: 1px solid rgba(255, 174, 77, 0.14);
+      background: rgba(0,0,0,0.24);
+      padding: 10px;
+    }
+
+    .tree-row {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      padding: 7px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .tree-row:last-child {
+      border-bottom: 0;
+    }
+
+    .alert {
+      border: 1px solid rgba(252, 165, 165, 0.28);
+      background: rgba(252, 165, 165, 0.08);
+      color: #fee2e2;
+      border-radius: 18px;
       padding: 12px;
+      margin-top: 12px;
     }
-    .warn {
-      border-color: rgba(251,113,133,0.34);
-      background: rgba(251,113,133,0.09);
-      color: #ffe4e8;
+
+    .success {
+      border: 1px solid rgba(134, 239, 172, 0.28);
+      background: rgba(134, 239, 172, 0.08);
+      color: #dcfce7;
+      border-radius: 18px;
+      padding: 12px;
+      margin-top: 12px;
     }
-    .toast {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 100;
-      max-width: min(520px, calc(100vw - 36px));
-      border: 1px solid var(--border2);
-      background: rgba(10, 4, 2, 0.94);
-      color: var(--text);
-      border-radius: 16px;
-      padding: 14px 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.55);
-      display: none;
+
+    .canvas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 12px;
     }
-    .toast.show { display: block; animation: toastIn 160ms ease both; }
-    @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .capture-img {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      display: block;
+    }
 
     @media (max-width: 980px) {
-      .layout { grid-template-columns: 1fr; }
-      .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
-      .iframe, .video { height: 420px; }
-    }
-    @media (max-width: 640px) {
-      .app { padding: 10px; }
-      .header { align-items: flex-start; }
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-      .nav { position: static; }
-      .tab-btn, .btn { width: 100%; }
-      .btn-row { width: 100%; }
-      .iframe, .video { height: 320px; }
+      body {
+        padding: 10px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .side {
+        position: static;
+      }
+
+      .grid.cols-2,
+      .grid.cols-3,
+      .grid.cols-4 {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        position: static;
+      }
+
+      video, iframe {
+        height: 340px;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div id="app" class="app">
-    <div class="shell">
-      <header class="header">
+  <div class="app">
+    <header class="header">
+      <div class="brand">
+        <div class="brand-mark">🎮</div>
         <div>
-          <div class="brand">
-            <div class="brand-icon">🎮</div>
-            <div>
-              <h1>MEM Palace Game Terminal</h1>
-              <p class="subtitle">LOAD → INSPECT → BLUEPRINT → RUN / ATTACH → OBSERVE → BUILD</p>
-            </div>
+          <h1>MEM Palace Game Terminal</h1>
+          <p class="subtitle">LOAD → INSPECT → BLUEPRINT → RUN / ATTACH → OBSERVE → SAVE SESSION</p>
+        </div>
+      </div>
+      <span class="pill purple">Single-file GitHub Pages console</span>
+    </header>
+
+    <nav class="nav" id="tabs"></nav>
+
+    <section class="layout">
+      <aside class="side">
+        <div class="card">
+          <h2>Project Stats</h2>
+          <div class="stat-grid">
+            <div class="stat"><small>Nodes</small><b id="statNodes">0</b></div>
+            <div class="stat"><small>Events</small><b id="statEvents">0</b></div>
+            <div class="stat"><small>Captures</small><b id="statCaptures">0</b></div>
+            <div class="stat"><small>GameCards</small><b id="statGameCards">0</b></div>
+            <div class="stat"><small>PALCards</small><b id="statPalCards">0</b></div>
+            <div class="stat"><small>Drawers</small><b id="statDrawers">0</b></div>
           </div>
         </div>
-        <span class="pill purple">Dual-card save architecture</span>
-      </header>
 
-      <nav id="nav" class="nav"></nav>
+        <div class="card hot">
+          <h2>Current Room</h2>
+          <div style="margin-top:10px">
+            <h3 id="currentRoomTitle">Midgar</h3>
+            <p class="muted" id="currentRoomType">location</p>
+            <div class="btn-row" id="currentRoomTags" style="margin-top:12px"></div>
+          </div>
 
-      <div class="layout">
-        <aside class="aside">
-          <section class="card">
-            <h2>Project Stats</h2>
-            <div id="stats" class="stats-grid"></div>
-          </section>
+          <div class="grid" style="margin-top:14px; gap:10px">
+            <button class="btn ghost full" id="saveDrawerBtn">📦 Save Drawer</button>
+            <button class="btn ghost full" id="exportActiveDrawerBtn">⬇️ Export Active Drawer</button>
+            <button class="btn full" id="saveFullSessionBtn">⬇️ Save Full Session</button>
+          </div>
+        </div>
 
-          <section class="card">
-            <h2>Current Room</h2>
-            <div id="currentRoomAside"></div>
-            <div class="stack" style="margin-top:14px">
-              <button id="saveDrawerBtn" class="btn ghost full">📦 Save Drawer</button>
-              <button id="exportActiveDrawerBtn" class="btn ghost full">⬇️ Export Active Drawer</button>
-              <button id="saveFullSessionBtn" class="btn full">⬇️ Save Full Session</button>
-            </div>
-          </section>
-        </aside>
+        <div class="card">
+          <h2>Native Runtime Rule</h2>
+          <p class="muted" style="margin-top:8px">
+            GitHub Pages can inspect ZIPs, folders, saves, screenshots and sessions. It cannot directly launch Windows EXE files.
+          </p>
+          <div class="alert">
+            Native files like <span class="mono">setup.exe</span> or <span class="mono">ff7.exe</span> must be started outside the browser, then attached using screen capture.
+          </div>
+        </div>
+      </aside>
 
-        <main class="main">
-          <section id="view-load" class="view"></section>
-          <section id="view-inspect" class="view"></section>
-          <section id="view-play" class="view"></section>
-          <section id="view-cards" class="view"></section>
-          <section id="view-history" class="view"></section>
-          <section id="view-palace" class="view"></section>
-          <section id="view-blueprint" class="view"></section>
-          <section id="view-timeline" class="view"></section>
-          <section id="view-notes" class="view"></section>
-          <section id="view-build" class="view"></section>
-        </main>
-      </div>
-    </div>
+      <main id="main"></main>
+    </section>
   </div>
 
   <input id="zipInput" class="hidden" type="file" accept=".zip" />
   <input id="folderInput" class="hidden" type="file" multiple webkitdirectory directory />
   <input id="saveInput" class="hidden" type="file" />
   <input id="memInput" class="hidden" type="file" accept=".json,.memsave,.memdrawer,.memsession" />
-  <div id="toast" class="toast"></div>
 
   <script>
-    const STORAGE_KEY = "mem-palace-game-terminal-v1";
+    const STORAGE_KEY = "mem-palace-game-terminal-pages-v1";
 
     const now = () => new Date().toISOString();
-    const uid = (prefix = "id") => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    const ext = (name = "") => {
-      const parts = String(name).toLowerCase().split(".");
-      return parts.length > 1 ? parts.pop() : "";
-    };
-    const slug = (input = "mem-palace") => String(input).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "mem-palace";
-    const escapeHtml = (value) => String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;");
+
+    const tabs = [
+      ["load", "📦 Load"],
+      ["inspect", "🔎 Inspect"],
+      ["play", "▶ Run / Attach"],
+      ["cards", "💳 Memory Cards"],
+      ["history", "🗄 Drawers"],
+      ["palace", "🗺 Palace"],
+      ["blueprint", "🧬 Blueprint"],
+      ["timeline", "📝 Timeline"],
+      ["notes", "📖 Notes"],
+      ["build", "🪄 Build"]
+    ];
 
     const seedProject = {
       project: {
@@ -350,7 +568,7 @@
         subtitle: "Game Load Test Console",
         type: "game-companion",
         createdAt: now(),
-        updatedAt: now(),
+        updatedAt: now()
       },
       package: {
         name: "No package loaded",
@@ -364,14 +582,14 @@
         detectedExecutables: [],
         detectedJson: [],
         warnings: [],
-        importReport: null,
+        importReport: null
       },
       runtime: {
         status: "idle",
         runMode: "none",
         internalHtml: "",
         internalEntry: "",
-        externalInstructions: [],
+        externalInstructions: []
       },
       currentNodeId: "midgar",
       nodes: [
@@ -387,7 +605,7 @@
           screenshots: [],
           notes: ["Use this as the first palace wing for the beta test."],
           tags: ["city", "opening", "hub"],
-          createdAt: now(),
+          createdAt: now()
         },
         {
           id: "reactor-1",
@@ -401,7 +619,7 @@
           screenshots: [],
           notes: [],
           tags: ["reactor", "mission", "midgar"],
-          createdAt: now(),
+          createdAt: now()
         },
         {
           id: "sector-7",
@@ -415,7 +633,7 @@
           screenshots: [],
           notes: [],
           tags: ["slums", "avalanche"],
-          createdAt: now(),
+          createdAt: now()
         },
         {
           id: "shinra-building",
@@ -429,7 +647,7 @@
           screenshots: [],
           notes: [],
           tags: ["midgar", "shinra", "infiltration"],
-          createdAt: now(),
+          createdAt: now()
         },
         {
           id: "guard-scorpion",
@@ -443,13 +661,13 @@
           screenshots: [],
           notes: ["Capture battle timing and tutorial dialogue."],
           tags: ["boss", "tutorial", "reactor-1"],
-          createdAt: now(),
-        },
+          createdAt: now()
+        }
       ],
       edges: [
         { id: "edge-midgar-reactor", from: "midgar", to: "reactor-1", label: "mission route" },
         { id: "edge-reactor-boss", from: "reactor-1", to: "guard-scorpion", label: "boss trigger" },
-        { id: "edge-midgar-sector", from: "midgar", to: "sector-7", label: "hub path" },
+        { id: "edge-midgar-sector", from: "midgar", to: "sector-7", label: "hub path" }
       ],
       timeline: [
         {
@@ -459,7 +677,7 @@
           type: "story",
           title: "Opening sequence",
           summary: "Begin mapping the first FF7 run as a memory palace.",
-          tags: ["opening"],
+          tags: ["opening"]
         },
         {
           id: "evt-bombing-mission",
@@ -468,91 +686,99 @@
           type: "story",
           title: "Bombing mission begins",
           summary: "Cloud joins Avalanche during the Reactor 1 mission.",
-          tags: ["mission", "reactor"],
-        },
+          tags: ["mission", "reactor"]
+        }
       ],
       inventory: [],
       characters: [
         { id: "cloud", name: "Cloud Strife", role: "party", notes: [] },
         { id: "barret", name: "Barret Wallace", role: "party", notes: [] },
         { id: "tifa", name: "Tifa Lockhart", role: "party", notes: [] },
-        { id: "aerith", name: "Aerith Gainsborough", role: "party", notes: [] },
+        { id: "aerith", name: "Aerith Gainsborough", role: "party", notes: [] }
       ],
       observations: [],
       captures: [],
-      memoryCards: { gameCards: [], palCards: [], pairs: [], activePairId: "" },
-      progressionDrawers: { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] },
+      memoryCards: {
+        gameCards: [],
+        palCards: [],
+        pairs: [],
+        activePairId: ""
+      },
+      progressionDrawers: {
+        drawers: [],
+        activeDrawerId: "",
+        pinnedDrawerIds: []
+      }
     };
-
-    const tabs = [
-      ["load", "📦", "Load"],
-      ["inspect", "🔎", "Inspect"],
-      ["play", "▶️", "Run / Attach"],
-      ["cards", "💳", "Memory Cards"],
-      ["history", "🗄️", "Drawers"],
-      ["palace", "🗺️", "Palace"],
-      ["blueprint", "🧬", "Blueprint"],
-      ["timeline", "📝", "Timeline"],
-      ["notes", "📖", "Notes"],
-      ["build", "🪄", "Build"],
-    ];
 
     let state = loadStoredState();
     let activeTab = "load";
     let captureStream = null;
-    let videoEl = null;
+
+    const els = {
+      tabs: document.getElementById("tabs"),
+      main: document.getElementById("main"),
+      zipInput: document.getElementById("zipInput"),
+      folderInput: document.getElementById("folderInput"),
+      saveInput: document.getElementById("saveInput"),
+      memInput: document.getElementById("memInput")
+    };
+
+    function uid(prefix = "id") {
+      return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    }
+
+    function ext(name = "") {
+      const parts = String(name).toLowerCase().split(".");
+      return parts.length > 1 ? parts.pop() : "";
+    }
+
+    function slug(input = "mem-palace") {
+      return String(input).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "mem-palace";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
 
     function loadStoredState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          return normalizeState(parsed);
-        }
-      } catch {}
-      return structuredCloneSafe(seedProject);
-    }
-
-    function structuredCloneSafe(obj) {
-      return JSON.parse(JSON.stringify(obj));
-    }
-
-    function normalizeState(data) {
-      const next = { ...structuredCloneSafe(seedProject), ...data };
-      next.package = { ...structuredCloneSafe(seedProject.package), ...(data.package || {}) };
-      next.runtime = { ...structuredCloneSafe(seedProject.runtime), ...(data.runtime || {}) };
-      next.memoryCards = { gameCards: [], palCards: [], pairs: [], activePairId: "", ...(data.memoryCards || {}) };
-      next.progressionDrawers = { drawers: [], activeDrawerId: "", pinnedDrawerIds: [], ...(data.progressionDrawers || {}) };
-      next.nodes = Array.isArray(data.nodes) ? data.nodes : seedProject.nodes;
-      next.edges = Array.isArray(data.edges) ? data.edges : seedProject.edges;
-      next.timeline = Array.isArray(data.timeline) ? data.timeline : seedProject.timeline;
-      next.captures = Array.isArray(data.captures) ? data.captures : [];
-      return next;
-    }
-
-    function saveLocal() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        return raw ? JSON.parse(raw) : structuredClone(seedProject);
       } catch {
-        toast("Local save failed. Large screenshots can overflow browser storage. Export a full session as backup.", "warn");
+        return structuredClone(seedProject);
       }
     }
 
-    function setState(updater, shouldRender = true) {
-      const next = typeof updater === "function" ? updater(state) : updater;
-      state = normalizeState({
-        ...next,
-        project: {
-          ...(next.project || state.project),
-          updatedAt: now(),
-        },
-      });
-      saveLocal();
-      if (shouldRender) render();
+    function saveStoredState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch {
+        console.warn("localStorage full. Export a full session, then clear captures.");
+      }
+    }
+
+    function setState(updater) {
+      state = typeof updater === "function" ? updater(state) : updater;
+      state.project.updatedAt = now();
+      saveStoredState();
+      render();
     }
 
     function currentNode() {
       return state.nodes.find((node) => node.id === state.currentNodeId) || state.nodes[0];
+    }
+
+    function memoryCards() {
+      return state.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" };
+    }
+
+    function drawers() {
+      return state.progressionDrawers || { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] };
     }
 
     function statusTone(status) {
@@ -563,35 +789,53 @@
       return "blue";
     }
 
+    function pill(text, tone = "") {
+      return `<span class="pill ${tone}">${escapeHtml(text)}</span>`;
+    }
+
     function getPairStatus(gameCard, palCard) {
       if (!gameCard && !palCard) return "unpaired";
       if (!gameCard) return "missing-gamecard";
       if (!palCard) return "missing-palcard";
+
       const pairing = palCard.pairing || {};
-      if (!pairing.gameCardId || pairing.gameCardId !== gameCard.id) return "unpaired";
-      if (pairing.gameSaveHash && gameCard.saveFile?.hash && pairing.gameSaveHash !== gameCard.saveFile.hash) return "out-of-sync";
+
+      if (!pairing.gameCardId || pairing.gameCardId !== gameCard.id) {
+        return "unpaired";
+      }
+
+      if (pairing.gameSaveHash && gameCard.saveFile?.hash && pairing.gameSaveHash !== gameCard.saveFile.hash) {
+        return "out-of-sync";
+      }
+
       return "synced";
     }
 
     function pairViews() {
-      const cards = state.memoryCards;
+      const cards = memoryCards();
       return (cards.pairs || []).map((pair) => {
         const gameCard = (cards.gameCards || []).find((card) => card.id === pair.gameCardId);
         const palCard = (cards.palCards || []).find((card) => card.id === pair.palCardId);
-        return { ...pair, gameCard, palCard, status: getPairStatus(gameCard, palCard) };
+        return {
+          ...pair,
+          gameCard,
+          palCard,
+          status: getPairStatus(gameCard, palCard)
+        };
       });
     }
 
-    function pill(text, tone = "orange") {
-      return `<span class="pill ${tone}">${escapeHtml(text)}</span>`;
-    }
+    function buildRouteFromNode(nodes, nodeId) {
+      const node = nodes.find((item) => item.id === nodeId);
+      if (!node) return [];
+      const route = [node.id];
 
-    function toast(message, tone = "info") {
-      const el = document.getElementById("toast");
-      el.textContent = message;
-      el.className = `toast show ${tone}`;
-      window.clearTimeout(toast._timer);
-      toast._timer = window.setTimeout(() => el.classList.remove("show"), 4300);
+      for (const connection of node.connections || []) {
+        if (!route.includes(connection)) route.unshift(connection);
+        if (route.length >= 8) break;
+      }
+
+      return Array.from(new Set(route));
     }
 
     function downloadText(filename, text, type = "text/plain") {
@@ -607,49 +851,47 @@
     }
 
     async function sha256File(file) {
-      if (!crypto.subtle) {
-        return `sha256-unavailable-${file.size}-${file.lastModified || Date.now()}`;
-      }
       const buffer = await file.arrayBuffer();
       const digest = await crypto.subtle.digest("SHA-256", buffer);
-      return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+      return Array.from(new Uint8Array(digest))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
     }
 
     function inspectFiles(files, sourceType, packageName) {
-      const fileList = Array.from(files || []).map((file) => ({
-        name: file.name || String(file.path || "unnamed"),
-        path: file.path || file.webkitRelativePath || file.name || "unnamed",
+      const fileList = files.map((file) => ({
+        name: file.name || file.path?.split("/").pop() || "unknown",
+        path: file.path || file.webkitRelativePath || file.name || "unknown",
         size: file.size || 0,
         type: file.type || "",
-        extension: ext(file.name || file.path || ""),
+        extension: ext(file.name || file.path || "")
       }));
 
-      const folders = Array.from(new Set(
-        fileList
-          .map((file) => file.path.split("/").slice(0, -1).join("/"))
-          .filter(Boolean)
-      ));
+      const folders = Array.from(
+        new Set(
+          fileList
+            .map((file) => file.path.split("/").slice(0, -1).join("/"))
+            .filter(Boolean)
+        )
+      );
 
       const scripts = fileList.filter((file) => ["js", "ts", "mjs", "jsx", "tsx"].includes(file.extension));
       const assets = fileList.filter((file) => ["png", "jpg", "jpeg", "webp", "gif", "svg", "mp3", "ogg", "wav", "mp4", "webm"].includes(file.extension));
-      const executables = fileList.filter((file) => ["exe", "bat", "cmd", "app", "msi"].includes(file.extension));
+      const executables = fileList.filter((file) => ["exe", "bat", "cmd", "msi", "app", "com"].includes(file.extension));
       const htmlEntries = fileList.filter((file) => file.name.toLowerCase() === "index.html" || file.extension === "html");
       const jsonFiles = fileList.filter((file) => file.extension === "json");
 
       let runMode = "external-attach";
       const warnings = [];
+
       if (htmlEntries.length) {
         runMode = "internal-html";
       } else if (executables.length) {
         runMode = "external-attach";
-        warnings.push("Native executables/installers cannot run inside a browser. Run the game normally on the PC, then use Attach Capture.");
+        warnings.push("Native executable detected. GitHub Pages cannot launch EXE/MSI/BAT/CMD files. Start the game normally, then use Attach Capture.");
       } else {
         runMode = "inspect-only";
-        warnings.push("No browser-runnable HTML entry point was detected. Blueprint inspection still works.");
-      }
-
-      if (!window.JSZip && fileList.some((file) => file.extension === "zip")) {
-        warnings.push("JSZip did not load from the CDN, so ZIP extraction is unavailable. Folder/file drop still works.");
+        warnings.push("No browser-runnable HTML entry point was detected. Blueprint inspection is still available.");
       }
 
       return {
@@ -670,20 +912,23 @@
           assetsFound: assets.length,
           scriptsFound: scripts.length,
           executablesFound: executables.length,
-          generatedAt: now(),
-        },
+          generatedAt: now()
+        }
       };
     }
 
     function createBlueprintFromPackage(pkg) {
-      const nodes = [{
-        id: "pkg-root",
-        type: "package",
-        source: "package",
-        title: pkg.name || "Loaded Package",
-        description: `Source: ${pkg.sourceType}. Run mode: ${pkg.runMode}.`,
-        tags: ["package", pkg.sourceType, pkg.runMode].filter(Boolean),
-      }];
+      const nodes = [
+        {
+          id: "pkg-root",
+          type: "package",
+          source: "package",
+          title: pkg.name || "Loaded Package",
+          description: `Source: ${pkg.sourceType}. Run mode: ${pkg.runMode}.`,
+          tags: ["package", pkg.sourceType, pkg.runMode].filter(Boolean)
+        }
+      ];
+
       const edges = [];
 
       for (const folder of pkg.detectedFolders || []) {
@@ -694,8 +939,8 @@
 
       for (const file of pkg.detectedExecutables || []) {
         const id = `exe-${slug(file.path)}`;
-        nodes.push({ id, type: "executable", source: "package", title: file.name, description: file.path, tags: ["executable"] });
-        edges.push({ id: `edge-root-${id}`, from: "pkg-root", to: id, label: "entry candidate", source: "package" });
+        nodes.push({ id, type: "executable", source: "package", title: file.name, description: file.path, tags: ["native", "executable", file.extension] });
+        edges.push({ id: `edge-root-${id}`, from: "pkg-root", to: id, label: "native entry candidate", source: "package" });
       }
 
       for (const file of pkg.detectedScripts || []) {
@@ -704,7 +949,7 @@
         edges.push({ id: `edge-root-${id}`, from: "pkg-root", to: id, label: "script", source: "package" });
       }
 
-      for (const file of (pkg.detectedAssets || []).slice(0, 70)) {
+      for (const file of (pkg.detectedAssets || []).slice(0, 60)) {
         const id = `asset-${slug(file.path)}`;
         nodes.push({ id, type: "asset", source: "package", title: file.name, description: file.path, tags: ["asset", file.extension] });
         edges.push({ id: `edge-root-${id}`, from: "pkg-root", to: id, label: "asset", source: "package" });
@@ -715,20 +960,18 @@
 
     async function loadZip(file) {
       if (!file) return;
-      if (!window.JSZip) {
-        toast("JSZip did not load, so this browser cannot inspect ZIP files yet. Drop an extracted folder instead.", "warn");
-        return;
-      }
 
       try {
         const zip = await JSZip.loadAsync(await file.arrayBuffer());
-        const files = Object.values(zip.files)
+        const entries = Object.values(zip.files);
+
+        const files = entries
           .filter((entry) => !entry.dir)
           .map((entry) => ({
             name: entry.name.split("/").pop(),
             path: entry.name,
             size: entry._data?.uncompressedSize || 0,
-            type: "",
+            type: ""
           }));
 
         const pkg = inspectFiles(files, "zip", file.name.replace(/\.zip$/i, ""));
@@ -739,13 +982,17 @@
           runMode: pkg.runMode,
           internalHtml: "",
           internalEntry: pkg.entryCandidates[0] || "",
-          externalInstructions: pkg.warnings,
+          externalInstructions: pkg.warnings
         };
 
         if (pkg.runMode === "internal-html") {
           const entry = pkg.entryCandidates.find((candidate) => candidate.toLowerCase().endsWith(".html"));
           const html = entry ? await zip.file(entry)?.async("string") : "";
-          runtime = { ...runtime, internalHtml: html || "<p>No HTML entry could be loaded.</p>", internalEntry: entry || "" };
+          runtime = {
+            ...runtime,
+            internalHtml: html || "<p>No HTML entry could be loaded.</p>",
+            internalEntry: entry || ""
+          };
         }
 
         setState((prev) => ({
@@ -754,34 +1001,38 @@
           runtime,
           nodes: [...prev.nodes.filter((node) => node.source !== "package"), ...blueprint.nodes],
           edges: [...prev.edges.filter((edge) => edge.source !== "package"), ...blueprint.edges],
-          timeline: [{
-            id: uid("evt"),
-            timestamp: now(),
-            nodeId: prev.currentNodeId,
-            type: "load",
-            title: `Loaded ZIP: ${pkg.name}`,
-            summary: `Inspected ${pkg.importReport.filesFound} files and generated a blueprint.`,
-            tags: ["load", "zip"],
-          }, ...prev.timeline],
+          timeline: [
+            {
+              id: uid("evt"),
+              timestamp: now(),
+              nodeId: prev.currentNodeId,
+              type: "load",
+              title: `Loaded ZIP: ${pkg.name}`,
+              summary: `Inspected ${pkg.importReport.filesFound} files and generated a browser-safe blueprint.`,
+              tags: ["load", "zip", pkg.runMode]
+            },
+            ...prev.timeline
+          ]
         }));
+
         activeTab = "inspect";
         render();
-        toast(`Loaded ZIP: ${file.name}`);
       } catch (error) {
+        alert("ZIP could not be read. The file may be damaged or blocked by the browser.");
         console.error(error);
-        toast("ZIP load failed. The file may be corrupt, blocked, or not a real ZIP.", "warn");
       }
     }
 
-    async function loadFolder(files) {
-      const list = Array.from(files || []);
-      if (!list.length) {
-        toast("No readable files were found. If these are cloud placeholders, make them available offline first.", "warn");
-        return;
-      }
+    async function loadLooseFiles(fileList, sourceType = "files", packageName = "Dropped Files") {
+      const files = Array.from(fileList || []);
+      if (!files.length) return;
 
-      const root = list[0].webkitRelativePath?.split("/")[0] || list[0].path?.split("/")[0] || "Dropped Files";
-      const pkg = inspectFiles(list, "folder", root);
+      const root =
+        files[0].webkitRelativePath?.split("/")[0] ||
+        files[0].path?.split("/")[0] ||
+        packageName;
+
+      const pkg = inspectFiles(files, sourceType, root);
       const blueprint = createBlueprintFromPackage(pkg);
 
       setState((prev) => ({
@@ -792,144 +1043,104 @@
           runMode: pkg.runMode,
           internalHtml: "",
           internalEntry: pkg.entryCandidates[0] || "",
-          externalInstructions: pkg.warnings,
+          externalInstructions: pkg.warnings
         },
         nodes: [...prev.nodes.filter((node) => node.source !== "package"), ...blueprint.nodes],
         edges: [...prev.edges.filter((edge) => edge.source !== "package"), ...blueprint.edges],
-        timeline: [{
-          id: uid("evt"),
-          timestamp: now(),
-          nodeId: prev.currentNodeId,
-          type: "load",
-          title: `Loaded folder/files: ${pkg.name}`,
-          summary: `Inspected ${pkg.importReport.filesFound} files and generated a blueprint.`,
-          tags: ["load", "folder", "drop"],
-        }, ...prev.timeline],
+        timeline: [
+          {
+            id: uid("evt"),
+            timestamp: now(),
+            nodeId: prev.currentNodeId,
+            type: "load",
+            title: `Loaded ${sourceType}: ${pkg.name}`,
+            summary: `Inspected ${pkg.importReport.filesFound} files and generated a browser-safe blueprint.`,
+            tags: ["load", sourceType, pkg.runMode]
+          },
+          ...prev.timeline
+        ]
       }));
+
       activeTab = "inspect";
       render();
-      toast(`Loaded ${list.length} readable file(s).`);
     }
 
-    async function readDroppedEntry(entry, pathPrefix = "") {
-      if (!entry) return [];
-
-      if (entry.isFile) {
-        return new Promise((resolve) => {
+    async function readEntry(entry, path = "") {
+      return new Promise((resolve) => {
+        if (entry.isFile) {
           entry.file((file) => {
-            const relativePath = `${pathPrefix}${file.name}`;
-            try {
-              Object.defineProperty(file, "webkitRelativePath", {
-                value: relativePath,
-                configurable: true,
-              });
-            } catch {}
+            file.path = path + file.name;
             resolve([file]);
-          }, () => resolve([]));
-        });
-      }
-
-      if (entry.isDirectory) {
-        const reader = entry.createReader();
-        const entries = [];
-        async function readAllEntries() {
-          return new Promise((resolve) => {
-            reader.readEntries(async (batch) => {
-              if (!batch.length) return resolve(entries);
-              entries.push(...batch);
-              resolve(await readAllEntries());
-            }, () => resolve(entries));
           });
+          return;
         }
 
-        const childEntries = await readAllEntries();
-        const nestedFiles = await Promise.all(childEntries.map((child) => readDroppedEntry(child, `${pathPrefix}${entry.name}/`)));
-        return nestedFiles.flat();
-      }
+        if (entry.isDirectory) {
+          const reader = entry.createReader();
+          const all = [];
 
-      return [];
-    }
+          const readBatch = () => {
+            reader.readEntries(async (entries) => {
+              if (!entries.length) {
+                resolve(all);
+                return;
+              }
 
-    async function getFilesFromDrop(event) {
-      const items = Array.from(event.dataTransfer?.items || []);
-      if (items.length) {
-        const entryFiles = await Promise.all(items.map((item) => {
-          const entry = item.webkitGetAsEntry?.();
-          return readDroppedEntry(entry);
-        }));
-        const files = entryFiles.flat();
-        if (files.length) return files;
-      }
-      return Array.from(event.dataTransfer?.files || []);
+              for (const child of entries) {
+                const childFiles = await readEntry(child, path + entry.name + "/");
+                all.push(...childFiles);
+              }
+
+              readBatch();
+            });
+          };
+
+          readBatch();
+          return;
+        }
+
+        resolve([]);
+      });
     }
 
     async function handleDrop(event) {
       event.preventDefault();
-      event.stopPropagation();
-      document.querySelectorAll(".drop-zone").forEach((el) => el.classList.remove("dragging"));
+      document.querySelector(".dropzone")?.classList.remove("drag");
 
-      try {
-        const droppedFiles = await getFilesFromDrop(event);
-        if (!droppedFiles.length) {
-          toast("No readable files were found. For OneDrive/Google Drive placeholders, keep them offline/on this device first.", "warn");
-          return;
-        }
+      const items = Array.from(event.dataTransfer.items || []);
+      const droppedFiles = Array.from(event.dataTransfer.files || []);
 
-        const zipFiles = droppedFiles.filter((file) => file.name.toLowerCase().endsWith(".zip"));
-        const memFiles = droppedFiles.filter((file) => /\.(json|memsave|memdrawer|memsession)$/i.test(file.name));
-
-        if (zipFiles.length === 1 && droppedFiles.length === 1) {
-          await loadZip(zipFiles[0]);
-          return;
-        }
-
-        if (memFiles.length === 1 && droppedFiles.length === 1) {
-          await importMemFile(memFiles[0]);
-          return;
-        }
-
-        if (zipFiles.length === 1 && droppedFiles.length <= 3) {
-          await loadZip(zipFiles[0]);
-          return;
-        }
-
-        await loadFolder(droppedFiles);
-      } catch (error) {
-        console.error(error);
-        toast("Drop failed. The browser could not read that file/folder.", "warn");
+      const zip = droppedFiles.find((file) => file.name.toLowerCase().endsWith(".zip"));
+      if (zip) {
+        await loadZip(zip);
+        return;
       }
-    }
 
-    function wireDropZone(zone) {
-      zone.addEventListener("dragover", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        zone.classList.add("dragging");
-      });
-      zone.addEventListener("dragleave", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        zone.classList.remove("dragging");
-      });
-      zone.addEventListener("drop", handleDrop);
-    }
+      if (items.length && items.some((item) => item.webkitGetAsEntry)) {
+        const files = [];
+        for (const item of items) {
+          const entry = item.webkitGetAsEntry?.();
+          if (entry) {
+            const result = await readEntry(entry);
+            files.push(...result);
+          }
+        }
 
-    function buildRouteFromNode(nodes, nodeId) {
-      const node = nodes.find((item) => item.id === nodeId);
-      if (!node) return [];
-      const route = [node.id];
-      for (const connection of node.connections || []) {
-        if (!route.includes(connection)) route.unshift(connection);
-        if (route.length >= 8) break;
+        if (files.length) {
+          await loadLooseFiles(files, "drag-drop", "Dropped Project");
+          return;
+        }
       }
-      return Array.from(new Set(route));
+
+      await loadLooseFiles(droppedFiles, "drag-drop", "Dropped Files");
     }
 
     async function createGameCardFromSaveFile(file) {
       if (!file) return;
+
       const hash = await sha256File(file);
-      const nowTime = now();
       const slotGuess = file.name.replace(/\.[^.]+$/, "").replace(/[^a-z0-9_-]+/gi, "-").toLowerCase() || "slot-imported";
+
       const card = {
         cardType: "GameCard",
         version: "0.1",
@@ -938,36 +1149,43 @@
         gameTitle: state.project?.title || "Unknown Game",
         slotId: slotGuess,
         slotTitle: file.name,
-        createdAt: nowTime,
-        updatedAt: nowTime,
+        createdAt: now(),
+        updatedAt: now(),
         saveMode: "file-import-fingerprint",
         saveFile: {
           name: file.name,
           relativePath: file.webkitRelativePath || file.name,
           hash,
           sizeBytes: file.size,
-          lastModified: file.lastModified ? new Date(file.lastModified).toISOString() : nowTime,
+          lastModified: file.lastModified ? new Date(file.lastModified).toISOString() : now()
         },
         gameRuntime: {
           runMode: state.package?.runMode || "external-attach",
           executableName: state.package?.detectedExecutables?.[0]?.name || "unknown",
-          packageId: state.project?.id || "unknown-package",
-        },
+          packageId: state.project?.id || "unknown-package"
+        }
       };
 
       setState((prev) => ({
         ...prev,
-        memoryCards: { ...prev.memoryCards, gameCards: [card, ...(prev.memoryCards?.gameCards || [])] },
-        timeline: [{
-          id: uid("evt"),
-          timestamp: nowTime,
-          nodeId: prev.currentNodeId,
-          type: "load",
-          title: `GameCard created: ${file.name}`,
-          summary: "Imported save file fingerprint. This stores the mechanical save-state identity.",
-          tags: ["GameCard", "save"],
-        }, ...prev.timeline],
+        memoryCards: {
+          ...memoryCards(),
+          gameCards: [card, ...(memoryCards().gameCards || [])]
+        },
+        timeline: [
+          {
+            id: uid("evt"),
+            timestamp: now(),
+            nodeId: prev.currentNodeId,
+            type: "load",
+            title: `GameCard created: ${file.name}`,
+            summary: "Imported save file fingerprint. This stores the mechanical save-state identity.",
+            tags: ["GameCard", "save"]
+          },
+          ...prev.timeline
+        ]
       }));
+
       activeTab = "cards";
       render();
     }
@@ -975,9 +1193,10 @@
     function createPALCardFromCurrentNode() {
       const node = currentNode();
       if (!node) return;
-      const nowTime = now();
+
       const capturesForNode = state.captures.filter((capture) => capture.nodeId === node.id).map((capture) => capture.id);
       const eventsForNode = state.timeline.filter((event) => event.nodeId === node.id).map((event) => event.id);
+
       const card = {
         cardType: "PALCard",
         version: "0.1",
@@ -986,137 +1205,177 @@
         title: `${node.title} Palace Context`,
         palaceNodeId: node.id,
         currentRoom: node.title,
-        createdAt: nowTime,
-        updatedAt: nowTime,
+        createdAt: now(),
+        updatedAt: now(),
         thumbnail: capturesForNode[0] || null,
         context: {
           summary: node.description || `Palace context for ${node.title}.`,
           route: buildRouteFromNode(state.nodes, node.id),
           tags: node.tags || [],
-          notes: node.notes || [],
+          notes: node.notes || []
         },
         linkedAssets: {
           captures: capturesForNode,
           blueprints: ["world-blueprint-v0"],
-          timelineEvents: eventsForNode,
+          timelineEvents: eventsForNode
         },
-        pairing: { gameCardId: null, gameSaveHash: null, pairStatus: "unpaired" },
+        pairing: {
+          gameCardId: null,
+          gameSaveHash: null,
+          pairStatus: "unpaired"
+        }
       };
 
       setState((prev) => ({
         ...prev,
-        memoryCards: { ...prev.memoryCards, palCards: [card, ...(prev.memoryCards?.palCards || [])] },
-        timeline: [{
-          id: uid("evt"),
-          timestamp: nowTime,
-          nodeId: node.id,
-          type: "note",
-          title: `PALCard created: ${card.title}`,
-          summary: "Created Palace Anchor Layer card from the current room.",
-          tags: ["PALCard", "memory"],
-        }, ...prev.timeline],
+        memoryCards: {
+          ...memoryCards(),
+          palCards: [card, ...(memoryCards().palCards || [])]
+        },
+        timeline: [
+          {
+            id: uid("evt"),
+            timestamp: now(),
+            nodeId: node.id,
+            type: "note",
+            title: `PALCard created: ${card.title}`,
+            summary: "Created Palace Anchor Layer card from the current room.",
+            tags: ["PALCard", "memory"]
+          },
+          ...prev.timeline
+        ]
       }));
+
       activeTab = "cards";
       render();
     }
 
     function pairCards(gameCardId, palCardId) {
-      const gameCard = state.memoryCards.gameCards.find((card) => card.id === gameCardId);
-      const palCard = state.memoryCards.palCards.find((card) => card.id === palCardId);
+      const cards = memoryCards();
+      const gameCard = cards.gameCards.find((card) => card.id === gameCardId);
+      const palCard = cards.palCards.find((card) => card.id === palCardId);
+
       if (!gameCard || !palCard) return;
-      const nowTime = now();
+
       const pairId = uid("pair");
+
       const updatedPalCard = {
         ...palCard,
-        updatedAt: nowTime,
-        pairing: { gameCardId, gameSaveHash: gameCard.saveFile?.hash || null, pairStatus: "synced" },
+        updatedAt: now(),
+        pairing: {
+          gameCardId,
+          gameSaveHash: gameCard.saveFile?.hash || null,
+          pairStatus: "synced"
+        }
       };
-      const status = getPairStatus(gameCard, updatedPalCard);
+
       const pair = {
         id: pairId,
         title: `${gameCard.slotTitle} + ${palCard.currentRoom}`,
         gameCardId,
         palCardId,
-        status,
-        createdAt: nowTime,
-        updatedAt: nowTime,
+        status: getPairStatus(gameCard, updatedPalCard),
+        createdAt: now(),
+        updatedAt: now()
       };
 
       setState((prev) => ({
         ...prev,
         memoryCards: {
-          ...prev.memoryCards,
+          ...cards,
           activePairId: pairId,
-          palCards: (prev.memoryCards?.palCards || []).map((card) => card.id === palCardId ? updatedPalCard : card),
-          pairs: [pair, ...(prev.memoryCards?.pairs || [])],
+          palCards: cards.palCards.map((card) => card.id === palCardId ? updatedPalCard : card),
+          pairs: [pair, ...(cards.pairs || [])]
         },
-        timeline: [{
-          id: uid("evt"),
-          timestamp: nowTime,
-          nodeId: palCard.palaceNodeId,
-          type: "note",
-          title: "MEM Save Pair created",
-          summary: `${gameCard.slotTitle} paired with ${palCard.currentRoom}.`,
-          tags: ["MEM Save Pair", "GameCard", "PALCard"],
-        }, ...prev.timeline],
+        timeline: [
+          {
+            id: uid("evt"),
+            timestamp: now(),
+            nodeId: palCard.palaceNodeId,
+            type: "note",
+            title: "MEM Save Pair created",
+            summary: `${gameCard.slotTitle} paired with ${palCard.currentRoom}.`,
+            tags: ["MEM Save Pair", "GameCard", "PALCard"]
+          },
+          ...prev.timeline
+        ]
       }));
     }
 
-    function verifyPairs() {
-      setState((prev) => {
-        const cards = prev.memoryCards;
-        const pairs = (cards.pairs || []).map((pair) => {
-          const gameCard = cards.gameCards.find((card) => card.id === pair.gameCardId);
-          const palCard = cards.palCards.find((card) => card.id === pair.palCardId);
-          return { ...pair, status: getPairStatus(gameCard, palCard), updatedAt: now() };
-        });
-        return { ...prev, memoryCards: { ...cards, pairs } };
-      });
+    function autoPairLatestCards() {
+      const cards = memoryCards();
+      const gameCard = cards.gameCards?.[0];
+      const palCard = cards.palCards?.[0];
+      if (!gameCard || !palCard) return;
+      pairCards(gameCard.id, palCard.id);
     }
 
     function loadPair(pairId) {
       const pair = pairViews().find((item) => item.id === pairId);
       if (!pair?.palCard?.palaceNodeId) return;
+
       setState((prev) => ({
         ...prev,
         currentNodeId: pair.palCard.palaceNodeId,
-        memoryCards: { ...prev.memoryCards, activePairId: pair.id },
-        timeline: [{
-          id: uid("evt"),
-          timestamp: now(),
-          nodeId: pair.palCard.palaceNodeId,
-          type: "load",
-          title: "MEM Save Pair loaded",
-          summary: `Restored palace context for ${pair.palCard.currentRoom}.`,
-          tags: ["MEM Save Pair", "load"],
-        }, ...prev.timeline],
+        memoryCards: {
+          ...memoryCards(),
+          activePairId: pair.id
+        },
+        timeline: [
+          {
+            id: uid("evt"),
+            timestamp: now(),
+            nodeId: pair.palCard.palaceNodeId,
+            type: "load",
+            title: "MEM Save Pair loaded",
+            summary: `Restored palace context for ${pair.palCard.currentRoom}.`,
+            tags: ["MEM Save Pair", "load"]
+          },
+          ...prev.timeline
+        ]
       }));
+
       activeTab = "blueprint";
       render();
     }
 
-    function duplicatePair(pairId) {
-      const pair = state.memoryCards.pairs.find((item) => item.id === pairId);
-      if (!pair) return;
-      const nowTime = now();
-      const cleanPair = { ...pair, id: uid("pair"), title: `${pair.title} Copy`, createdAt: nowTime, updatedAt: nowTime };
-      setState((prev) => ({ ...prev, memoryCards: { ...prev.memoryCards, pairs: [cleanPair, ...(prev.memoryCards?.pairs || [])] } }));
-    }
+    function verifyPairs() {
+      const cards = memoryCards();
+      const pairs = (cards.pairs || []).map((pair) => {
+        const gameCard = cards.gameCards.find((card) => card.id === pair.gameCardId);
+        const palCard = cards.palCards.find((card) => card.id === pair.palCardId);
+        return {
+          ...pair,
+          status: getPairStatus(gameCard, palCard),
+          updatedAt: now()
+        };
+      });
 
-    function unpairCards(pairId) {
       setState((prev) => ({
         ...prev,
         memoryCards: {
-          ...prev.memoryCards,
-          pairs: (prev.memoryCards?.pairs || []).filter((pair) => pair.id !== pairId),
-          activePairId: prev.memoryCards?.activePairId === pairId ? "" : prev.memoryCards?.activePairId || "",
-        },
+          ...cards,
+          pairs
+        }
+      }));
+    }
+
+    function unpairCards(pairId) {
+      const cards = memoryCards();
+      setState((prev) => ({
+        ...prev,
+        memoryCards: {
+          ...cards,
+          pairs: cards.pairs.filter((pair) => pair.id !== pairId),
+          activePairId: cards.activePairId === pairId ? "" : cards.activePairId
+        }
       }));
     }
 
     function exportPair(pairId) {
       const pair = pairViews().find((item) => item.id === pairId);
       if (!pair) return;
+
       const manifest = {
         memSaveVersion: "0.1",
         savePairId: pair.id,
@@ -1128,10 +1387,11 @@
         pairing: {
           status: pair.status,
           gameSaveHash: pair.gameCard?.saveFile?.hash || null,
-          palaceNodeId: pair.palCard?.palaceNodeId || null,
+          palaceNodeId: pair.palCard?.palaceNodeId || null
         },
-        palaceProject: state,
+        palaceProject: state
       };
+
       downloadText(`${slug(pair.title)}.memsave.json`, JSON.stringify(manifest, null, 2), "application/json");
     }
 
@@ -1140,77 +1400,27 @@
         memSaveVersion: "0.1",
         title: `${state.project.title} MEM Save Pairs`,
         exportedAt: now(),
-        memoryCards: state.memoryCards,
-        palaceProject: state,
+        memoryCards: memoryCards(),
+        palaceProject: state
       };
-      downloadText(`${state.project.id || "mem-palace"}-memsave.json`, JSON.stringify(manifest, null, 2), "application/json");
-    }
 
-    async function importMemFile(file) {
-      if (!file) return;
-      try {
-        const parsed = JSON.parse(await file.text());
-        if (parsed.sessionVersion && parsed.palaceSnapshot?.nodes) {
-          state = normalizeState(parsed.palaceSnapshot);
-          saveLocal();
-          activeTab = "history";
-          render();
-          toast("Imported full MEM session.");
-          return;
-        }
-        if (parsed.drawerArchiveVersion && parsed.progressionDrawers) {
-          setState((prev) => ({ ...prev, progressionDrawers: parsed.progressionDrawers }));
-          activeTab = "history";
-          render();
-          toast("Imported drawer archive.");
-          return;
-        }
-        if (parsed.drawerVersion && parsed.drawer) {
-          setState((prev) => ({
-            ...prev,
-            progressionDrawers: {
-              ...prev.progressionDrawers,
-              activeDrawerId: parsed.drawer.drawerId,
-              drawers: [parsed.drawer, ...(prev.progressionDrawers?.drawers || [])],
-            },
-          }));
-          activeTab = "history";
-          render();
-          toast("Imported drawer.");
-          return;
-        }
-        if (parsed.palaceProject?.nodes) {
-          state = normalizeState(parsed.palaceProject);
-          saveLocal();
-          activeTab = "cards";
-          render();
-          toast("Imported MEM save project snapshot.");
-          return;
-        }
-        if (parsed.memoryCards) {
-          setState((prev) => ({ ...prev, memoryCards: parsed.memoryCards }));
-          activeTab = "cards";
-          render();
-          toast("Imported memory cards.");
-          return;
-        }
-        toast("JSON was valid, but it was not a recognised MEM file.", "warn");
-      } catch (error) {
-        console.error(error);
-        toast("Could not import MEM file. The file is not valid JSON.", "warn");
-      }
+      downloadText(`${state.project.id || "mem-palace"}-memsave.json`, JSON.stringify(manifest, null, 2), "application/json");
     }
 
     function buildProgressionDrawer(titleOverride = "") {
       const views = pairViews();
-      const activePair = views.find((pair) => pair.id === state.memoryCards.activePairId) || views[0] || null;
+      const cards = memoryCards();
+      const activePair = views.find((pair) => pair.id === cards.activePairId) || views[0] || null;
+      const node = currentNode();
       const lastCapture = state.captures?.[0] || null;
       const lastEvent = state.timeline?.[0] || null;
-      const drawerId = uid("drawer");
-      const node = currentNode();
-      const drawerTitle = titleOverride.trim() || `${state.package?.name && state.package.name !== "No package loaded" ? state.package.name : state.project.title} - ${node?.title || "Current Room"}`;
+
+      const drawerTitle =
+        titleOverride.trim() ||
+        `${state.package?.name && state.package.name !== "No package loaded" ? state.package.name : state.project.title} - ${node?.title || "Current Room"}`;
+
       return {
-        drawerId,
+        drawerId: uid("drawer"),
         title: drawerTitle,
         type: "progression-drawer",
         status: activePair ? activePair.status : "legacy",
@@ -1222,7 +1432,7 @@
         activeTab,
         currentNodeId: state.currentNodeId,
         currentRoom: node?.title || "Unknown Room",
-        activePairId: activePair?.id || state.memoryCards.activePairId || "",
+        activePairId: activePair?.id || cards.activePairId || "",
         gameCardId: activePair?.gameCardId || "",
         palCardId: activePair?.palCardId || "",
         lastCaptureId: lastCapture?.id || "",
@@ -1230,58 +1440,178 @@
         layout: {
           leftPanel: state.runtime?.runMode === "internal-html" ? "internal-html" : "capture",
           rightPanel: "blueprint",
-          sidePanel: "memoryCards",
+          sidePanel: "memoryCards"
         },
-        summary: `Resume ${node?.title || "the current room"} with package, palace, card, and timeline context.`,
+        summary: `Resume ${node?.title || "the current room"} with package, palace, card, and timeline context.`
       };
     }
 
     function createProgressionDrawer(titleOverride = "") {
       const drawer = buildProgressionDrawer(titleOverride);
+      const currentDrawers = drawers();
+
       setState((prev) => ({
         ...prev,
         progressionDrawers: {
-          ...prev.progressionDrawers,
+          ...currentDrawers,
           activeDrawerId: drawer.drawerId,
-          drawers: [drawer, ...(prev.progressionDrawers?.drawers || [])],
+          drawers: [drawer, ...(currentDrawers.drawers || [])]
         },
-        timeline: [{
-          id: uid("evt"),
-          timestamp: now(),
-          nodeId: prev.currentNodeId,
-          type: "checkpoint",
-          title: "Progression Drawer created",
-          summary: `${drawer.title} saved as a resumable MEM Palace session drawer.`,
-          tags: ["drawer", "progression-history"],
-        }, ...prev.timeline],
+        timeline: [
+          {
+            id: uid("evt"),
+            timestamp: now(),
+            nodeId: prev.currentNodeId,
+            type: "checkpoint",
+            title: "Progression Drawer created",
+            summary: `${drawer.title} saved as a resumable MEM Palace session drawer.`,
+            tags: ["drawer", "progression-history"]
+          },
+          ...prev.timeline
+        ]
       }));
+
       activeTab = "history";
       render();
     }
 
+    function resumeDrawer(drawerId) {
+      const drawer = drawers().drawers.find((item) => item.drawerId === drawerId);
+      if (!drawer) return;
+
+      const currentDrawers = drawers();
+
+      setState((prev) => ({
+        ...prev,
+        currentNodeId: drawer.currentNodeId || prev.currentNodeId,
+        memoryCards: {
+          ...memoryCards(),
+          activePairId: drawer.activePairId || memoryCards().activePairId || ""
+        },
+        progressionDrawers: {
+          ...currentDrawers,
+          activeDrawerId: drawer.drawerId,
+          drawers: currentDrawers.drawers.map((item) =>
+            item.drawerId === drawer.drawerId ? { ...item, updatedAt: now() } : item
+          )
+        },
+        timeline: [
+          {
+            id: uid("evt"),
+            timestamp: now(),
+            nodeId: drawer.currentNodeId || prev.currentNodeId,
+            type: "load",
+            title: "Progression Drawer resumed",
+            summary: `Restored workspace drawer: ${drawer.title}.`,
+            tags: ["drawer", "resume"]
+          },
+          ...prev.timeline
+        ]
+      }));
+
+      activeTab = drawer.activeTab && drawer.activeTab !== "history" ? drawer.activeTab : "palace";
+      render();
+    }
+
+    function exportDrawer(drawerId) {
+      const drawer = drawers().drawers.find((item) => item.drawerId === drawerId);
+      if (!drawer) return;
+
+      const payload = {
+        drawerVersion: "0.1",
+        exportedAt: now(),
+        drawer,
+        linkedPair: pairViews().find((pair) => pair.id === drawer.activePairId) || null,
+        palaceSnapshot: state,
+        browserBetaNote: "Browser Beta restores session context and save identity. Desktop Edition can relaunch/copy saves and reattach native runtimes."
+      };
+
+      downloadText(`${slug(drawer.title)}.memdrawer.json`, JSON.stringify(payload, null, 2), "application/json");
+    }
+
+    function exportActiveDrawer() {
+      const activeId = drawers().activeDrawerId;
+      if (!activeId) return;
+      exportDrawer(activeId);
+    }
+
+    function deleteDrawer(drawerId) {
+      const currentDrawers = drawers();
+
+      setState((prev) => ({
+        ...prev,
+        progressionDrawers: {
+          ...currentDrawers,
+          drawers: currentDrawers.drawers.filter((drawer) => drawer.drawerId !== drawerId),
+          pinnedDrawerIds: currentDrawers.pinnedDrawerIds.filter((id) => id !== drawerId),
+          activeDrawerId: currentDrawers.activeDrawerId === drawerId ? "" : currentDrawers.activeDrawerId
+        }
+      }));
+    }
+
+    function togglePinDrawer(drawerId) {
+      const currentDrawers = drawers();
+      const existing = currentDrawers.pinnedDrawerIds || [];
+      const pinnedDrawerIds = existing.includes(drawerId)
+        ? existing.filter((id) => id !== drawerId)
+        : [drawerId, ...existing];
+
+      setState((prev) => ({
+        ...prev,
+        progressionDrawers: {
+          ...currentDrawers,
+          pinnedDrawerIds
+        }
+      }));
+    }
+
+    function exportAllDrawers() {
+      const payload = {
+        drawerArchiveVersion: "0.1",
+        title: `${state.project.title} Progression Drawers`,
+        exportedAt: now(),
+        progressionDrawers: drawers(),
+        project: state.project,
+        palaceSnapshot: state
+      };
+
+      downloadText(`${slug(state.project.title)}-drawers.memdrawer.json`, JSON.stringify(payload, null, 2), "application/json");
+    }
+
     function saveFullSession() {
       const drawer = buildProgressionDrawer();
+      const currentDrawers = drawers();
+
       const nextProgressionDrawers = {
-        ...state.progressionDrawers,
+        ...currentDrawers,
         activeDrawerId: drawer.drawerId,
-        drawers: [drawer, ...(state.progressionDrawers.drawers || [])],
+        drawers: [drawer, ...(currentDrawers.drawers || [])]
       };
-      const nextData = normalizeState({
+
+      const nextData = {
         ...state,
         progressionDrawers: nextProgressionDrawers,
-        timeline: [{
-          id: uid("evt"),
-          timestamp: now(),
-          nodeId: state.currentNodeId,
-          type: "checkpoint",
-          title: "Full Session saved",
-          summary: `${drawer.title} saved as a full MEM Palace session.`,
-          tags: ["drawer", "full-session", "progression-history"],
-        }, ...state.timeline],
-        project: { ...state.project, updatedAt: now() },
-      });
+        timeline: [
+          {
+            id: uid("evt"),
+            timestamp: now(),
+            nodeId: state.currentNodeId,
+            type: "checkpoint",
+            title: "Full Session saved",
+            summary: `${drawer.title} saved as a full MEM Palace session.`,
+            tags: ["drawer", "full-session", "progression-history"]
+          },
+          ...state.timeline
+        ],
+        project: {
+          ...state.project,
+          updatedAt: now()
+        }
+      };
+
       state = nextData;
-      saveLocal();
+      saveStoredState();
+
       const payload = {
         sessionVersion: "0.1",
         exportedAt: now(),
@@ -1293,156 +1623,200 @@
         progressionDrawers: nextProgressionDrawers,
         activeDrawer: drawer,
         palaceSnapshot: nextData,
-        browserBetaNote: "This browser beta saves MEM Palace context, memory cards, progression drawers, captures, notes, and blueprint state. It does not freeze a native game process.",
+        browserBetaNote: "This browser beta saves MEM Palace context, memory cards, progression drawers, captures, notes, and blueprint state. It does not freeze a native game process."
       };
+
       downloadText(`${slug(state.project.title)}-full-session.memsession.json`, JSON.stringify(payload, null, 2), "application/json");
+
       activeTab = "history";
       render();
     }
 
-    function resumeDrawer(drawerId) {
-      const drawer = state.progressionDrawers.drawers.find((item) => item.drawerId === drawerId);
-      if (!drawer) return;
-      setState((prev) => ({
-        ...prev,
-        currentNodeId: drawer.currentNodeId || prev.currentNodeId,
-        memoryCards: { ...prev.memoryCards, activePairId: drawer.activePairId || prev.memoryCards?.activePairId || "" },
-        progressionDrawers: {
-          ...prev.progressionDrawers,
-          activeDrawerId: drawer.drawerId,
-          drawers: (prev.progressionDrawers?.drawers || []).map((item) => item.drawerId === drawer.drawerId ? { ...item, updatedAt: now() } : item),
-        },
-        timeline: [{
-          id: uid("evt"),
-          timestamp: now(),
-          nodeId: drawer.currentNodeId || prev.currentNodeId,
-          type: "load",
-          title: "Progression Drawer resumed",
-          summary: `Restored workspace drawer: ${drawer.title}.`,
-          tags: ["drawer", "resume"],
-        }, ...prev.timeline],
-      }));
-      activeTab = drawer.activeTab && drawer.activeTab !== "history" ? drawer.activeTab : "palace";
-      render();
-    }
+    function importMemFile(file) {
+      if (!file) return;
 
-    function exportDrawer(drawerId) {
-      const drawer = typeof drawerId === "object" ? drawerId : state.progressionDrawers.drawers.find((item) => item.drawerId === drawerId);
-      if (!drawer) return;
-      const payload = {
-        drawerVersion: "0.1",
-        exportedAt: now(),
-        drawer,
-        linkedPair: pairViews().find((pair) => pair.id === drawer.activePairId) || null,
-        palaceSnapshot: state,
-        browserBetaNote: "Browser Beta restores session context and save identity. Desktop Edition can relaunch/copy saves and reattach native runtimes.",
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(String(reader.result));
+
+          if (parsed.sessionVersion && parsed.palaceSnapshot?.nodes) {
+            state = parsed.palaceSnapshot;
+            saveStoredState();
+            activeTab = "history";
+            render();
+            return;
+          }
+
+          if (parsed.drawerArchiveVersion && parsed.progressionDrawers) {
+            setState((prev) => ({ ...prev, progressionDrawers: parsed.progressionDrawers }));
+            activeTab = "history";
+            render();
+            return;
+          }
+
+          if (parsed.drawerVersion && parsed.drawer) {
+            const currentDrawers = drawers();
+            setState((prev) => ({
+              ...prev,
+              progressionDrawers: {
+                ...currentDrawers,
+                activeDrawerId: parsed.drawer.drawerId,
+                drawers: [parsed.drawer, ...(currentDrawers.drawers || [])]
+              }
+            }));
+            activeTab = "history";
+            render();
+            return;
+          }
+
+          if (parsed.palaceProject?.nodes) {
+            state = parsed.palaceProject;
+            saveStoredState();
+            activeTab = "cards";
+            render();
+            return;
+          }
+
+          if (parsed.memoryCards) {
+            setState((prev) => ({ ...prev, memoryCards: parsed.memoryCards }));
+            activeTab = "cards";
+            render();
+            return;
+          }
+
+          alert("MEM file loaded, but no recognized MEM payload was found.");
+        } catch {
+          alert("Could not import MEM file. The file is not valid JSON.");
+        }
       };
-      downloadText(`${slug(drawer.title)}.memdrawer.json`, JSON.stringify(payload, null, 2), "application/json");
-    }
 
-    function deleteDrawer(drawerId) {
-      setState((prev) => ({
-        ...prev,
-        progressionDrawers: {
-          ...prev.progressionDrawers,
-          drawers: (prev.progressionDrawers?.drawers || []).filter((drawer) => drawer.drawerId !== drawerId),
-          pinnedDrawerIds: (prev.progressionDrawers?.pinnedDrawerIds || []).filter((id) => id !== drawerId),
-          activeDrawerId: prev.progressionDrawers?.activeDrawerId === drawerId ? "" : prev.progressionDrawers?.activeDrawerId || "",
-        },
-      }));
-    }
-
-    function togglePinDrawer(drawerId) {
-      setState((prev) => {
-        const existing = prev.progressionDrawers.pinnedDrawerIds || [];
-        const pinnedDrawerIds = existing.includes(drawerId) ? existing.filter((id) => id !== drawerId) : [drawerId, ...existing];
-        return { ...prev, progressionDrawers: { ...prev.progressionDrawers, pinnedDrawerIds } };
-      });
-    }
-
-    function exportAllDrawers() {
-      const payload = {
-        drawerArchiveVersion: "0.1",
-        title: `${state.project.title} Progression Drawers`,
-        exportedAt: now(),
-        progressionDrawers: state.progressionDrawers,
-        project: state.project,
-        palaceSnapshot: state,
-      };
-      downloadText(`${slug(state.project.title)}-drawers.memdrawer.json`, JSON.stringify(payload, null, 2), "application/json");
+      reader.readAsText(file);
     }
 
     async function startCapture() {
       if (!navigator.mediaDevices?.getDisplayMedia) {
-        toast("Screen capture is not available in this browser.", "warn");
+        alert("Screen capture is not available in this browser.");
         return;
       }
-      try {
-        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
-        captureStream = stream;
-        if (videoEl) videoEl.srcObject = stream;
-        const [track] = stream.getVideoTracks();
-        if (track) {
-          track.onended = () => {
-            captureStream = null;
-            if (videoEl) videoEl.srcObject = null;
-          };
-        }
-        toast("Screen capture attached.");
-      } catch (error) {
-        console.error(error);
-        toast("Screen capture was cancelled or blocked.", "warn");
+
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+      captureStream = stream;
+
+      const video = document.getElementById("captureVideo");
+      if (video) {
+        video.srcObject = stream;
+      }
+
+      const [track] = stream.getVideoTracks();
+      if (track) {
+        track.onended = () => {
+          captureStream = null;
+          const video = document.getElementById("captureVideo");
+          if (video) video.srcObject = null;
+        };
       }
     }
 
     function stopCapture() {
-      if (captureStream) captureStream.getTracks().forEach((track) => track.stop());
+      if (captureStream) {
+        captureStream.getTracks().forEach((track) => track.stop());
+      }
+
       captureStream = null;
-      if (videoEl) videoEl.srcObject = null;
-      toast("Screen capture stopped.");
+
+      const video = document.getElementById("captureVideo");
+      if (video) video.srcObject = null;
     }
 
     function captureMoment() {
-      const video = videoEl;
+      const video = document.getElementById("captureVideo");
       if (!video || !video.videoWidth) {
-        toast("Start screen capture first, then capture the moment.", "warn");
+        alert("Start screen capture first, then capture a moment.");
         return;
       }
+
       const canvas = document.createElement("canvas");
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+
       const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        toast("Canvas capture failed in this browser.", "warn");
-        return;
-      }
       ctx.drawImage(video, 0, 0);
+
       const dataUrl = canvas.toDataURL("image/webp", 0.82);
       const captureId = uid("cap");
-      const eventId = uid("evt");
       const node = currentNode();
+
       setState((prev) => ({
         ...prev,
-        captures: [{ id: captureId, nodeId: prev.currentNodeId, screenshot: dataUrl, createdAt: now(), title: `Capture at ${node?.title || "current room"}` }, ...prev.captures],
-        nodes: prev.nodes.map((item) => item.id === prev.currentNodeId ? { ...item, screenshots: [captureId, ...(item.screenshots || [])] } : item),
-        timeline: [{
-          id: eventId,
-          timestamp: now(),
-          nodeId: prev.currentNodeId,
-          type: "capture",
-          title: "Captured moment",
-          summary: `Screenshot attached to ${node?.title || "current room"}.`,
-          tags: ["capture"],
-        }, ...prev.timeline],
+        captures: [
+          {
+            id: captureId,
+            nodeId: prev.currentNodeId,
+            screenshot: dataUrl,
+            createdAt: now(),
+            title: `Capture at ${node?.title || "current room"}`
+          },
+          ...prev.captures
+        ],
+        nodes: prev.nodes.map((item) =>
+          item.id === prev.currentNodeId
+            ? { ...item, screenshots: [captureId, ...(item.screenshots || [])] }
+            : item
+        ),
+        timeline: [
+          {
+            id: uid("evt"),
+            timestamp: now(),
+            nodeId: prev.currentNodeId,
+            type: "capture",
+            title: "Captured moment",
+            summary: `Screenshot attached to ${node?.title || "current room"}.`,
+            tags: ["capture"]
+          },
+          ...prev.timeline
+        ]
       }));
+    }
+
+    function addNote() {
+      const input = document.getElementById("noteText");
+      const note = input?.value.trim();
+      if (!note) return;
+
+      setState((prev) => ({
+        ...prev,
+        nodes: prev.nodes.map((node) =>
+          node.id === prev.currentNodeId
+            ? { ...node, notes: [note, ...(node.notes || [])] }
+            : node
+        ),
+        timeline: [
+          {
+            id: uid("evt"),
+            timestamp: now(),
+            nodeId: prev.currentNodeId,
+            type: "note",
+            title: "Manual note",
+            summary: note,
+            tags: ["note"]
+          },
+          ...prev.timeline
+        ]
+      }));
+
+      activeTab = "notes";
+      render();
     }
 
     function addFastNode(type = "location") {
       const input = document.getElementById("newNodeTitle");
       const title = input?.value.trim() || `New ${type}`;
+      const node = currentNode();
       const id = slug(`${type}-${title}-${Date.now()}`);
       const eventId = uid("evt");
-      const node = currentNode();
+
       const newNode = {
         id,
         type,
@@ -1455,42 +1829,32 @@
         screenshots: [],
         notes: [],
         tags: [type],
-        createdAt: now(),
+        createdAt: now()
       };
+
       setState((prev) => ({
         ...prev,
         currentNodeId: id,
         nodes: [newNode, ...prev.nodes],
-        edges: node ? [{ id: uid("edge"), from: node.id, to: id, label: "observed route" }, ...prev.edges] : prev.edges,
-        timeline: [{
-          id: eventId,
-          timestamp: now(),
-          nodeId: id,
-          type,
-          title: `New ${type}: ${title}`,
-          summary: "Created while mapping the loaded world.",
-          tags: [type, "manual"],
-        }, ...prev.timeline],
+        edges: node
+          ? [{ id: uid("edge"), from: node.id, to: id, label: "observed route" }, ...prev.edges]
+          : prev.edges,
+        timeline: [
+          {
+            id: eventId,
+            timestamp: now(),
+            nodeId: id,
+            type,
+            title: `New ${type}: ${title}`,
+            summary: "Created while mapping the loaded world.",
+            tags: [type, "manual"]
+          },
+          ...prev.timeline
+        ]
       }));
-    }
 
-    function addNote() {
-      const input = document.getElementById("noteText");
-      const note = input?.value.trim();
-      if (!note) return;
-      setState((prev) => ({
-        ...prev,
-        nodes: prev.nodes.map((node) => node.id === prev.currentNodeId ? { ...node, notes: [note, ...(node.notes || [])] } : node),
-        timeline: [{
-          id: uid("evt"),
-          timestamp: now(),
-          nodeId: prev.currentNodeId,
-          type: "note",
-          title: "Manual note",
-          summary: note,
-          tags: ["note"],
-        }, ...prev.timeline],
-      }));
+      activeTab = "palace";
+      render();
     }
 
     function exportProjectJson() {
@@ -1502,314 +1866,687 @@
       downloadText(`${slug(state.project.title)}-guide.html`, html, "text/html");
     }
 
-    function renderNav() {
-      const nav = document.getElementById("nav");
-      nav.innerHTML = tabs.map(([id, icon, label]) => `<button class="tab-btn ${activeTab === id ? "active" : ""}" data-tab="${id}">${icon} ${label}</button>`).join("");
-      nav.querySelectorAll("[data-tab]").forEach((button) => button.addEventListener("click", () => {
-        activeTab = button.dataset.tab;
-        render();
-      }));
+    function clearProject() {
+      if (!confirm("Reset this browser terminal back to the seed project? Export a full session first if needed.")) return;
+      state = structuredClone(seedProject);
+      saveStoredState();
+      activeTab = "load";
+      render();
     }
 
-    function renderStats() {
-      const cards = state.memoryCards;
-      const drawers = state.progressionDrawers;
-      const stats = [
-        ["Nodes", state.nodes.length],
-        ["Events", state.timeline.length],
-        ["Captures", state.captures.length],
-        ["GameCards", cards.gameCards?.length || 0],
-        ["PALCards", cards.palCards?.length || 0],
-        ["Pairs", cards.pairs?.length || 0],
-        ["Drawers", drawers.drawers?.length || 0],
-      ];
-      document.getElementById("stats").innerHTML = stats.map(([label, value]) => `<div class="stat"><div class="faint small">${label}</div><div class="num">${value}</div></div>`).join("");
+    function renderTabs() {
+      els.tabs.innerHTML = tabs.map(([id, label]) => `
+        <button class="tab ${activeTab === id ? "active" : ""}" data-tab="${id}">${label}</button>
+      `).join("");
 
+      els.tabs.querySelectorAll(".tab").forEach((button) => {
+        button.addEventListener("click", () => {
+          activeTab = button.dataset.tab;
+          render();
+        });
+      });
+    }
+
+    function renderSidebar() {
+      const cards = memoryCards();
+      const d = drawers();
       const node = currentNode();
-      document.getElementById("currentRoomAside").innerHTML = `
-        <div class="item-title" style="color:var(--orange2)">${escapeHtml(node?.title || "No room")}</div>
-        <p class="muted small" style="margin-top:6px">${escapeHtml(node?.type || "none")}</p>
-        <div class="btn-row" style="margin-top:12px">${(node?.tags || []).map((tag) => pill(tag)).join("")}</div>
-      `;
 
-      const activeDrawerBtn = document.getElementById("exportActiveDrawerBtn");
-      activeDrawerBtn.disabled = !state.progressionDrawers.activeDrawerId;
+      document.getElementById("statNodes").textContent = state.nodes.length;
+      document.getElementById("statEvents").textContent = state.timeline.length;
+      document.getElementById("statCaptures").textContent = state.captures.length;
+      document.getElementById("statGameCards").textContent = cards.gameCards?.length || 0;
+      document.getElementById("statPalCards").textContent = cards.palCards?.length || 0;
+      document.getElementById("statDrawers").textContent = d.drawers?.length || 0;
+
+      document.getElementById("currentRoomTitle").textContent = node?.title || "Unknown";
+      document.getElementById("currentRoomType").textContent = node?.type || "unknown";
+      document.getElementById("currentRoomTags").innerHTML = (node?.tags || []).map((tag) => pill(tag)).join("");
+
+      document.getElementById("exportActiveDrawerBtn").disabled = !d.activeDrawerId;
     }
 
     function renderLoad() {
-      const html = `
-        <div class="stack">
-          <div class="drop-zone" id="dropZone">
-            <div class="drop-inner">
-              <div class="drop-icon">🧲</div>
-              <h2>Drag and drop files, folders, ZIPs, or MEM sessions here</h2>
-              <p class="muted">Drop the FF7 ZIP, the extracted game folder, setup files, save files, or MEM backup files. The terminal decides whether to inspect, import, or fingerprint.</p>
-              <div class="btn-row" style="justify-content:center;margin-top:8px">
-                <button class="btn" id="chooseZipBtn">🗄️ Choose ZIP</button>
-                <button class="btn ghost" id="chooseFolderBtn">📁 Choose Folder</button>
-                <button class="btn ghost" id="chooseMemBtn">📄 Import MEM File</button>
+      return `
+        <div class="grid">
+          <div class="dropzone" id="dropzone">
+            <div>
+              <div class="big">⬇️</div>
+              <h2>Drag and drop your ZIP, folder, setup file, EXE, save file, or project files here</h2>
+              <p class="muted" style="margin-top:8px">
+                The console will inspect what the browser is allowed to read, detect native executables, build the file blueprint, and prepare Attach Mode.
+              </p>
+              <div class="btn-row" style="justify-content:center;margin-top:18px">
+                <button class="btn" id="loadZipBtn">📦 Load ZIP</button>
+                <button class="btn ghost" id="loadFolderBtn">📁 Load Folder</button>
+                <button class="btn ghost" id="importMemBtn">📄 Import MEM File</button>
               </div>
             </div>
           </div>
-          <div class="grid-3">
-            <section class="card">
-              <h2>Load ZIP</h2>
-              <p class="muted small">Inspect a ZIP package and auto-build the first hard blueprint.</p>
-              <button class="btn" style="margin-top:14px" id="chooseZipBtn2">🗄️ Load ZIP</button>
-            </section>
-            <section class="card">
-              <h2>Load Folder</h2>
-              <p class="muted small">Use browser folder permission to inspect local project/game files.</p>
-              <button class="btn" style="margin-top:14px" id="chooseFolderBtn2">📁 Load Folder</button>
-            </section>
-            <section class="card">
-              <h2>Import MEM File</h2>
-              <p class="muted small">Reload a .memsave.json, .memdrawer.json, drawer archive, project snapshot, or .memsession.json.</p>
-              <button class="btn" style="margin-top:14px" id="chooseMemBtn2">📄 Import MEM File</button>
-            </section>
-          </div>
-          <div class="notice">
-            <b>FF7 beta test mode:</b> if the file is an installer like setup.exe, the browser cannot run it. This page will still inspect/fingerprint it. Run the game outside the browser, then use <b>Run / Attach → Attach Capture</b> to map it live.
+
+          <div class="grid cols-3">
+            <div class="card">
+              <h2>ZIP / Game Archive</h2>
+              <p class="muted" style="margin-top:8px">Reads the ZIP, detects files, folders, setup files, EXEs, scripts, media, saves and HTML entries.</p>
+            </div>
+            <div class="card">
+              <h2>Folder / Loose Files</h2>
+              <p class="muted" style="margin-top:8px">Reads browser-permitted files and generates a package blueprint without needing React or npm.</p>
+            </div>
+            <div class="card">
+              <h2>Native EXE Detection</h2>
+              <p class="muted" style="margin-top:8px">Detects <span class="mono">setup.exe</span>, <span class="mono">ff7.exe</span>, MSI/BAT/CMD files and switches to External Attach Mode.</p>
+            </div>
           </div>
         </div>
       `;
-      document.getElementById("view-load").innerHTML = html;
-      wireDropZone(document.getElementById("dropZone"));
-      ["chooseZipBtn", "chooseZipBtn2"].forEach((id) => document.getElementById(id)?.addEventListener("click", () => document.getElementById("zipInput").click()));
-      ["chooseFolderBtn", "chooseFolderBtn2"].forEach((id) => document.getElementById(id)?.addEventListener("click", () => document.getElementById("folderInput").click()));
-      ["chooseMemBtn", "chooseMemBtn2"].forEach((id) => document.getElementById(id)?.addEventListener("click", () => document.getElementById("memInput").click()));
     }
 
     function renderInspect() {
       const pkg = state.package;
-      const report = pkg.importReport || {};
-      document.getElementById("view-inspect").innerHTML = `
-        <div class="stack">
-          <section class="card row">
-            <div>
-              <h2 style="font-size:28px;margin-bottom:4px">Package Inspector</h2>
-              <p class="muted">${escapeHtml(pkg.name)}</p>
+
+      return `
+        <div class="grid">
+          <div class="card hot">
+            <div class="item-head">
+              <div>
+                <h2>Package Inspector</h2>
+                <p class="muted" style="margin-top:6px">${escapeHtml(pkg.name)}</p>
+              </div>
+              ${pill(pkg.runMode || "none", pkg.runMode === "internal-html" ? "green" : "blue")}
             </div>
-            ${pill(pkg.runMode, pkg.runMode === "internal-html" ? "green" : "blue")}
-          </section>
-          <div class="grid-4">
-            ${[["Files", report.filesFound || 0], ["Folders", report.foldersFound || 0], ["Scripts", report.scriptsFound || 0], ["Assets", report.assetsFound || 0]].map(([label, val]) => `<section class="card"><div class="faint">${label}</div><div style="font-size:34px;font-weight:950">${val}</div></section>`).join("")}
+
+            ${(pkg.warnings || []).length ? `
+              <div class="alert">
+                ${(pkg.warnings || []).map(escapeHtml).join("<br>")}
+              </div>
+            ` : `
+              <div class="success">No hard browser warnings detected.</div>
+            `}
           </div>
-          <section class="card">
-            <h2>Detected entries</h2>
-            <div class="stack">${(pkg.entryCandidates || []).map((entry) => `<div class="item mono small">${escapeHtml(entry)}</div>`).join("") || `<p class="muted small">No entry candidates detected.</p>`}</div>
-          </section>
-          ${(pkg.warnings || []).length ? `<section class="card warn"><h2>Warnings</h2><div class="stack">${pkg.warnings.map((warning) => `<div>⚠️ ${escapeHtml(warning)}</div>`).join("")}</div></section>` : ""}
-          <section class="card">
-            <h2>Detected files</h2>
-            <div class="stack">${(pkg.detectedFiles || []).slice(0, 90).map((file) => `<div class="item"><div class="row"><span class="item-title">${escapeHtml(file.name)}</span>${pill(file.extension || "file", "blue")}</div><p class="muted small mono truncate" style="margin-top:5px">${escapeHtml(file.path)}</p></div>`).join("") || `<p class="muted small">No files loaded yet.</p>`}</div>
-          </section>
+
+          <div class="grid cols-4">
+            <div class="card"><p class="faint">Files</p><h3>${pkg.importReport?.filesFound || 0}</h3></div>
+            <div class="card"><p class="faint">Folders</p><h3>${pkg.importReport?.foldersFound || 0}</h3></div>
+            <div class="card"><p class="faint">Scripts</p><h3>${pkg.importReport?.scriptsFound || 0}</h3></div>
+            <div class="card"><p class="faint">Executables</p><h3>${pkg.importReport?.executablesFound || 0}</h3></div>
+          </div>
+
+          <div class="grid cols-2">
+            <div class="card">
+              <h2>Detected Entries</h2>
+              <div class="list">
+                ${(pkg.entryCandidates || []).map((entry) => `
+                  <div class="item mono truncate">${escapeHtml(entry)}</div>
+                `).join("") || `<p class="muted">No entry candidates detected.</p>`}
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>Native Runtime Console Decision</h2>
+              ${pkg.detectedExecutables?.length ? `
+                <p class="muted" style="margin-top:8px">Native files were detected. The browser will not launch them, but it can attach to the running game window.</p>
+                <div class="list">
+                  ${pkg.detectedExecutables.map((file) => `
+                    <div class="item">
+                      <div class="item-head">
+                        <b>${escapeHtml(file.name)}</b>
+                        ${pill(file.extension.toUpperCase(), "red")}
+                      </div>
+                      <p class="mono faint truncate" style="margin-top:6px">${escapeHtml(file.path)}</p>
+                    </div>
+                  `).join("")}
+                </div>
+                <button class="btn full" style="margin-top:12px" data-tab-jump="play">▶ Go To Attach Mode</button>
+              ` : `
+                <p class="muted" style="margin-top:8px">No native executable was found in the current loaded package.</p>
+              `}
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>File Tree</h2>
+            <div class="tree">
+              ${(pkg.detectedFiles || []).slice(0, 500).map((file) => `
+                <div class="tree-row">
+                  <span class="truncate">${escapeHtml(file.path)}</span>
+                  <span class="faint">${escapeHtml(file.extension || "file")}</span>
+                </div>
+              `).join("") || `<p class="muted">No files loaded yet.</p>`}
+            </div>
+          </div>
         </div>
       `;
     }
 
     function renderPlay() {
-      const internal = state.runtime.runMode === "internal-html" && state.runtime.internalHtml;
-      document.getElementById("view-play").innerHTML = `
-        <div class="grid-2">
-          <section class="card">
-            <div class="row" style="margin-bottom:12px">
+      const runtime = state.runtime;
+
+      return `
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="item-head">
               <h2>Play / Attach View</h2>
               <div class="btn-row">
                 <button class="btn ghost" id="attachCaptureBtn">📷 Attach Capture</button>
-                <button class="btn ghost" id="stopCaptureBtn">Stop Capture</button>
+                <button class="btn ghost" id="stopCaptureBtn">Stop</button>
                 <button class="btn" id="captureMomentBtn">➕ Capture Moment</button>
               </div>
             </div>
-            ${internal ? `<iframe class="iframe" title="Internal HTML Game" sandbox="allow-scripts allow-same-origin" srcdoc="${escapeHtml(state.runtime.internalHtml)}"></iframe>` : `<video id="captureVideo" class="video" autoplay muted playsinline></video>`}
-          </section>
-          <section class="card">
+
+            <div style="margin-top:12px">
+              ${runtime.runMode === "internal-html" && runtime.internalHtml ? `
+                <iframe title="Internal HTML Game" sandbox="allow-scripts allow-same-origin" srcdoc="${escapeHtml(runtime.internalHtml)}"></iframe>
+              ` : `
+                <video id="captureVideo" autoplay muted playsinline></video>
+              `}
+            </div>
+          </div>
+
+          <div class="card">
             <h2>Runtime Mode</h2>
-            ${pill(state.runtime.runMode || "none", state.runtime.runMode === "internal-html" ? "green" : "blue")}
-            <p class="muted" style="margin-top:16px">Native PC games belong in External Attach Mode. Run the game normally, then attach screen/window capture.</p>
-            <p class="faint small" style="margin-top:10px">Browser beta can inspect files, capture your screen, create cards, save drawers, and export sessions. It does not freeze a native process.</p>
-          </section>
+            <div style="margin-top:10px">${pill(runtime.runMode || "none", runtime.runMode === "internal-html" ? "green" : "blue")}</div>
+
+            <p class="muted" style="margin-top:14px">
+              For Final Fantasy VII PC files like <span class="mono">setup.exe</span> or <span class="mono">ff7.exe</span>, the browser terminal cannot run the EXE directly.
+            </p>
+
+            <div class="alert">
+              Correct browser-console route: run the game normally on Windows, then use <b>Attach Capture</b> here. This console becomes the memory palace, save card, drawer and observation layer.
+            </div>
+
+            <div class="success">
+              Browser-safe functions active: ZIP load, folder load, drag/drop, file inspection, executable detection, screen capture, capture moments, GameCards, PALCards, drawers, full session export/import.
+            </div>
+          </div>
         </div>
       `;
-      videoEl = document.getElementById("captureVideo");
-      if (videoEl && captureStream) videoEl.srcObject = captureStream;
-      document.getElementById("attachCaptureBtn")?.addEventListener("click", startCapture);
-      document.getElementById("stopCaptureBtn")?.addEventListener("click", stopCapture);
-      document.getElementById("captureMomentBtn")?.addEventListener("click", captureMoment);
     }
 
     function renderCards() {
-      const cards = state.memoryCards;
+      const cards = memoryCards();
       const views = pairViews();
-      document.getElementById("view-cards").innerHTML = `
-        <div class="stack">
-          <section class="card row">
-            <div>
-              <h2 style="font-size:28px;margin-bottom:4px">Memory Card Bay</h2>
-              <p class="muted">GameCard stores the mechanical save identity/hash. PALCard stores palace context. Together they form the MEM Save Pair.</p>
+
+      return `
+        <div class="grid">
+          <div class="card hot">
+            <div class="item-head">
+              <div>
+                <h2>Memory Card Bay</h2>
+                <p class="muted" style="margin-top:6px">GameCard stores mechanical save identity. PALCard stores palace context. Together they form the MEM Save Pair.</p>
+              </div>
+              ${pill("Dual-card save architecture", "purple")}
             </div>
-            <div style="font-size:42px">💳</div>
-          </section>
-          <div class="grid-2">
-            <section class="card"><h2>Create GameCard</h2><p class="muted small">Import a game save file or setup file. The terminal fingerprints it with SHA-256.</p><button class="btn" style="margin-top:14px" id="importSaveBtn">⬆️ Import Save/File</button></section>
-            <section class="card"><h2>Create PALCard</h2><p class="muted small">Create a Palace Anchor Layer card from the current room, notes, captures, and timeline context.</p><button class="btn" style="margin-top:14px" id="createPalBtn">➕ Create From Current Node</button></section>
           </div>
-          <div class="grid-2">
-            <section class="card"><h2>GameCards</h2><div class="stack">${(cards.gameCards || []).map((card) => `<div class="item"><div class="row"><span class="item-title">${escapeHtml(card.slotTitle)}</span>${pill("GameCard", "blue")}</div><p class="muted small">${escapeHtml(card.saveFile?.name || "file")} · ${(card.saveFile?.sizeBytes || 0).toLocaleString()} bytes</p><p class="faint small mono truncate">${escapeHtml(card.saveFile?.hash || "")}</p></div>`).join("") || `<p class="muted small">No GameCards yet.</p>`}</div></section>
-            <section class="card"><h2>PALCards</h2><div class="stack">${(cards.palCards || []).map((card) => `<div class="item"><div class="row"><span class="item-title">${escapeHtml(card.title)}</span>${pill("PALCard", "orange")}</div><p class="muted small">Room: ${escapeHtml(card.currentRoom)}</p><p class="muted small">Pair status: ${escapeHtml(card.pairing?.pairStatus || "unpaired")}</p></div>`).join("") || `<p class="muted small">No PALCards yet.</p>`}</div></section>
-          </div>
-          <section class="card">
-            <div class="row"><div><h2>Create MEM Save Pair</h2><p class="muted small">Choose one mechanical save card and one palace context card.</p></div><button class="btn ghost" id="autoPairBtn">Auto-pair latest</button></div>
-            <div class="grid-3" style="margin-top:12px">
-              <label>GameCard<select id="gameCardSelect"><option value="">Choose GameCard</option>${(cards.gameCards || []).map((card) => `<option value="${escapeHtml(card.id)}">${escapeHtml(card.slotTitle)}</option>`).join("")}</select></label>
-              <label>PALCard<select id="palCardSelect"><option value="">Choose PALCard</option>${(cards.palCards || []).map((card) => `<option value="${escapeHtml(card.id)}">${escapeHtml(card.title)}</option>`).join("")}</select></label>
-              <div style="display:flex;align-items:end"><button class="btn full" id="pairCardsBtn">Pair Cards</button></div>
+
+          <div class="grid cols-2">
+            <div class="card">
+              <h2>Create GameCard</h2>
+              <p class="muted" style="margin-top:8px">Import a save file or any file you want fingerprinted with SHA-256.</p>
+              <button class="btn" id="importSaveBtn" style="margin-top:12px">⬆️ Import Save File</button>
             </div>
-          </section>
-          <section class="card">
-            <div class="row"><div><h2>MEM Save Pairs</h2><p class="muted small">[GameCard] + [PALCard] = full restoration key.</p></div><div class="btn-row"><button class="btn ghost" id="verifyPairsBtn">Verify Pairs</button><button class="btn ghost" id="exportAllPairsBtn">⬇️ Export All</button></div></div>
-            <div class="stack" style="margin-top:12px">${views.map((pair) => `<div class="item"><div class="row"><div><div class="btn-row"><span class="item-title">${escapeHtml(pair.title)}</span>${pill(pair.status, statusTone(pair.status))}</div><p class="muted small">Game: ${escapeHtml(pair.gameCard?.slotTitle || "missing")} · PAL: ${escapeHtml(pair.palCard?.currentRoom || "missing")}</p></div><div class="btn-row"><button class="btn ghost" data-load-pair="${pair.id}">Load Pair</button><button class="btn ghost" data-dup-pair="${pair.id}">Duplicate</button><button class="btn ghost" data-export-pair="${pair.id}">Export</button><button class="btn ghost" data-unpair="${pair.id}">Unpair</button></div></div></div>`).join("") || `<p class="muted small">No paired cards yet.</p>`}</div>
-          </section>
+
+            <div class="card">
+              <h2>Create PALCard</h2>
+              <p class="muted" style="margin-top:8px">Create a Palace Anchor Layer card from the current room, notes, captures, and timeline.</p>
+              <button class="btn" id="createPalCardBtn" style="margin-top:12px">➕ Create From Current Room</button>
+            </div>
+          </div>
+
+          <div class="grid cols-2">
+            <div class="card">
+              <h2>GameCards</h2>
+              <div class="list">
+                ${(cards.gameCards || []).map((card) => `
+                  <div class="item">
+                    <div class="item-head"><b>${escapeHtml(card.slotTitle)}</b>${pill("GameCard", "blue")}</div>
+                    <p class="faint" style="margin-top:6px">${escapeHtml(card.saveFile.name)} · ${Number(card.saveFile.sizeBytes || 0).toLocaleString()} bytes</p>
+                    <p class="mono faint truncate" style="margin-top:6px">${escapeHtml(card.saveFile.hash)}</p>
+                  </div>
+                `).join("") || `<p class="muted">No GameCards yet.</p>`}
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>PALCards</h2>
+              <div class="list">
+                ${(cards.palCards || []).map((card) => `
+                  <div class="item">
+                    <div class="item-head"><b>${escapeHtml(card.title)}</b>${pill("PALCard")}</div>
+                    <p class="faint" style="margin-top:6px">Room: ${escapeHtml(card.currentRoom)}</p>
+                    <p class="faint" style="margin-top:6px">Pair status: ${escapeHtml(card.pairing?.pairStatus || "unpaired")}</p>
+                  </div>
+                `).join("") || `<p class="muted">No PALCards yet.</p>`}
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="item-head">
+              <div>
+                <h2>Create MEM Save Pair</h2>
+                <p class="muted" style="margin-top:6px">Choose one mechanical save card and one palace context card.</p>
+              </div>
+              <button class="btn ghost" id="autoPairBtn" ${(cards.gameCards?.length && cards.palCards?.length) ? "" : "disabled"}>Auto-pair latest</button>
+            </div>
+
+            <div class="grid cols-3" style="margin-top:12px">
+              <div class="field">
+                <label>GameCard</label>
+                <select id="gameCardSelect">
+                  <option value="">Choose GameCard</option>
+                  ${(cards.gameCards || []).map((card) => `<option value="${escapeHtml(card.id)}">${escapeHtml(card.slotTitle)}</option>`).join("")}
+                </select>
+              </div>
+              <div class="field">
+                <label>PALCard</label>
+                <select id="palCardSelect">
+                  <option value="">Choose PALCard</option>
+                  ${(cards.palCards || []).map((card) => `<option value="${escapeHtml(card.id)}">${escapeHtml(card.title)}</option>`).join("")}
+                </select>
+              </div>
+              <div style="display:flex;align-items:end">
+                <button class="btn full" id="pairCardsBtn">Pair Cards</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="item-head">
+              <div>
+                <h2>MEM Save Pairs</h2>
+                <p class="muted" style="margin-top:6px">[GameCard] + [PALCard] = restoration key.</p>
+              </div>
+              <div class="btn-row">
+                <button class="btn ghost" id="verifyPairsBtn">Verify Pairs</button>
+                <button class="btn ghost" id="exportPairsBtn">⬇️ Export All</button>
+              </div>
+            </div>
+
+            <div class="list">
+              ${views.map((pair) => `
+                <div class="item">
+                  <div class="item-head">
+                    <div>
+                      <b>${escapeHtml(pair.title)}</b>
+                      ${pill(pair.status, statusTone(pair.status))}
+                      <p class="faint" style="margin-top:6px">Game: ${escapeHtml(pair.gameCard?.slotTitle || "missing")} · PAL: ${escapeHtml(pair.palCard?.currentRoom || "missing")}</p>
+                    </div>
+                    <div class="btn-row">
+                      <button class="btn ghost" data-load-pair="${escapeHtml(pair.id)}">Load</button>
+                      <button class="btn ghost" data-export-pair="${escapeHtml(pair.id)}">Export</button>
+                      <button class="btn ghost" data-unpair="${escapeHtml(pair.id)}">Unpair</button>
+                    </div>
+                  </div>
+                </div>
+              `).join("") || `<p class="muted">No paired cards yet.</p>`}
+            </div>
+          </div>
         </div>
       `;
-
-      document.getElementById("importSaveBtn")?.addEventListener("click", () => document.getElementById("saveInput").click());
-      document.getElementById("createPalBtn")?.addEventListener("click", createPALCardFromCurrentNode);
-      document.getElementById("autoPairBtn")?.addEventListener("click", () => {
-        const gameCard = state.memoryCards.gameCards?.[0];
-        const palCard = state.memoryCards.palCards?.[0];
-        if (gameCard && palCard) pairCards(gameCard.id, palCard.id);
-      });
-      document.getElementById("pairCardsBtn")?.addEventListener("click", () => {
-        const g = document.getElementById("gameCardSelect").value;
-        const p = document.getElementById("palCardSelect").value;
-        if (g && p) pairCards(g, p);
-      });
-      document.getElementById("verifyPairsBtn")?.addEventListener("click", verifyPairs);
-      document.getElementById("exportAllPairsBtn")?.addEventListener("click", exportAllPairs);
-      document.querySelectorAll("[data-load-pair]").forEach((b) => b.addEventListener("click", () => loadPair(b.dataset.loadPair)));
-      document.querySelectorAll("[data-dup-pair]").forEach((b) => b.addEventListener("click", () => duplicatePair(b.dataset.dupPair)));
-      document.querySelectorAll("[data-export-pair]").forEach((b) => b.addEventListener("click", () => exportPair(b.dataset.exportPair)));
-      document.querySelectorAll("[data-unpair]").forEach((b) => b.addEventListener("click", () => unpairCards(b.dataset.unpair)));
     }
 
     function renderHistory() {
-      const drawers = state.progressionDrawers;
-      const pinned = drawers.pinnedDrawerIds || [];
-      const sorted = [...(drawers.drawers || [])].sort((a, b) => {
-        const ap = pinned.includes(a.drawerId) ? 1 : 0;
-        const bp = pinned.includes(b.drawerId) ? 1 : 0;
-        if (ap !== bp) return bp - ap;
+      const d = drawers();
+      const pinned = d.pinnedDrawerIds || [];
+      const views = pairViews();
+
+      const sorted = [...(d.drawers || [])].sort((a, b) => {
+        const aPinned = pinned.includes(a.drawerId) ? 1 : 0;
+        const bPinned = pinned.includes(b.drawerId) ? 1 : 0;
+        if (aPinned !== bPinned) return bPinned - aPinned;
         return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
       });
-      const views = pairViews();
-      document.getElementById("view-history").innerHTML = `
-        <div class="stack">
-          <section class="card row"><div><h2 style="font-size:28px;margin-bottom:4px">Progression History Drawers</h2><p class="muted">Drawer = how the workspace was left: loaded world, room, active cards, captures, notes, route, runtime mode, and layout.</p></div><div style="font-size:42px">🗄️</div></section>
-          <div class="grid-3">
-            <section class="card"><div class="faint">Drawers</div><div style="font-size:34px;font-weight:950">${drawers.drawers?.length || 0}</div></section>
-            <section class="card"><div class="faint">Pinned</div><div style="font-size:34px;font-weight:950">${drawers.pinnedDrawerIds?.length || 0}</div></section>
-            <section class="card"><div class="faint">Active Drawer</div><div class="truncate" style="font-weight:900;color:var(--orange2)">${escapeHtml(drawers.activeDrawerId || "none")}</div></section>
+
+      return `
+        <div class="grid">
+          <div class="card hot">
+            <h2>Progression History Drawers</h2>
+            <p class="muted" style="margin-top:8px">
+              Drawer = how the workspace was left. It stores loaded package context, current room, active MEM pair, capture cursor, timeline cursor, runtime mode and layout.
+            </p>
           </div>
-          <section class="card row"><div><h2>Create Drawer Checkpoint</h2><p class="muted small">Freeze current package, room, active MEM pair, timeline cursor, runtime mode, and layout.</p></div><div class="btn-row"><button class="btn" id="saveCurrentDrawerBtn">➕ Save Current Drawer</button><button class="btn ghost" id="exportDrawersBtn">⬇️ Export Drawers</button></div></section>
-          <div class="stack">${sorted.map((drawer) => {
-            const pair = views.find((item) => item.id === drawer.activePairId);
-            const isPinned = pinned.includes(drawer.drawerId);
-            const isActive = drawer.drawerId === drawers.activeDrawerId;
-            return `<section class="card ${isActive ? "active" : ""}"><div class="row"><div><div class="btn-row"><span class="item-title">${escapeHtml(drawer.title)}</span>${pill(drawer.status, statusTone(drawer.status))}${isPinned ? pill("pinned", "purple") : ""}</div><p class="muted small">Room: ${escapeHtml(drawer.currentRoom)} · Runtime: ${escapeHtml(drawer.runtimeMode)} · Tab: ${escapeHtml(drawer.activeTab)}</p><p class="faint small">Package: ${escapeHtml(drawer.packageName)} · Pair: ${escapeHtml(pair?.title || drawer.activePairId || "none")}</p><p class="faint small">Updated: ${escapeHtml(drawer.updatedAt || drawer.createdAt)}</p></div><div class="btn-row"><button class="btn ghost" data-resume-drawer="${drawer.drawerId}">Resume Drawer</button><button class="btn ghost" data-pin-drawer="${drawer.drawerId}">${isPinned ? "Unpin" : "Pin"}</button><button class="btn ghost" data-export-drawer="${drawer.drawerId}">Export</button><button class="btn ghost" data-delete-drawer="${drawer.drawerId}">Delete</button></div></div></section>`;
-          }).join("") || `<section class="card"><p class="muted small">No drawers yet. Save a checkpoint when the workspace reaches a meaningful point.</p></section>`}</div>
+
+          <div class="grid cols-3">
+            <div class="card"><p class="faint">Drawers</p><h3>${d.drawers?.length || 0}</h3></div>
+            <div class="card"><p class="faint">Pinned</p><h3>${d.pinnedDrawerIds?.length || 0}</h3></div>
+            <div class="card"><p class="faint">Active Drawer</p><p class="mono truncate" style="margin-top:8px">${escapeHtml(d.activeDrawerId || "none")}</p></div>
+          </div>
+
+          <div class="card">
+            <div class="item-head">
+              <div>
+                <h2>Create Drawer Checkpoint</h2>
+                <p class="muted" style="margin-top:6px">Freeze current package, room, active pair, timeline cursor, runtime mode and layout.</p>
+              </div>
+              <div class="btn-row">
+                <button class="btn" id="createDrawerBtn">➕ Save Current Drawer</button>
+                <button class="btn ghost" id="exportDrawersBtn">⬇️ Export Drawers</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="list">
+            ${sorted.map((drawer) => {
+              const pair = views.find((item) => item.id === drawer.activePairId);
+              const isPinned = pinned.includes(drawer.drawerId);
+              return `
+                <div class="card ${drawer.drawerId === d.activeDrawerId ? "hot" : ""}">
+                  <div class="item-head">
+                    <div>
+                      <h2>${escapeHtml(drawer.title)}</h2>
+                      <div class="btn-row" style="margin-top:8px">
+                        ${pill(drawer.status, statusTone(drawer.status))}
+                        ${isPinned ? pill("pinned", "purple") : ""}
+                      </div>
+                      <p class="muted" style="margin-top:8px">Room: ${escapeHtml(drawer.currentRoom)} · Runtime: ${escapeHtml(drawer.runtimeMode)} · Tab: ${escapeHtml(drawer.activeTab)}</p>
+                      <p class="faint" style="margin-top:5px">Package: ${escapeHtml(drawer.packageName)} · Pair: ${escapeHtml(pair?.title || drawer.activePairId || "none")}</p>
+                      <p class="faint" style="margin-top:5px">Updated: ${escapeHtml(drawer.updatedAt || drawer.createdAt)}</p>
+                    </div>
+                    <div class="btn-row">
+                      <button class="btn ghost" data-resume-drawer="${escapeHtml(drawer.drawerId)}">Resume</button>
+                      <button class="btn ghost" data-pin-drawer="${escapeHtml(drawer.drawerId)}">${isPinned ? "Unpin" : "Pin"}</button>
+                      <button class="btn ghost" data-export-drawer="${escapeHtml(drawer.drawerId)}">Export</button>
+                      <button class="btn ghost" data-delete-drawer="${escapeHtml(drawer.drawerId)}">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join("") || `<div class="card"><p class="muted">No drawers yet. Save a checkpoint once the workspace reaches a meaningful point.</p></div>`}
+          </div>
         </div>
       `;
-      document.getElementById("saveCurrentDrawerBtn")?.addEventListener("click", () => createProgressionDrawer());
-      document.getElementById("exportDrawersBtn")?.addEventListener("click", exportAllDrawers);
-      document.querySelectorAll("[data-resume-drawer]").forEach((b) => b.addEventListener("click", () => resumeDrawer(b.dataset.resumeDrawer)));
-      document.querySelectorAll("[data-pin-drawer]").forEach((b) => b.addEventListener("click", () => togglePinDrawer(b.dataset.pinDrawer)));
-      document.querySelectorAll("[data-export-drawer]").forEach((b) => b.addEventListener("click", () => exportDrawer(b.dataset.exportDrawer)));
-      document.querySelectorAll("[data-delete-drawer]").forEach((b) => b.addEventListener("click", () => deleteDrawer(b.dataset.deleteDrawer)));
     }
 
     function renderPalace() {
       const node = currentNode();
-      document.getElementById("view-palace").innerHTML = `
-        <div class="grid-2">
-          <section class="card"><h2>Palace Rooms</h2><div class="stack">${state.nodes.map((item) => `<button class="item ${item.id === node?.id ? "active" : ""}" data-room="${escapeHtml(item.id)}" style="text-align:left;color:var(--text);cursor:pointer"><div class="row"><span class="item-title">${escapeHtml(item.title)}</span>${pill(item.type)}</div><p class="muted small">${escapeHtml(item.description || "")}</p></button>`).join("")}</div></section>
-          <section class="card"><h2>Current Room</h2><h3>${escapeHtml(node?.title || "No room")}</h3><p class="muted">${escapeHtml(node?.description || "")}</p><div class="btn-row" style="margin-top:14px">${(node?.tags || []).map((tag) => pill(tag)).join("")}</div><div class="grid-3" style="margin-top:14px"><input id="newNodeTitle" placeholder="New node title" /><button class="btn" id="newLocationBtn">New Location</button><button class="btn ghost" id="newBattleBtn">New Battle</button></div></section>
+
+      return `
+        <div class="grid cols-2">
+          <div class="card">
+            <h2>Palace Rooms</h2>
+            <div class="list">
+              ${state.nodes.map((item) => `
+                <button class="item" style="text-align:left;color:inherit;width:100%;${item.id === node?.id ? "border-color:var(--border-hot);background:rgba(251,146,60,0.1)" : ""}" data-node="${escapeHtml(item.id)}">
+                  <div class="item-head"><b>${escapeHtml(item.title)}</b>${pill(item.type)}</div>
+                  <p class="muted" style="margin-top:6px">${escapeHtml(item.description || "")}</p>
+                </button>
+              `).join("")}
+            </div>
+          </div>
+
+          <div class="card hot">
+            <h2>Current Room</h2>
+            <h3 style="margin-top:10px">${escapeHtml(node?.title || "Unknown")}</h3>
+            <p class="muted" style="margin-top:8px">${escapeHtml(node?.description || "")}</p>
+            <div class="btn-row" style="margin-top:12px">${(node?.tags || []).map((tag) => pill(tag)).join("")}</div>
+
+            <div class="grid" style="margin-top:16px">
+              <input id="newNodeTitle" placeholder="New node title" />
+              <div class="btn-row">
+                <button class="btn" id="newLocationBtn">New Location</button>
+                <button class="btn ghost" id="newBattleBtn">New Battle</button>
+              </div>
+            </div>
+
+            <div style="margin-top:18px">
+              <h2>Notes</h2>
+              <div class="list">
+                ${(node?.notes || []).map((note) => `<div class="item">${escapeHtml(note)}</div>`).join("") || `<p class="muted">No notes for this room yet.</p>`}
+              </div>
+            </div>
+          </div>
         </div>
       `;
-      document.querySelectorAll("[data-room]").forEach((b) => b.addEventListener("click", () => setState((prev) => ({ ...prev, currentNodeId: b.dataset.room }))));
-      document.getElementById("newLocationBtn")?.addEventListener("click", () => addFastNode("location"));
-      document.getElementById("newBattleBtn")?.addEventListener("click", () => addFastNode("battle"));
     }
 
     function renderBlueprint() {
-      document.getElementById("view-blueprint").innerHTML = `
-        <div class="stack">
-          <section class="card"><h2>Blueprint Graph</h2><div class="grid-3">${state.nodes.slice(0, 90).map((node) => `<div class="item"><div class="row"><span class="item-title">${escapeHtml(node.title)}</span>${pill(node.type, node.type === "package" ? "purple" : "orange")}</div><p class="faint small">${(node.connections || []).length} connections</p><p class="muted small">${escapeHtml(node.description || "")}</p></div>`).join("")}</div></section>
-          <section class="card"><h2>Edges</h2><div class="stack">${state.edges.map((edge) => `<div class="item mono small">${escapeHtml(edge.from)} → ${escapeHtml(edge.to)} · ${escapeHtml(edge.label)}</div>`).join("") || `<p class="muted small">No edges yet.</p>`}</div></section>
+      return `
+        <div class="grid">
+          <div class="card">
+            <h2>Blueprint Graph</h2>
+            <div class="canvas-grid" style="margin-top:12px">
+              ${state.nodes.slice(0, 120).map((node) => `
+                <div class="item">
+                  <div class="item-head">
+                    <b class="truncate">${escapeHtml(node.title)}</b>
+                    ${pill(node.type, node.type === "package" ? "purple" : node.type === "executable" ? "red" : "")}
+                  </div>
+                  <p class="faint" style="margin-top:6px">${escapeHtml(node.description || "")}</p>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Edges</h2>
+            <div class="list">
+              ${state.edges.map((edge) => `
+                <div class="item mono">${escapeHtml(edge.from)} → ${escapeHtml(edge.to)} · ${escapeHtml(edge.label)}</div>
+              `).join("") || `<p class="muted">No edges yet.</p>`}
+            </div>
+          </div>
         </div>
       `;
     }
 
     function renderTimeline() {
-      document.getElementById("view-timeline").innerHTML = `<div class="stack">${state.timeline.map((event) => `<section class="card"><div class="row"><span class="item-title">${escapeHtml(event.title)}</span>${pill(event.type, "blue")}</div><p class="muted small" style="margin-top:6px">${escapeHtml(event.summary || "")}</p><p class="faint small" style="margin-top:8px">${escapeHtml(event.timestamp)} · ${escapeHtml(event.nodeId)}</p></section>`).join("")}</div>`;
+      return `
+        <div class="grid">
+          ${state.timeline.map((event) => `
+            <div class="card">
+              <div class="item-head">
+                <b>${escapeHtml(event.title)}</b>
+                ${pill(event.type, "blue")}
+              </div>
+              <p class="muted" style="margin-top:8px">${escapeHtml(event.summary || "")}</p>
+              <p class="faint mono" style="margin-top:8px">${escapeHtml(event.timestamp)} · ${escapeHtml(event.nodeId)}</p>
+            </div>
+          `).join("")}
+        </div>
+      `;
     }
 
     function renderNotes() {
       const node = currentNode();
-      document.getElementById("view-notes").innerHTML = `
-        <div class="grid-2">
-          <section class="card"><h2>Add Note to ${escapeHtml(node?.title || "Room")}</h2><textarea id="noteText" placeholder="What did the player learn here?"></textarea><button class="btn" style="margin-top:12px" id="saveNoteBtn">Save Note</button></section>
-          <section class="card"><h2>Room Notes</h2><div class="stack">${(node?.notes || []).map((note) => `<div class="item small">${escapeHtml(note)}</div>`).join("") || `<p class="muted small">No notes for this room yet.</p>`}</div></section>
+
+      return `
+        <div class="grid cols-2">
+          <div class="card">
+            <h2>Add Note to ${escapeHtml(node?.title || "Current Room")}</h2>
+            <textarea id="noteText" placeholder="What did the player learn here?"></textarea>
+            <button class="btn" id="saveNoteBtn" style="margin-top:12px">Save Note</button>
+          </div>
+
+          <div class="card">
+            <h2>Room Notes</h2>
+            <div class="list">
+              ${(node?.notes || []).map((note) => `<div class="item">${escapeHtml(note)}</div>`).join("") || `<p class="muted">No notes yet.</p>`}
+            </div>
+          </div>
+
+          <div class="card" style="grid-column:1/-1">
+            <h2>Captures</h2>
+            <div class="canvas-grid" style="margin-top:12px">
+              ${(state.captures || []).map((cap) => `
+                <div class="item">
+                  <img class="capture-img" src="${cap.screenshot}" alt="${escapeHtml(cap.title)}" />
+                  <p class="muted" style="margin-top:8px">${escapeHtml(cap.title)}</p>
+                  <p class="faint mono" style="margin-top:4px">${escapeHtml(cap.createdAt)}</p>
+                </div>
+              `).join("") || `<p class="muted">No captures yet.</p>`}
+            </div>
+          </div>
         </div>
       `;
-      document.getElementById("saveNoteBtn")?.addEventListener("click", addNote);
     }
 
     function renderBuild() {
-      document.getElementById("view-build").innerHTML = `
-        <div class="grid-3">
-          <section class="card"><h2>Export Project JSON</h2><p class="muted small">Full current palace state.</p><button class="btn" style="margin-top:14px" id="exportProjectBtn">⬇️ Export JSON</button></section>
-          <section class="card"><h2>Export HTML Guide</h2><p class="muted small">Readable palace guide for the mapped run.</p><button class="btn" style="margin-top:14px" id="exportHtmlBtn">⬇️ Export HTML</button></section>
-          <section class="card"><h2>Export MEM Save Pairs</h2><p class="muted small">All GameCard/PALCard pair data.</p><button class="btn" style="margin-top:14px" id="exportPairsBtn">⬇️ Export Pairs</button></section>
+      return `
+        <div class="grid cols-3">
+          <div class="card">
+            <h2>Export Project JSON</h2>
+            <p class="muted" style="margin-top:8px">Exports the current MEM Palace project state.</p>
+            <button class="btn" id="exportProjectBtn" style="margin-top:12px">⬇️ Export JSON</button>
+          </div>
+
+          <div class="card">
+            <h2>Export HTML Guide</h2>
+            <p class="muted" style="margin-top:8px">Exports a simple readable HTML guide from your current palace rooms.</p>
+            <button class="btn" id="exportHtmlBtn" style="margin-top:12px">⬇️ Export HTML</button>
+          </div>
+
+          <div class="card">
+            <h2>Export MEM Save Pairs</h2>
+            <p class="muted" style="margin-top:8px">Exports all GameCards, PALCards and pair links.</p>
+            <button class="btn" id="exportBuildPairsBtn" style="margin-top:12px">⬇️ Export Pairs</button>
+          </div>
+
+          <div class="card">
+            <h2>Save Full Session</h2>
+            <p class="muted" style="margin-top:8px">Exports everything: project, package, cards, drawers, captures, notes, blueprint and timeline.</p>
+            <button class="btn" id="exportFullSessionBuildBtn" style="margin-top:12px">⬇️ Save Full Session</button>
+          </div>
+
+          <div class="card">
+            <h2>Import MEM File</h2>
+            <p class="muted" style="margin-top:8px">Imports .memsave, .memdrawer, .memsession or compatible JSON.</p>
+            <button class="btn ghost" id="importMemBuildBtn" style="margin-top:12px">📄 Import MEM File</button>
+          </div>
+
+          <div class="card">
+            <h2>Reset Console</h2>
+            <p class="muted" style="margin-top:8px">Clears local browser state and returns to the seed FF7 beta map.</p>
+            <button class="btn ghost" id="resetBtn" style="margin-top:12px">Reset Local Project</button>
+          </div>
         </div>
       `;
+    }
+
+    function renderMain() {
+      const views = {
+        load: renderLoad,
+        inspect: renderInspect,
+        play: renderPlay,
+        cards: renderCards,
+        history: renderHistory,
+        palace: renderPalace,
+        blueprint: renderBlueprint,
+        timeline: renderTimeline,
+        notes: renderNotes,
+        build: renderBuild
+      };
+
+      els.main.innerHTML = (views[activeTab] || renderLoad)();
+      wireMainEvents();
+    }
+
+    function wireMainEvents() {
+      document.querySelectorAll("[data-tab-jump]").forEach((button) => {
+        button.addEventListener("click", () => {
+          activeTab = button.dataset.tabJump;
+          render();
+        });
+      });
+
+      const dropzone = document.getElementById("dropzone");
+      if (dropzone) {
+        dropzone.addEventListener("dragover", (event) => {
+          event.preventDefault();
+          dropzone.classList.add("drag");
+        });
+
+        dropzone.addEventListener("dragleave", () => dropzone.classList.remove("drag"));
+        dropzone.addEventListener("drop", handleDrop);
+      }
+
+      document.getElementById("loadZipBtn")?.addEventListener("click", () => els.zipInput.click());
+      document.getElementById("loadFolderBtn")?.addEventListener("click", () => els.folderInput.click());
+      document.getElementById("importMemBtn")?.addEventListener("click", () => els.memInput.click());
+
+      document.getElementById("attachCaptureBtn")?.addEventListener("click", startCapture);
+      document.getElementById("stopCaptureBtn")?.addEventListener("click", stopCapture);
+      document.getElementById("captureMomentBtn")?.addEventListener("click", captureMoment);
+
+      document.getElementById("importSaveBtn")?.addEventListener("click", () => els.saveInput.click());
+      document.getElementById("createPalCardBtn")?.addEventListener("click", createPALCardFromCurrentNode);
+      document.getElementById("autoPairBtn")?.addEventListener("click", autoPairLatestCards);
+      document.getElementById("verifyPairsBtn")?.addEventListener("click", verifyPairs);
+      document.getElementById("exportPairsBtn")?.addEventListener("click", exportAllPairs);
+
+      document.getElementById("pairCardsBtn")?.addEventListener("click", () => {
+        const gameCardId = document.getElementById("gameCardSelect")?.value;
+        const palCardId = document.getElementById("palCardSelect")?.value;
+        if (!gameCardId || !palCardId) return;
+        pairCards(gameCardId, palCardId);
+      });
+
+      document.querySelectorAll("[data-load-pair]").forEach((button) => {
+        button.addEventListener("click", () => loadPair(button.dataset.loadPair));
+      });
+
+      document.querySelectorAll("[data-export-pair]").forEach((button) => {
+        button.addEventListener("click", () => exportPair(button.dataset.exportPair));
+      });
+
+      document.querySelectorAll("[data-unpair]").forEach((button) => {
+        button.addEventListener("click", () => unpairCards(button.dataset.unpair));
+      });
+
+      document.getElementById("createDrawerBtn")?.addEventListener("click", () => createProgressionDrawer());
+      document.getElementById("exportDrawersBtn")?.addEventListener("click", exportAllDrawers);
+
+      document.querySelectorAll("[data-resume-drawer]").forEach((button) => {
+        button.addEventListener("click", () => resumeDrawer(button.dataset.resumeDrawer));
+      });
+
+      document.querySelectorAll("[data-pin-drawer]").forEach((button) => {
+        button.addEventListener("click", () => togglePinDrawer(button.dataset.pinDrawer));
+      });
+
+      document.querySelectorAll("[data-export-drawer]").forEach((button) => {
+        button.addEventListener("click", () => exportDrawer(button.dataset.exportDrawer));
+      });
+
+      document.querySelectorAll("[data-delete-drawer]").forEach((button) => {
+        button.addEventListener("click", () => deleteDrawer(button.dataset.deleteDrawer));
+      });
+
+      document.querySelectorAll("[data-node]").forEach((button) => {
+        button.addEventListener("click", () => {
+          setState((prev) => ({ ...prev, currentNodeId: button.dataset.node }));
+        });
+      });
+
+      document.getElementById("newLocationBtn")?.addEventListener("click", () => addFastNode("location"));
+      document.getElementById("newBattleBtn")?.addEventListener("click", () => addFastNode("battle"));
+      document.getElementById("saveNoteBtn")?.addEventListener("click", addNote);
+
       document.getElementById("exportProjectBtn")?.addEventListener("click", exportProjectJson);
       document.getElementById("exportHtmlBtn")?.addEventListener("click", exportHtmlGuide);
-      document.getElementById("exportPairsBtn")?.addEventListener("click", exportAllPairs);
+      document.getElementById("exportBuildPairsBtn")?.addEventListener("click", exportAllPairs);
+      document.getElementById("exportFullSessionBuildBtn")?.addEventListener("click", saveFullSession);
+      document.getElementById("importMemBuildBtn")?.addEventListener("click", () => els.memInput.click());
+      document.getElementById("resetBtn")?.addEventListener("click", clearProject);
     }
 
     function render() {
-      renderNav();
-      renderStats();
-      document.querySelectorAll(".view").forEach((view) => view.classList.remove("active"));
-      document.getElementById(`view-${activeTab}`)?.classList.add("active");
-
-      renderLoad();
-      renderInspect();
-      renderPlay();
-      renderCards();
-      renderHistory();
-      renderPalace();
-      renderBlueprint();
-      renderTimeline();
-      renderNotes();
-      renderBuild();
+      renderTabs();
+      renderSidebar();
+      renderMain();
     }
 
-    document.getElementById("zipInput").addEventListener("change", (event) => loadZip(event.target.files?.[0]));
-    document.getElementById("folderInput").addEventListener("change", (event) => loadFolder(event.target.files));
-    document.getElementById("saveInput").addEventListener("change", (event) => createGameCardFromSaveFile(event.target.files?.[0]));
-    document.getElementById("memInput").addEventListener("change", (event) => importMemFile(event.target.files?.[0]));
-
-    document.getElementById("app").addEventListener("dragover", (event) => event.preventDefault());
-    document.getElementById("app").addEventListener("drop", handleDrop);
+    els.zipInput.addEventListener("change", (event) => loadZip(event.target.files?.[0]));
+    els.folderInput.addEventListener("change", (event) => loadLooseFiles(event.target.files, "folder", "Loaded Folder"));
+    els.saveInput.addEventListener("change", (event) => createGameCardFromSaveFile(event.target.files?.[0]));
+    els.memInput.addEventListener("change", (event) => importMemFile(event.target.files?.[0]));
 
     document.getElementById("saveDrawerBtn").addEventListener("click", () => createProgressionDrawer());
-    document.getElementById("exportActiveDrawerBtn").addEventListener("click", () => {
-      const activeDrawer = state.progressionDrawers.drawers.find((drawer) => drawer.drawerId === state.progressionDrawers.activeDrawerId);
-      if (activeDrawer) exportDrawer(activeDrawer);
-    });
+    document.getElementById("exportActiveDrawerBtn").addEventListener("click", exportActiveDrawer);
     document.getElementById("saveFullSessionBtn").addEventListener("click", saveFullSession);
+
+    window.addEventListener("dragover", (event) => event.preventDefault());
+    window.addEventListener("drop", (event) => event.preventDefault());
 
     render();
   </script>
