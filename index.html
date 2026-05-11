@@ -1,168 +1,185 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>MEM Palace Game Terminal</title>
-  <meta name="description" content="Single-file MEM Palace Game Terminal for GitHub Pages." />
   <style>
-    :root {
-      --bg0: #030201;
-      --bg1: #080403;
-      --bg2: #3b1d0b;
-      --panel: rgba(0, 0, 0, 0.32);
-      --panel2: rgba(0, 0, 0, 0.22);
-      --line: rgba(253, 186, 116, 0.22);
-      --line2: rgba(253, 186, 116, 0.12);
-      --orange: #fb923c;
-      --orange2: #fdba74;
-      --text: #fff7ed;
-      --muted: rgba(255, 237, 213, 0.66);
-      --muted2: rgba(255, 237, 213, 0.45);
-      --green: #86efac;
-      --red: #fca5a5;
-      --blue: #7dd3fc;
-      --purple: #d8b4fe;
-      --shadow: rgba(0, 0, 0, 0.30);
+    :root{
+      --bg0:#030201;
+      --bg1:#080403;
+      --bg2:#3b1d0b;
+      --panel:rgba(0,0,0,.34);
+      --panel2:rgba(0,0,0,.24);
+      --line:rgba(255,190,110,.22);
+      --line2:rgba(255,190,110,.42);
+      --text:#fff7ed;
+      --muted:rgba(255,237,213,.66);
+      --faint:rgba(255,237,213,.44);
+      --orange:#fb923c;
+      --orange2:#fdba74;
+      --green:#86efac;
+      --red:#fca5a5;
+      --blue:#7dd3fc;
+      --purple:#d8b4fe;
+      --shadow:rgba(0,0,0,.35);
     }
 
-    * { box-sizing: border-box; }
-    html, body, #root { min-height: 100%; }
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top left, var(--bg2), var(--bg1) 45%, var(--bg0));
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:#030201;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{
+      background:
+        radial-gradient(circle at top left,var(--bg2),var(--bg1) 45%,var(--bg0)),
+        linear-gradient(135deg,rgba(251,146,60,.09),transparent 38%);
     }
-    button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; }
-    button:disabled { cursor: not-allowed; opacity: 0.45; }
-    .app { min-height: 100vh; padding: 16px; }
-    .wrap { width: min(1280px, 100%); margin: 0 auto; display: grid; gap: 16px; }
-    .hero, .nav, .card {
-      border: 1px solid var(--line);
-      background: var(--panel);
-      border-radius: 28px;
-      box-shadow: 0 24px 70px var(--shadow);
-    }
-    .hero { padding: 16px; }
-    .heroRow, .rowBetween { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brandIcon { font-size: 34px; line-height: 1; filter: drop-shadow(0 0 12px rgba(251, 146, 60, .55)); }
-    h1, h2, h3, p { margin: 0; }
-    h1 { font-size: clamp(1.35rem, 2.5vw, 1.85rem); letter-spacing: -0.03em; font-weight: 950; }
-    h2 { font-size: 1.08rem; font-weight: 850; }
-    h3 { font-size: clamp(1.55rem, 3vw, 2rem); color: #fed7aa; }
-    .sub { margin-top: 4px; color: var(--muted); font-size: .92rem; }
-    .tiny { color: var(--muted2); font-size: .78rem; line-height: 1.45; }
-    .muted { color: var(--muted); font-size: .9rem; line-height: 1.55; }
-    .nav { display: flex; gap: 8px; flex-wrap: wrap; padding: 8px; position: sticky; top: 8px; z-index: 10; backdrop-filter: blur(14px); }
-    .navBtn, .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      border-radius: 16px; padding: 10px 12px; border: 1px solid transparent;
-      color: var(--text); background: transparent; font-weight: 800; font-size: .88rem;
-      transition: transform .16s ease, background .16s ease, border-color .16s ease;
-      white-space: nowrap;
-    }
-    .navBtn:hover, .btn:hover { transform: translateY(-1px); background: rgba(253, 186, 116, .10); }
-    .navBtn.active, .btn.solid { background: var(--orange); color: #0b0502; }
-    .btn.ghost { border-color: var(--line); background: rgba(0,0,0,.20); color: #ffedd5; }
-    .btn.full { width: 100%; margin-top: 8px; }
-    .layout { display: grid; gap: 16px; grid-template-columns: 280px 1fr; align-items: start; }
-    aside { display: grid; gap: 16px; }
-    .card { padding: 16px; border-radius: 22px; }
-    .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-    .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
-    .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .playGrid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; }
-    .space { display: grid; gap: 16px; }
-    .spaceSm { display: grid; gap: 10px; }
-    .stat { border-radius: 14px; background: rgba(0,0,0,.28); padding: 12px; }
-    .statLabel { color: var(--muted2); font-size: .82rem; }
-    .statNum { font-size: 1.55rem; font-weight: 950; margin-top: 2px; }
-    .pill {
-      display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line);
-      border-radius: 999px; padding: 5px 9px; font-size: .74rem; color: #ffedd5;
-      background: rgba(253, 186, 116, .10); white-space: nowrap;
-    }
-    .pill.green { border-color: rgba(134,239,172,.32); background: rgba(134,239,172,.10); color: var(--green); }
-    .pill.red { border-color: rgba(252,165,165,.32); background: rgba(252,165,165,.10); color: var(--red); }
-    .pill.blue { border-color: rgba(125,211,252,.32); background: rgba(125,211,252,.10); color: var(--blue); }
-    .pill.purple { border-color: rgba(216,180,254,.32); background: rgba(216,180,254,.10); color: var(--purple); }
-    .tagWrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .input, select, textarea {
-      width: 100%; color: var(--text); background: rgba(0,0,0,.38); border: 1px solid var(--line);
-      border-radius: 14px; padding: 10px 11px; outline: none;
-    }
-    textarea { min-height: 150px; resize: vertical; }
-    .field span { display: block; color: var(--muted); font-size: .82rem; margin: 0 0 5px; }
-    .hidden { display: none; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-    .listItem, .roomBtn {
-      width: 100%; border: 1px solid var(--line2); background: rgba(0,0,0,.28);
-      border-radius: 16px; padding: 12px; color: var(--text); text-align: left;
-    }
-    .roomBtn.active { border-color: rgba(253,186,116,.56); background: rgba(253,186,116,.10); }
-    .listItem b, .roomBtn b { font-weight: 900; }
-    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .fileLine { border-radius: 14px; background: rgba(0,0,0,.30); padding: 10px; }
-    .preview {
-      width: 100%; height: 480px; border-radius: 16px; border: 1px solid var(--line);
-      background: #000; object-fit: contain;
-    }
-    iframe.preview { background: #fff; }
-    ul { margin: 0; padding-left: 22px; }
-    li { margin: 4px 0; }
-    .buttons { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .roomCreate { display: flex; gap: 8px; margin-top: 16px; }
-    .empty { color: var(--muted); font-size: .9rem; }
-    .warn { color: #fed7aa; }
-    .toast {
-      position: fixed; right: 16px; bottom: 16px; z-index: 50; max-width: 420px;
-      border: 1px solid var(--line); background: rgba(0,0,0,.82); color: var(--text);
-      padding: 12px 14px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.45);
-      backdrop-filter: blur(10px);
-    }
-    .caps { text-transform: uppercase; letter-spacing: .08em; }
 
-    @media (max-width: 980px) {
-      .layout, .playGrid, .split, .grid4 { grid-template-columns: 1fr; }
-      aside { order: 2; }
-      main { order: 1; }
-      .preview { height: 360px; }
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    button:disabled{cursor:not-allowed;opacity:.45}
+    .wrap{max-width:1280px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+    .header,.nav,.card{border:1px solid var(--line);background:var(--panel);box-shadow:0 20px 50px var(--shadow);backdrop-filter:blur(10px)}
+    .header{border-radius:28px;padding:18px}
+    .header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand-icon{font-size:32px;filter:drop-shadow(0 0 14px rgba(251,146,60,.55))}
+    h1,h2,h3,p{margin:0}
+    h1{font-size:clamp(22px,4vw,34px);line-height:1.05;font-weight:950;letter-spacing:-.04em}
+    h2{font-size:18px;margin-bottom:12px}
+    h3{font-size:28px;color:var(--orange2);margin-bottom:8px}
+    .subtitle{margin-top:6px;color:var(--muted);font-size:14px}
+    .nav{border-radius:26px;padding:8px;display:flex;flex-wrap:wrap;gap:8px;position:sticky;top:8px;z-index:20}
+    .tab{border:0;border-radius:18px;background:transparent;color:var(--text);padding:10px 12px;font-weight:800;display:inline-flex;align-items:center;gap:8px;transition:.18s ease}
+    .tab:hover{background:rgba(251,146,60,.1)}
+    .tab.active{background:var(--orange);color:#090401}
+    .grid-main{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+    .side{display:flex;flex-direction:column;gap:16px;position:sticky;top:84px}
+    .card{border-radius:22px;padding:16px}
+    .cards-grid{display:grid;gap:16px}
+    .cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .play-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .stat{background:var(--panel2);border-radius:14px;padding:12px}
+    .stat .label{color:var(--faint);font-size:13px}
+    .stat .num{font-size:28px;font-weight:950;margin-top:2px}
+    .btn{border:0;border-radius:14px;background:var(--orange);color:#090401;padding:10px 12px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s ease;text-decoration:none;white-space:nowrap}
+    .btn:hover{background:var(--orange2)}
+    .btn.ghost{border:1px solid var(--line);background:rgba(0,0,0,.22);color:var(--text)}
+    .btn.ghost:hover{background:rgba(251,146,60,.12)}
+    .btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn.full{width:100%;margin-top:10px}
+    .hidden{display:none!important}
+    .muted{color:var(--muted);font-size:14px;line-height:1.5}
+    .faint{color:var(--faint);font-size:12px;line-height:1.45}
+    .pill{display:inline-flex;align-items:center;border-radius:999px;border:1px solid var(--line);padding:5px 9px;font-size:12px;color:var(--text);background:rgba(251,146,60,.1);white-space:nowrap}
+    .pill.green{border-color:rgba(134,239,172,.32);background:rgba(134,239,172,.1);color:var(--green)}
+    .pill.red{border-color:rgba(252,165,165,.32);background:rgba(252,165,165,.1);color:var(--red)}
+    .pill.blue{border-color:rgba(125,211,252,.32);background:rgba(125,211,252,.1);color:var(--blue)}
+    .pill.purple{border-color:rgba(216,180,254,.32);background:rgba(216,180,254,.1);color:var(--purple)}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{border:1px solid rgba(255,190,110,.16);background:rgba(0,0,0,.28);border-radius:16px;padding:12px}
+    .item.active{border-color:rgba(251,146,60,.7);background:rgba(251,146,60,.1)}
+    .item-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:rgba(255,237,213,.54);word-break:break-all}
+    .truncate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+    select,input,textarea{width:100%;border:1px solid var(--line);background:rgba(0,0,0,.42);color:var(--text);border-radius:14px;padding:10px;outline:none}
+    textarea{min-height:150px;resize:vertical}
+    label span{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}
+    .video-frame,.html-frame{height:480px;width:100%;border:1px solid var(--line);border-radius:16px;background:#000;overflow:hidden}
+    .video-frame{object-fit:contain}
+    .html-frame{background:#fff}
+    .notice{border:1px solid rgba(125,211,252,.25);background:rgba(125,211,252,.08);border-radius:16px;padding:12px;color:var(--blue);font-size:13px;line-height:1.5}
+    .warn{border-color:rgba(252,165,165,.25);background:rgba(252,165,165,.08);color:var(--red)}
+    .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .rooms button{width:100%;text-align:left;border:1px solid rgba(255,190,110,.16);background:rgba(0,0,0,.22);color:var(--text);border-radius:16px;padding:12px;transition:.18s ease}
+    .rooms button:hover{background:rgba(251,146,60,.1)}
+    .rooms button.active{border-color:rgba(251,146,60,.7);background:rgba(251,146,60,.12)}
+    .room-create{display:flex;gap:8px;margin-top:16px;align-items:center}
+    .room-create input{min-width:0;flex:1}
+    .capture-thumb{max-width:100%;border-radius:14px;border:1px solid var(--line);margin-top:8px}
+    .top-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .loader{color:var(--orange2);font-size:13px;margin-top:8px}
+
+    @media (max-width: 980px){
+      .grid-main,.play-grid,.two-col{grid-template-columns:1fr}
+      .side{position:static}
+      .cols-3,.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .form-grid{grid-template-columns:1fr}
+      .nav{position:static}
     }
-    @media (max-width: 680px) {
-      .app { padding: 10px; }
-      .grid2, .grid3 { grid-template-columns: 1fr; }
-      .nav { position: static; }
-      .navBtn { flex: 1 1 auto; }
-      .roomCreate { flex-direction: column; }
-      .buttons { align-items: stretch; }
-      .buttons .btn { width: 100%; }
+    @media (max-width: 620px){
+      .wrap{padding:10px}
+      .cols-2,.cols-3,.cols-4{grid-template-columns:1fr}
+      .stat-grid{grid-template-columns:1fr 1fr}
+      .btn-row{display:grid;grid-template-columns:1fr;align-items:stretch}
+      .btn{width:100%}
+      .video-frame,.html-frame{height:340px}
+      .room-create{flex-direction:column;align-items:stretch}
     }
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div class="wrap">
+    <header class="header">
+      <div class="header-row">
+        <div>
+          <div class="brand"><span class="brand-icon">🎮</span><h1>MEM Palace Game Terminal</h1></div>
+          <p class="subtitle">LOAD → INSPECT → BLUEPRINT → RUN / ATTACH → OBSERVE → BUILD</p>
+        </div>
+        <span class="pill purple">Dual-card save architecture</span>
+      </div>
+      <div id="zipLoaderStatus" class="loader"></div>
+    </header>
 
-  <script type="module">
-    import React, { useEffect, useMemo, useRef, useState } from "https://esm.sh/react@18.2.0";
-    import { createRoot } from "https://esm.sh/react-dom@18.2.0/client";
-    import JSZip from "https://esm.sh/jszip@3.10.1";
+    <nav id="tabs" class="nav"></nav>
 
-    const h = React.createElement;
+    <div class="grid-main">
+      <aside class="side">
+        <section class="card">
+          <h2>Project Stats</h2>
+          <div class="stat-grid" id="statsGrid"></div>
+        </section>
+
+        <section class="card">
+          <h2>Current Room</h2>
+          <b id="sideRoomTitle" style="color:var(--orange2)"></b>
+          <p id="sideRoomType" class="muted" style="margin-top:4px"></p>
+          <div id="sideRoomTags" class="tag-row"></div>
+
+          <button class="btn ghost full" id="sideSaveDrawer">📦 Save Drawer</button>
+          <button class="btn ghost full" id="sideExportActiveDrawer">⬇️ Export Active Drawer</button>
+          <button class="btn full" id="sideSaveFullSession">⬇️ Save Full Session</button>
+        </section>
+      </aside>
+
+      <main id="main"></main>
+    </div>
+  </div>
+
+  <input id="zipInput" type="file" accept=".zip" class="hidden" />
+  <input id="folderInput" type="file" multiple webkitdirectory directory class="hidden" />
+  <input id="saveFileInput" type="file" class="hidden" />
+  <input id="memFileInput" type="file" accept=".json,.memsave,.memdrawer,.memsession" class="hidden" />
+
+  <script>
+    const STORE_KEY = "mem-palace-game-terminal-v1";
     const now = () => new Date().toISOString();
 
-    const iconMap = {
-      Archive: "▣", BookOpen: "▤", Camera: "◉", CreditCard: "▰", Download: "⇩",
-      FileJson: "{}", FolderOpen: "▱", Gamepad2: "🎮", Map: "⌖", Network: "⌁",
-      NotebookPen: "✎", PackageOpen: "▤", Play: "▶", Plus: "+", Search: "⌕", Upload: "⇧", Wand2: "✦"
-    };
-
-    function I({ name }) {
-      return h("span", { className: "mono", "aria-hidden": true }, iconMap[name] || "•");
-    }
+    const tabs = [
+      ["load", "Load", "📦"],
+      ["inspect", "Inspect", "🔎"],
+      ["play", "Run / Attach", "▶️"],
+      ["cards", "Memory Cards", "💳"],
+      ["history", "Drawers", "🗄️"],
+      ["palace", "Palace", "🗺️"],
+      ["blueprint", "Blueprint", "🕸️"],
+      ["timeline", "Timeline", "📝"],
+      ["notes", "Notes", "📖"],
+      ["build", "Build", "🪄"],
+    ];
 
     const seedProject = {
       project: {
@@ -196,30 +213,74 @@
       currentNodeId: "midgar",
       nodes: [
         {
-          id: "midgar", type: "location", title: "Midgar", description: "Central city hub and opening region.",
-          connections: ["sector-7", "reactor-1", "shinra-building"], characters: ["cloud", "barret", "tifa", "aerith"],
-          items: [], events: ["evt-opening"], screenshots: [], notes: ["Use this as the first palace wing for the beta test."],
-          tags: ["city", "opening", "hub"], createdAt: now(),
+          id: "midgar",
+          type: "location",
+          title: "Midgar",
+          description: "Central city hub and opening region.",
+          connections: ["sector-7", "reactor-1", "shinra-building"],
+          characters: ["cloud", "barret", "tifa", "aerith"],
+          items: [],
+          events: ["evt-opening"],
+          screenshots: [],
+          notes: ["Use this as the first palace wing for the beta test."],
+          tags: ["city", "opening", "hub"],
+          createdAt: now(),
         },
         {
-          id: "reactor-1", type: "location", title: "Mako Reactor 1", description: "Opening bombing mission area.",
-          connections: ["midgar", "guard-scorpion"], characters: ["cloud", "barret", "biggs", "wedge", "jessie"],
-          items: [], events: ["evt-bombing-mission"], screenshots: [], notes: [], tags: ["reactor", "mission", "midgar"], createdAt: now(),
+          id: "reactor-1",
+          type: "location",
+          title: "Mako Reactor 1",
+          description: "Opening bombing mission area.",
+          connections: ["midgar", "guard-scorpion"],
+          characters: ["cloud", "barret", "biggs", "wedge", "jessie"],
+          items: [],
+          events: ["evt-bombing-mission"],
+          screenshots: [],
+          notes: [],
+          tags: ["reactor", "mission", "midgar"],
+          createdAt: now(),
         },
         {
-          id: "sector-7", type: "location", title: "Sector 7", description: "Avalanche base area and early story hub.",
-          connections: ["midgar", "seventh-heaven"], characters: ["cloud", "barret", "tifa"],
-          items: [], events: [], screenshots: [], notes: [], tags: ["slums", "avalanche"], createdAt: now(),
+          id: "sector-7",
+          type: "location",
+          title: "Sector 7",
+          description: "Avalanche base area and early story hub.",
+          connections: ["midgar", "seventh-heaven"],
+          characters: ["cloud", "barret", "tifa"],
+          items: [],
+          events: [],
+          screenshots: [],
+          notes: [],
+          tags: ["slums", "avalanche"],
+          createdAt: now(),
         },
         {
-          id: "shinra-building", type: "location", title: "Shinra Building", description: "Major Midgar infiltration sequence.",
-          connections: ["midgar"], characters: ["cloud", "barret", "tifa", "aerith", "red-xiii"],
-          items: [], events: [], screenshots: [], notes: [], tags: ["midgar", "shinra", "infiltration"], createdAt: now(),
+          id: "shinra-building",
+          type: "location",
+          title: "Shinra Building",
+          description: "Major Midgar infiltration sequence.",
+          connections: ["midgar"],
+          characters: ["cloud", "barret", "tifa", "aerith", "red-xiii"],
+          items: [],
+          events: [],
+          screenshots: [],
+          notes: [],
+          tags: ["midgar", "shinra", "infiltration"],
+          createdAt: now(),
         },
         {
-          id: "guard-scorpion", type: "battle", title: "Guard Scorpion", description: "First boss encounter. Watch the tail warning.",
-          connections: ["reactor-1"], characters: ["cloud", "barret"], items: [], events: [], screenshots: [],
-          notes: ["Capture battle timing and tutorial dialogue."], tags: ["boss", "tutorial", "reactor-1"], createdAt: now(),
+          id: "guard-scorpion",
+          type: "battle",
+          title: "Guard Scorpion",
+          description: "First boss encounter. Watch the tail warning.",
+          connections: ["reactor-1"],
+          characters: ["cloud", "barret"],
+          items: [],
+          events: [],
+          screenshots: [],
+          notes: ["Capture battle timing and tutorial dialogue."],
+          tags: ["boss", "tutorial", "reactor-1"],
+          createdAt: now(),
         },
       ],
       edges: [
@@ -228,8 +289,24 @@
         { id: "edge-midgar-sector", from: "midgar", to: "sector-7", label: "hub path" },
       ],
       timeline: [
-        { id: "evt-opening", timestamp: now(), nodeId: "midgar", type: "story", title: "Opening sequence", summary: "Begin mapping the first FF7 run as a memory palace.", tags: ["opening"] },
-        { id: "evt-bombing-mission", timestamp: now(), nodeId: "reactor-1", type: "story", title: "Bombing mission begins", summary: "Cloud joins Avalanche during the Reactor 1 mission.", tags: ["mission", "reactor"] },
+        {
+          id: "evt-opening",
+          timestamp: now(),
+          nodeId: "midgar",
+          type: "story",
+          title: "Opening sequence",
+          summary: "Begin mapping the first FF7 run as a memory palace.",
+          tags: ["opening"],
+        },
+        {
+          id: "evt-bombing-mission",
+          timestamp: now(),
+          nodeId: "reactor-1",
+          type: "story",
+          title: "Bombing mission begins",
+          summary: "Cloud joins Avalanche during the Reactor 1 mission.",
+          tags: ["mission", "reactor"],
+        },
       ],
       inventory: [],
       characters: [
@@ -238,30 +315,140 @@
         { id: "tifa", name: "Tifa Lockhart", role: "party", notes: [] },
         { id: "aerith", name: "Aerith Gainsborough", role: "party", notes: [] },
       ],
-      observations: [], captures: [],
+      observations: [],
+      captures: [],
       memoryCards: { gameCards: [], palCards: [], pairs: [], activePairId: "" },
       progressionDrawers: { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] },
     };
 
-    const tabs = [
-      ["load", "Load", "PackageOpen"], ["inspect", "Inspect", "Search"], ["play", "Run / Attach", "Play"],
-      ["cards", "Memory Cards", "CreditCard"], ["history", "Drawers", "Archive"], ["palace", "Palace", "Map"],
-      ["blueprint", "Blueprint", "Network"], ["timeline", "Timeline", "NotebookPen"], ["notes", "Notes", "BookOpen"], ["build", "Build", "Wand2"],
-    ];
+    let data = loadStoredProject();
+    let activeTab = "load";
+    let captureStream = null;
 
-    function uid(prefix = "id") { return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`; }
-    function ext(name = "") { const parts = name.toLowerCase().split("."); return parts.length > 1 ? parts.pop() : ""; }
-    function slug(input = "mem-palace") { return String(input).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "mem-palace"; }
-    function cls(...parts) { return parts.filter(Boolean).join(" "); }
-    function escapeHtml(value) {
-      return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+    function loadStoredProject(){
+      try{
+        const raw = localStorage.getItem(STORE_KEY);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          return normalizeProject(parsed);
+        }
+      }catch(e){ console.warn("Storage load failed", e); }
+      return structuredClone(seedProject);
     }
-    async function sha256File(file) {
+
+    function normalizeProject(project){
+      const out = { ...structuredClone(seedProject), ...(project || {}) };
+      out.project = { ...seedProject.project, ...(project?.project || {}) };
+      out.package = { ...seedProject.package, ...(project?.package || {}) };
+      out.runtime = { ...seedProject.runtime, ...(project?.runtime || {}) };
+      out.nodes = Array.isArray(project?.nodes) ? project.nodes : seedProject.nodes;
+      out.edges = Array.isArray(project?.edges) ? project.edges : seedProject.edges;
+      out.timeline = Array.isArray(project?.timeline) ? project.timeline : seedProject.timeline;
+      out.captures = Array.isArray(project?.captures) ? project.captures : [];
+      out.memoryCards = { gameCards: [], palCards: [], pairs: [], activePairId: "", ...(project?.memoryCards || {}) };
+      out.progressionDrawers = { drawers: [], activeDrawerId: "", pinnedDrawerIds: [], ...(project?.progressionDrawers || {}) };
+      if(!out.currentNodeId || !out.nodes.some(n => n.id === out.currentNodeId)) out.currentNodeId = out.nodes[0]?.id || "";
+      return out;
+    }
+
+    function persist(){
+      try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+      catch(e){ console.warn("Storage save failed. Captures may be too large.", e); }
+    }
+
+    function setData(updater){
+      const next = typeof updater === "function" ? updater(data) : updater;
+      data = normalizeProject({
+        ...next,
+        project: { ...(next.project || data.project), updatedAt: now() }
+      });
+      persist();
+      render();
+    }
+
+    function uid(prefix = "id"){
+      return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+    }
+
+    function ext(name = ""){
+      const parts = String(name).toLowerCase().split(".");
+      return parts.length > 1 ? parts.pop() : "";
+    }
+
+    function slug(input = "mem-palace"){
+      return String(input).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "mem-palace";
+    }
+
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function currentNode(){
+      return data.nodes.find(n => n.id === data.currentNodeId) || data.nodes[0] || null;
+    }
+
+    function memoryCards(){
+      return data.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" };
+    }
+
+    function progressionDrawers(){
+      return data.progressionDrawers || { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] };
+    }
+
+    function statusTone(status){
+      if(status === "synced") return "green";
+      if(status === "out-of-sync" || status === "conflict") return "red";
+      if(String(status || "").startsWith("missing")) return "red";
+      if(status === "legacy") return "purple";
+      return "blue";
+    }
+
+    function pill(text, tone = "orange"){
+      return `<span class="pill ${escapeHtml(tone)}">${escapeHtml(text)}</span>`;
+    }
+
+    function getPairStatus(gameCard, palCard){
+      if(!gameCard && !palCard) return "unpaired";
+      if(!gameCard) return "missing-gamecard";
+      if(!palCard) return "missing-palcard";
+      const pairing = palCard.pairing || {};
+      if(!pairing.gameCardId || pairing.gameCardId !== gameCard.id) return "unpaired";
+      if(pairing.gameSaveHash && gameCard.saveFile?.hash && pairing.gameSaveHash !== gameCard.saveFile.hash) return "out-of-sync";
+      return "synced";
+    }
+
+    function pairViews(){
+      const cards = memoryCards();
+      return (cards.pairs || []).map(pair => {
+        const gameCard = (cards.gameCards || []).find(card => card.id === pair.gameCardId);
+        const palCard = (cards.palCards || []).find(card => card.id === pair.palCardId);
+        return { ...pair, gameCard, palCard, status: getPairStatus(gameCard, palCard) };
+      });
+    }
+
+    function buildRouteFromNode(nodes, nodeId){
+      const node = nodes.find(item => item.id === nodeId);
+      if(!node) return [];
+      const route = [node.id];
+      for(const connection of node.connections || []){
+        if(!route.includes(connection)) route.unshift(connection);
+        if(route.length >= 8) break;
+      }
+      return Array.from(new Set(route));
+    }
+
+    async function sha256File(file){
       const buffer = await file.arrayBuffer();
       const digest = await crypto.subtle.digest("SHA-256", buffer);
-      return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+      return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2,"0")).join("");
     }
-    function downloadText(filename, text, type = "text/plain") {
+
+    function downloadText(filename, text, type = "text/plain"){
       const blob = new Blob([text], { type });
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
@@ -270,80 +457,90 @@
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 250);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
-    function statusTone(status) {
-      if (status === "synced") return "green";
-      if (status === "out-of-sync" || status === "conflict") return "red";
-      if (status?.startsWith("missing")) return "red";
-      if (status === "legacy") return "purple";
-      return "blue";
-    }
-    function getPairStatus(gameCard, palCard) {
-      if (!gameCard && !palCard) return "unpaired";
-      if (!gameCard) return "missing-gamecard";
-      if (!palCard) return "missing-palcard";
-      const pairing = palCard.pairing || {};
-      if (!pairing.gameCardId || pairing.gameCardId !== gameCard.id) return "unpaired";
-      if (pairing.gameSaveHash && gameCard.saveFile?.hash && pairing.gameSaveHash !== gameCard.saveFile.hash) return "out-of-sync";
-      return "synced";
-    }
-    function buildRouteFromNode(nodes, nodeId) {
-      const node = nodes.find((item) => item.id === nodeId);
-      if (!node) return [];
-      const route = [node.id];
-      for (const connection of node.connections || []) {
-        if (!route.includes(connection)) route.unshift(connection);
-        if (route.length >= 8) break;
-      }
-      return Array.from(new Set(route));
-    }
-    function inspectFiles(files, sourceType, packageName) {
-      const fileList = files.map((file) => ({
-        name: file.name,
-        path: file.path || file.webkitRelativePath || file.name,
+
+    function inspectFiles(files, sourceType, packageName){
+      const fileList = Array.from(files || []).map(file => ({
+        name: file.name || String(file.path || "file"),
+        path: file.path || file.webkitRelativePath || file.name || "file",
         size: file.size || 0,
         type: file.type || "",
-        extension: ext(file.name),
+        extension: ext(file.name || file.path || ""),
       }));
-      const folders = Array.from(new Set(fileList.map((file) => file.path.split("/").slice(0, -1).join("/")).filter(Boolean)));
-      const scripts = fileList.filter((file) => ["js", "ts", "mjs", "jsx", "tsx"].includes(file.extension));
-      const assets = fileList.filter((file) => ["png", "jpg", "jpeg", "webp", "gif", "svg", "mp3", "ogg", "wav", "mp4", "webm"].includes(file.extension));
-      const executables = fileList.filter((file) => ["exe", "bat", "cmd", "app"].includes(file.extension));
-      const htmlEntries = fileList.filter((file) => file.name.toLowerCase() === "index.html" || file.extension === "html");
-      const jsonFiles = fileList.filter((file) => file.extension === "json");
+
+      const folders = Array.from(new Set(
+        fileList.map(file => file.path.split("/").slice(0,-1).join("/")).filter(Boolean)
+      ));
+
+      const scripts = fileList.filter(file => ["js","ts","mjs","jsx","tsx"].includes(file.extension));
+      const assets = fileList.filter(file => ["png","jpg","jpeg","webp","gif","svg","mp3","ogg","wav","mp4","webm"].includes(file.extension));
+      const executables = fileList.filter(file => ["exe","bat","cmd","app"].includes(file.extension));
+      const htmlEntries = fileList.filter(file => file.name.toLowerCase() === "index.html" || file.extension === "html");
+      const jsonFiles = fileList.filter(file => file.extension === "json");
+
       let runMode = "external-attach";
       const warnings = [];
-      if (htmlEntries.length) runMode = "internal-html";
-      else if (executables.length) warnings.push("Native executables cannot be run inside the browser sandbox. Use External Attach Mode.");
-      else { runMode = "inspect-only"; warnings.push("No browser-runnable entry point was detected. Blueprint inspection is still available."); }
+      if(htmlEntries.length){
+        runMode = "internal-html";
+      }else if(executables.length){
+        runMode = "external-attach";
+        warnings.push("Native executables cannot be run inside the browser sandbox. Use External Attach Mode.");
+      }else{
+        runMode = "inspect-only";
+        warnings.push("No browser-runnable entry point was detected. Blueprint inspection is still available.");
+      }
+
       return {
-        name: packageName, sourceType, runMode,
-        entryCandidates: [...htmlEntries.map((file) => file.path), ...executables.map((file) => file.path)],
-        detectedFolders: folders, detectedFiles: fileList, detectedScripts: scripts, detectedAssets: assets,
-        detectedExecutables: executables, detectedJson: jsonFiles, warnings,
-        importReport: { filesFound: fileList.length, foldersFound: folders.length, assetsFound: assets.length, scriptsFound: scripts.length, executablesFound: executables.length, generatedAt: now() },
+        name: packageName,
+        sourceType,
+        runMode,
+        entryCandidates: [...htmlEntries.map(file => file.path), ...executables.map(file => file.path)],
+        detectedFolders: folders,
+        detectedFiles: fileList,
+        detectedScripts: scripts,
+        detectedAssets: assets,
+        detectedExecutables: executables,
+        detectedJson: jsonFiles,
+        warnings,
+        importReport: {
+          filesFound: fileList.length,
+          foldersFound: folders.length,
+          assetsFound: assets.length,
+          scriptsFound: scripts.length,
+          executablesFound: executables.length,
+          generatedAt: now(),
+        },
       };
     }
-    function createBlueprintFromPackage(pkg) {
-      const nodes = [{ id: "pkg-root", type: "package", source: "package", title: pkg.name || "Loaded Package", description: `Source: ${pkg.sourceType}. Run mode: ${pkg.runMode}.`, tags: ["package", pkg.sourceType, pkg.runMode].filter(Boolean) }];
+
+    function createBlueprintFromPackage(pkg){
+      const nodes = [{
+        id: "pkg-root",
+        type: "package",
+        source: "package",
+        title: pkg.name || "Loaded Package",
+        description: `Source: ${pkg.sourceType}. Run mode: ${pkg.runMode}.`,
+        tags: ["package", pkg.sourceType, pkg.runMode].filter(Boolean),
+      }];
       const edges = [];
-      for (const folder of pkg.detectedFolders || []) {
+
+      for(const folder of pkg.detectedFolders || []){
         const id = `folder-${slug(folder)}`;
         nodes.push({ id, type: "folder", source: "package", title: folder, description: "Detected package folder.", tags: ["folder"] });
         edges.push({ id: `edge-root-${id}`, from: "pkg-root", to: id, label: "contains", source: "package" });
       }
-      for (const file of pkg.detectedExecutables || []) {
+      for(const file of pkg.detectedExecutables || []){
         const id = `exe-${slug(file.path)}`;
         nodes.push({ id, type: "executable", source: "package", title: file.name, description: file.path, tags: ["executable"] });
         edges.push({ id: `edge-root-${id}`, from: "pkg-root", to: id, label: "entry candidate", source: "package" });
       }
-      for (const file of pkg.detectedScripts || []) {
+      for(const file of pkg.detectedScripts || []){
         const id = `script-${slug(file.path)}`;
         nodes.push({ id, type: "script", source: "package", title: file.name, description: file.path, tags: ["script", file.extension] });
         edges.push({ id: `edge-root-${id}`, from: "pkg-root", to: id, label: "script", source: "package" });
       }
-      for (const file of (pkg.detectedAssets || []).slice(0, 40)) {
+      for(const file of (pkg.detectedAssets || []).slice(0,40)){
         const id = `asset-${slug(file.path)}`;
         nodes.push({ id, type: "asset", source: "package", title: file.name, description: file.path, tags: ["asset", file.extension] });
         edges.push({ id: `edge-root-${id}`, from: "pkg-root", to: id, label: "asset", source: "package" });
@@ -351,389 +548,970 @@
       return { nodes, edges };
     }
 
-    function Button({ children, onClick, variant = "solid", disabled = false, className = "" }) {
-      return h("button", { onClick, disabled, className: cls("btn", variant, className) }, children);
-    }
-    function Field({ label, children }) { return h("label", { className: "field" }, h("span", null, label), children); }
-    function Card({ children, className = "" }) { return h("div", { className: cls("card", className) }, children); }
-    function Pill({ children, tone = "orange" }) { return h("span", { className: cls("pill", tone !== "orange" && tone) }, children); }
-    function MotionWrap({ children, className = "" }) {
-      return h("div", { className }, children);
-    }
-
-    function PairCreator({ gameCards, palCards, onPair }) {
-      const [gameCardId, setGameCardId] = useState("");
-      const [palCardId, setPalCardId] = useState("");
-      return h("div", { className: "grid3" },
-        h(Field, { label: "GameCard" }, h("select", { value: gameCardId, onChange: (event) => setGameCardId(event.target.value) },
-          h("option", { value: "" }, "Choose GameCard"),
-          gameCards.map((card) => h("option", { key: card.id, value: card.id }, card.slotTitle))
-        )),
-        h(Field, { label: "PALCard" }, h("select", { value: palCardId, onChange: (event) => setPalCardId(event.target.value) },
-          h("option", { value: "" }, "Choose PALCard"),
-          palCards.map((card) => h("option", { key: card.id, value: card.id }, card.title))
-        )),
-        h("div", { style: { display: "flex", alignItems: "end" } }, h(Button, { disabled: !gameCardId || !palCardId, onClick: () => onPair(gameCardId, palCardId) }, "Pair Cards"))
-      );
-    }
-
-    function MemPalaceGameTerminal() {
-      const [data, setData] = useState(seedProject);
-      const [activeTab, setActiveTab] = useState("load");
-      const [noteText, setNoteText] = useState("");
-      const [newNodeTitle, setNewNodeTitle] = useState("");
-      const [captureStream, setCaptureStream] = useState(null);
-      const [hasLoadedStoredProject, setHasLoadedStoredProject] = useState(false);
-      const [toast, setToast] = useState("");
-
-      const zipInputRef = useRef(null);
-      const folderInputRef = useRef(null);
-      const saveFileInputRef = useRef(null);
-      const memSaveInputRef = useRef(null);
-      const videoRef = useRef(null);
-
-      function notify(message) {
-        setToast(message);
-        window.clearTimeout(notify._t);
-        notify._t = window.setTimeout(() => setToast(""), 3600);
-      }
-
-      useEffect(() => {
-        try {
-          const raw = localStorage.getItem("mem-palace-game-terminal-v1");
-          if (raw) setData(JSON.parse(raw));
-        } catch {}
-        finally { setHasLoadedStoredProject(true); }
-      }, []);
-
-      useEffect(() => {
-        if (!hasLoadedStoredProject) return;
-        try { localStorage.setItem("mem-palace-game-terminal-v1", JSON.stringify(data)); }
-        catch { notify("Local storage is full. Export a full session and clear old captures if needed."); }
-      }, [data, hasLoadedStoredProject]);
-
-      const memoryCards = data.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" };
-      const progressionDrawers = data.progressionDrawers || { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] };
-      const currentNode = useMemo(() => data.nodes.find((node) => node.id === data.currentNodeId) || data.nodes[0], [data.nodes, data.currentNodeId]);
-      const pairViews = useMemo(() => (memoryCards.pairs || []).map((pair) => {
-        const gameCard = (memoryCards.gameCards || []).find((card) => card.id === pair.gameCardId);
-        const palCard = (memoryCards.palCards || []).find((card) => card.id === pair.palCardId);
-        return { ...pair, gameCard, palCard, status: getPairStatus(gameCard, palCard) };
-      }), [memoryCards]);
-
-      function updateData(updater) {
-        setData((prev) => {
-          const next = typeof updater === "function" ? updater(prev) : updater;
-          return { ...next, project: { ...next.project, updatedAt: now() } };
-        });
-      }
-
-      async function loadZip(file) {
-        if (!file) return;
-        try {
-          const zip = await JSZip.loadAsync(await file.arrayBuffer());
-          const files = Object.values(zip.files).filter((entry) => !entry.dir).map((entry) => ({ name: entry.name.split("/").pop(), path: entry.name, size: entry._data?.uncompressedSize || 0, type: "" }));
-          const pkg = inspectFiles(files, "zip", file.name.replace(/\.zip$/i, ""));
-          const blueprint = createBlueprintFromPackage(pkg);
-          let runtime = { status: "loaded", runMode: pkg.runMode, internalHtml: "", internalEntry: pkg.entryCandidates[0] || "", externalInstructions: pkg.warnings };
-          if (pkg.runMode === "internal-html") {
-            const entry = pkg.entryCandidates.find((candidate) => candidate.toLowerCase().endsWith(".html"));
-            const html = entry ? await zip.file(entry)?.async("string") : "";
-            runtime = { ...runtime, internalHtml: html || "<p>No HTML entry could be loaded.</p>", internalEntry: entry || "" };
+    function loadJSZipIfNeeded(){
+      if(window.JSZip) return Promise.resolve(window.JSZip);
+      const status = document.getElementById("zipLoaderStatus");
+      status.textContent = "ZIP support loading from CDN only when needed...";
+      const sources = [
+        "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+        "https://unpkg.com/jszip@3.10.1/dist/jszip.min.js",
+        "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"
+      ];
+      return new Promise((resolve,reject) => {
+        let index = 0;
+        const tryNext = () => {
+          if(index >= sources.length){
+            status.textContent = "ZIP support could not load. Folder mode still works.";
+            reject(new Error("JSZip could not load from any CDN."));
+            return;
           }
-          updateData((prev) => ({
-            ...prev, package: pkg, runtime,
-            nodes: [...prev.nodes.filter((node) => node.source !== "package"), ...blueprint.nodes],
-            edges: [...prev.edges.filter((edge) => edge.source !== "package"), ...blueprint.edges],
-            timeline: [{ id: uid("evt"), timestamp: now(), nodeId: prev.currentNodeId, type: "load", title: `Loaded package: ${pkg.name}`, summary: `Inspected ${pkg.importReport.filesFound} files and generated a hard blueprint.`, tags: ["load", "package", pkg.sourceType] }, ...prev.timeline],
-          }));
-          setActiveTab("inspect");
-          notify("ZIP loaded and blueprint generated.");
-        } catch (error) { notify(`ZIP load failed: ${error.message}`); }
-      }
-
-      async function loadFolder(files) {
-        const list = Array.from(files || []);
-        if (!list.length) return;
-        const root = list[0].webkitRelativePath?.split("/")[0] || "Loaded Folder";
-        const pkg = inspectFiles(list, "folder", root);
-        const blueprint = createBlueprintFromPackage(pkg);
-        updateData((prev) => ({
-          ...prev, package: pkg,
-          runtime: { status: "loaded", runMode: pkg.runMode, internalHtml: "", internalEntry: pkg.entryCandidates[0] || "", externalInstructions: pkg.warnings },
-          nodes: [...prev.nodes.filter((node) => node.source !== "package"), ...blueprint.nodes],
-          edges: [...prev.edges.filter((edge) => edge.source !== "package"), ...blueprint.edges],
-          timeline: [{ id: uid("evt"), timestamp: now(), nodeId: prev.currentNodeId, type: "load", title: `Loaded folder: ${pkg.name}`, summary: `Inspected ${pkg.importReport.filesFound} files and generated a hard blueprint.`, tags: ["load", "folder"] }, ...prev.timeline],
-        }));
-        setActiveTab("inspect");
-        notify("Folder inspected and blueprint generated.");
-      }
-
-      function addFastNode(type = "location") {
-        const title = newNodeTitle.trim() || `New ${type}`;
-        const id = slug(`${type}-${title}-${Date.now()}`);
-        const eventId = uid("evt");
-        const node = { id, type, title, description: `Captured ${type} node from the current session.`, connections: currentNode ? [currentNode.id] : [], characters: [], items: [], events: [eventId], screenshots: [], notes: [], tags: [type], createdAt: now() };
-        updateData((prev) => ({
-          ...prev, currentNodeId: id,
-          nodes: [node, ...prev.nodes],
-          edges: currentNode ? [{ id: uid("edge"), from: currentNode.id, to: id, label: "observed route" }, ...prev.edges] : prev.edges,
-          timeline: [{ id: eventId, timestamp: now(), nodeId: id, type, title: `New ${type}: ${title}`, summary: "Created while mapping the loaded world.", tags: [type, "manual"] }, ...prev.timeline],
-        }));
-        setNewNodeTitle("");
-      }
-
-      async function createGameCardFromSaveFile(file) {
-        if (!file) return;
-        const hash = await sha256File(file);
-        const nowTime = now();
-        const slotGuess = file.name.replace(/\.[^.]+$/, "").replace(/[^a-z0-9_-]+/gi, "-").toLowerCase() || "slot-imported";
-        const card = { cardType: "GameCard", version: "0.1", id: uid("gamecard"), gameId: data.project?.id || "unknown-game", gameTitle: data.project?.title || "Unknown Game", slotId: slotGuess, slotTitle: file.name, createdAt: nowTime, updatedAt: nowTime, saveMode: "file-import-fingerprint", saveFile: { name: file.name, relativePath: file.name, hash, sizeBytes: file.size, lastModified: file.lastModified ? new Date(file.lastModified).toISOString() : nowTime }, gameRuntime: { runMode: data.package?.runMode || "external-attach", executableName: data.package?.detectedExecutables?.[0]?.name || "unknown", packageId: data.project?.id || "unknown-package" } };
-        updateData((prev) => ({ ...prev, memoryCards: { ...(prev.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" }), gameCards: [card, ...(prev.memoryCards?.gameCards || [])] }, timeline: [{ id: uid("evt"), timestamp: nowTime, nodeId: prev.currentNodeId, type: "load", title: `GameCard created: ${file.name}`, summary: "Imported save file fingerprint. This stores the mechanical save-state identity.", tags: ["GameCard", "save"] }, ...prev.timeline] }));
-        setActiveTab("cards");
-      }
-
-      function createPALCardFromCurrentNode() {
-        if (!currentNode) return;
-        const nowTime = now();
-        const capturesForNode = data.captures.filter((capture) => capture.nodeId === currentNode.id).map((capture) => capture.id);
-        const eventsForNode = data.timeline.filter((event) => event.nodeId === currentNode.id).map((event) => event.id);
-        const card = { cardType: "PALCard", version: "0.1", id: uid("palcard"), gameId: data.project?.id || "unknown-game", title: `${currentNode.title} Palace Context`, palaceNodeId: currentNode.id, currentRoom: currentNode.title, createdAt: nowTime, updatedAt: nowTime, thumbnail: capturesForNode[0] || null, context: { summary: currentNode.description || `Palace context for ${currentNode.title}.`, route: buildRouteFromNode(data.nodes, currentNode.id), tags: currentNode.tags || [], notes: currentNode.notes || [] }, linkedAssets: { captures: capturesForNode, blueprints: ["world-blueprint-v0"], timelineEvents: eventsForNode }, pairing: { gameCardId: null, gameSaveHash: null, pairStatus: "unpaired" } };
-        updateData((prev) => ({ ...prev, memoryCards: { ...(prev.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" }), palCards: [card, ...(prev.memoryCards?.palCards || [])] }, timeline: [{ id: uid("evt"), timestamp: nowTime, nodeId: currentNode.id, type: "note", title: `PALCard created: ${card.title}`, summary: "Created Palace Anchor Layer card from the current room.", tags: ["PALCard", "memory"] }, ...prev.timeline] }));
-        setActiveTab("cards");
-      }
-
-      function pairCards(gameCardId, palCardId) {
-        const gameCard = memoryCards.gameCards.find((card) => card.id === gameCardId);
-        const palCard = memoryCards.palCards.find((card) => card.id === palCardId);
-        if (!gameCard || !palCard) return;
-        const nowTime = now();
-        const pairId = uid("pair");
-        const updatedPalCard = { ...palCard, updatedAt: nowTime, pairing: { gameCardId, gameSaveHash: gameCard.saveFile?.hash || null, pairStatus: "synced" } };
-        const pair = { id: pairId, title: `${gameCard.slotTitle} + ${palCard.currentRoom}`, gameCardId, palCardId, status: getPairStatus(gameCard, updatedPalCard), createdAt: nowTime, updatedAt: nowTime };
-        updateData((prev) => ({ ...prev, memoryCards: { ...(prev.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" }), activePairId: pairId, palCards: (prev.memoryCards?.palCards || []).map((card) => card.id === palCardId ? updatedPalCard : card), pairs: [pair, ...(prev.memoryCards?.pairs || [])] }, timeline: [{ id: uid("evt"), timestamp: nowTime, nodeId: palCard.palaceNodeId, type: "note", title: "MEM Save Pair created", summary: `${gameCard.slotTitle} paired with ${palCard.currentRoom}.`, tags: ["MEM Save Pair", "GameCard", "PALCard"] }, ...prev.timeline] }));
-      }
-      function autoPairLatestCards() {
-        const gameCard = memoryCards.gameCards?.[0];
-        const palCard = memoryCards.palCards?.[0];
-        if (gameCard && palCard) pairCards(gameCard.id, palCard.id);
-      }
-      function loadPair(pair) {
-        if (!pair?.palCard?.palaceNodeId) return;
-        updateData((prev) => ({ ...prev, currentNodeId: pair.palCard.palaceNodeId, memoryCards: { ...(prev.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" }), activePairId: pair.id }, timeline: [{ id: uid("evt"), timestamp: now(), nodeId: pair.palCard.palaceNodeId, type: "load", title: "MEM Save Pair loaded", summary: `Restored palace context for ${pair.palCard.currentRoom}.`, tags: ["MEM Save Pair", "load"] }, ...prev.timeline] }));
-        setActiveTab("blueprint");
-      }
-      function duplicatePair(pair) {
-        if (!pair) return;
-        const cleanPair = { id: uid("pair"), title: `${pair.title} Copy`, gameCardId: pair.gameCardId, palCardId: pair.palCardId, status: pair.status, createdAt: now(), updatedAt: now() };
-        updateData((prev) => ({ ...prev, memoryCards: { ...(prev.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" }), pairs: [cleanPair, ...(prev.memoryCards?.pairs || [])] } }));
-      }
-      function unpairCards(pairId) {
-        updateData((prev) => ({ ...prev, memoryCards: { ...(prev.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" }), pairs: (prev.memoryCards?.pairs || []).filter((pair) => pair.id !== pairId), activePairId: prev.memoryCards?.activePairId === pairId ? "" : prev.memoryCards?.activePairId || "" } }));
-      }
-      function exportPair(pair) {
-        if (!pair) return;
-        const manifest = { memSaveVersion: "0.1", savePairId: pair.id, title: pair.title, createdAt: pair.createdAt, updatedAt: now(), gameCard: pair.gameCard, palCard: pair.palCard, pairing: { status: pair.status, gameSaveHash: pair.gameCard?.saveFile?.hash || null, palaceNodeId: pair.palCard?.palaceNodeId || null }, palaceProject: data };
-        downloadText(`${slug(pair.title) || "mem-save-pair"}.memsave.json`, JSON.stringify(manifest, null, 2), "application/json");
-      }
-      function exportAllPairs() {
-        const manifest = { memSaveVersion: "0.1", title: `${data.project.title} MEM Save Pairs`, exportedAt: now(), memoryCards, palaceProject: data };
-        downloadText(`${data.project.id || "mem-palace"}-memsave.json`, JSON.stringify(manifest, null, 2), "application/json");
-      }
-      function importMemSave(file) {
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const parsed = JSON.parse(String(reader.result));
-            if (parsed.sessionVersion && parsed.palaceSnapshot?.nodes) { setData(parsed.palaceSnapshot); setActiveTab("history"); notify("Full MEM session imported."); return; }
-            if (parsed.drawerArchiveVersion && parsed.progressionDrawers) { updateData((prev) => ({ ...prev, progressionDrawers: parsed.progressionDrawers })); setActiveTab("history"); notify("Drawer archive imported."); return; }
-            if (parsed.drawerVersion && parsed.drawer) { updateData((prev) => ({ ...prev, progressionDrawers: { ...(prev.progressionDrawers || { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] }), activeDrawerId: parsed.drawer.drawerId, drawers: [parsed.drawer, ...(prev.progressionDrawers?.drawers || [])] } })); setActiveTab("history"); notify("Drawer imported."); return; }
-            if (parsed.palaceProject?.nodes) setData(parsed.palaceProject);
-            else if (parsed.memoryCards) updateData((prev) => ({ ...prev, memoryCards: parsed.memoryCards }));
-            setActiveTab("cards");
-            notify("MEM file imported.");
-          } catch { alert("Could not import MEM file. The file format is not valid JSON."); }
+          const script = document.createElement("script");
+          script.src = sources[index++];
+          script.onload = () => {
+            status.textContent = "ZIP support ready.";
+            resolve(window.JSZip);
+          };
+          script.onerror = tryNext;
+          document.head.appendChild(script);
         };
-        reader.readAsText(file);
-      }
-      function verifyPairs() {
-        updateData((prev) => {
-          const cards = prev.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" };
-          return { ...prev, memoryCards: { ...cards, pairs: (cards.pairs || []).map((pair) => { const gameCard = cards.gameCards.find((card) => card.id === pair.gameCardId); const palCard = cards.palCards.find((card) => card.id === pair.palCardId); return { ...pair, status: getPairStatus(gameCard, palCard), updatedAt: now() }; }) } };
-        });
-      }
-      function buildProgressionDrawer(titleOverride = "") {
-        const activePair = pairViews.find((pair) => pair.id === memoryCards.activePairId) || pairViews[0] || null;
-        const lastCapture = data.captures?.[0] || null;
-        const lastEvent = data.timeline?.[0] || null;
-        const drawerId = uid("drawer");
-        const drawerTitle = titleOverride.trim() || `${data.package?.name && data.package.name !== "No package loaded" ? data.package.name : data.project.title} - ${currentNode?.title || "Current Room"}`;
-        return { drawerId, title: drawerTitle, type: "progression-drawer", status: activePair ? activePair.status : "legacy", createdAt: now(), updatedAt: now(), packageId: data.project?.id || "unknown-package", packageName: data.package?.name || data.project.title, runtimeMode: data.runtime?.runMode || "none", activeTab, currentNodeId: data.currentNodeId, currentRoom: currentNode?.title || "Unknown Room", activePairId: activePair?.id || memoryCards.activePairId || "", gameCardId: activePair?.gameCardId || "", palCardId: activePair?.palCardId || "", lastCaptureId: lastCapture?.id || "", timelineCursor: lastEvent?.id || "", layout: { leftPanel: data.runtime?.runMode === "internal-html" ? "internal-html" : "capture", rightPanel: "blueprint", sidePanel: "memoryCards" }, summary: `Resume ${currentNode?.title || "the current room"} with package, palace, card, and timeline context.` };
-      }
-      function createProgressionDrawer(titleOverride = "") {
-        const drawer = buildProgressionDrawer(titleOverride);
-        updateData((prev) => ({ ...prev, progressionDrawers: { ...(prev.progressionDrawers || { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] }), activeDrawerId: drawer.drawerId, drawers: [drawer, ...(prev.progressionDrawers?.drawers || [])] }, timeline: [{ id: uid("evt"), timestamp: now(), nodeId: prev.currentNodeId, type: "checkpoint", title: "Progression Drawer created", summary: `${drawer.title} saved as a resumable MEM Palace session drawer.`, tags: ["drawer", "progression-history"] }, ...prev.timeline] }));
-        setActiveTab("history");
-      }
-      function saveFullSession() {
-        const drawer = buildProgressionDrawer();
-        const nextProgressionDrawers = { ...(progressionDrawers || { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] }), activeDrawerId: drawer.drawerId, drawers: [drawer, ...(progressionDrawers.drawers || [])] };
-        const nextData = { ...data, progressionDrawers: nextProgressionDrawers, timeline: [{ id: uid("evt"), timestamp: now(), nodeId: data.currentNodeId, type: "checkpoint", title: "Full Session saved", summary: `${drawer.title} saved as a full MEM Palace session.`, tags: ["drawer", "full-session", "progression-history"] }, ...data.timeline], project: { ...data.project, updatedAt: now() } };
-        setData(nextData);
-        const payload = { sessionVersion: "0.1", exportedAt: now(), project: nextData.project, package: nextData.package, runtime: nextData.runtime, currentNode, memoryCards: nextData.memoryCards, progressionDrawers: nextProgressionDrawers, activeDrawer: drawer, palaceSnapshot: nextData, browserBetaNote: "This browser beta saves MEM Palace context, memory cards, progression drawers, captures, notes, and blueprint state. It does not freeze a native game process." };
-        downloadText(`${slug(data.project.title)}-full-session.memsession.json`, JSON.stringify(payload, null, 2), "application/json");
-        setActiveTab("history");
-      }
-      function resumeDrawer(drawer) {
-        if (!drawer) return;
-        updateData((prev) => ({ ...prev, currentNodeId: drawer.currentNodeId || prev.currentNodeId, memoryCards: { ...(prev.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" }), activePairId: drawer.activePairId || prev.memoryCards?.activePairId || "" }, progressionDrawers: { ...(prev.progressionDrawers || { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] }), activeDrawerId: drawer.drawerId, drawers: (prev.progressionDrawers?.drawers || []).map((item) => item.drawerId === drawer.drawerId ? { ...item, updatedAt: now() } : item) }, timeline: [{ id: uid("evt"), timestamp: now(), nodeId: drawer.currentNodeId || prev.currentNodeId, type: "load", title: "Progression Drawer resumed", summary: `Restored workspace drawer: ${drawer.title}.`, tags: ["drawer", "resume"] }, ...prev.timeline] }));
-        setActiveTab(drawer.activeTab && drawer.activeTab !== "history" ? drawer.activeTab : "palace");
-      }
-      function exportDrawer(drawer) {
-        if (!drawer) return;
-        const payload = { drawerVersion: "0.1", exportedAt: now(), drawer, linkedPair: pairViews.find((pair) => pair.id === drawer.activePairId) || null, palaceSnapshot: data, browserBetaNote: "Browser Beta restores session context and save identity. Desktop Edition can relaunch/copy saves and reattach native runtimes." };
-        downloadText(`${slug(drawer.title)}.memdrawer.json`, JSON.stringify(payload, null, 2), "application/json");
-      }
-      function deleteDrawer(drawerId) {
-        updateData((prev) => ({ ...prev, progressionDrawers: { ...(prev.progressionDrawers || { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] }), drawers: (prev.progressionDrawers?.drawers || []).filter((drawer) => drawer.drawerId !== drawerId), pinnedDrawerIds: (prev.progressionDrawers?.pinnedDrawerIds || []).filter((id) => id !== drawerId), activeDrawerId: prev.progressionDrawers?.activeDrawerId === drawerId ? "" : prev.progressionDrawers?.activeDrawerId || "" } }));
-      }
-      function togglePinDrawer(drawerId) {
-        updateData((prev) => { const drawers = prev.progressionDrawers || { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] }; const existing = drawers.pinnedDrawerIds || []; const pinnedDrawerIds = existing.includes(drawerId) ? existing.filter((id) => id !== drawerId) : [drawerId, ...existing]; return { ...prev, progressionDrawers: { ...drawers, pinnedDrawerIds } }; });
-      }
-      function exportAllDrawers() {
-        const payload = { drawerArchiveVersion: "0.1", title: `${data.project.title} Progression Drawers`, exportedAt: now(), progressionDrawers, project: data.project, palaceSnapshot: data };
-        downloadText(`${slug(data.project.title)}-drawers.memdrawer.json`, JSON.stringify(payload, null, 2), "application/json");
-      }
+        tryNext();
+      });
+    }
 
-      async function startCapture() {
-        if (!navigator.mediaDevices?.getDisplayMedia) { alert("Screen capture is not available in this browser."); return; }
-        try {
-          const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
-          setCaptureStream(stream);
-          if (videoRef.current) videoRef.current.srcObject = stream;
-          const [track] = stream.getVideoTracks();
-          if (track) track.onended = () => { setCaptureStream(null); if (videoRef.current) videoRef.current.srcObject = null; };
-        } catch (error) { notify(`Capture cancelled or blocked: ${error.message}`); }
-      }
-      function stopCapture() {
-        if (captureStream) captureStream.getTracks().forEach((track) => track.stop());
-        setCaptureStream(null);
-        if (videoRef.current) videoRef.current.srcObject = null;
-      }
-      function captureMoment() {
-        const video = videoRef.current;
-        if (!video || !video.videoWidth) { alert("Start screen capture first. The capture button requires a capture."); return; }
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) { alert("Canvas context could not be created in this browser."); return; }
-        ctx.drawImage(video, 0, 0);
-        const dataUrl = canvas.toDataURL("image/webp", 0.82);
-        const captureId = uid("cap");
-        const eventId = uid("evt");
-        updateData((prev) => ({ ...prev, captures: [{ id: captureId, nodeId: prev.currentNodeId, screenshot: dataUrl, createdAt: now(), title: `Capture at ${currentNode?.title || "current room"}` }, ...prev.captures], nodes: prev.nodes.map((node) => node.id === prev.currentNodeId ? { ...node, screenshots: [captureId, ...(node.screenshots || [])] } : node), timeline: [{ id: eventId, timestamp: now(), nodeId: prev.currentNodeId, type: "capture", title: "Captured moment", summary: `Screenshot attached to ${currentNode?.title || "current room"}.`, tags: ["capture"] }, ...prev.timeline] }));
-      }
-      function addNote() {
-        if (!noteText.trim()) return;
-        const note = noteText.trim();
-        updateData((prev) => ({ ...prev, nodes: prev.nodes.map((node) => node.id === prev.currentNodeId ? { ...node, notes: [note, ...(node.notes || [])] } : node), timeline: [{ id: uid("evt"), timestamp: now(), nodeId: prev.currentNodeId, type: "note", title: "Manual note", summary: note, tags: ["note"] }, ...prev.timeline] }));
-        setNoteText("");
-      }
-      function exportProjectJson() { downloadText(`${slug(data.project.title)}.mempalace.json`, JSON.stringify(data, null, 2), "application/json"); }
-      function exportHtmlGuide() {
-        const html = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(data.project.title)}</title><style>body{font-family:system-ui;background:#110905;color:#ffe8ce;padding:32px}section{border:1px solid #c87935;padding:16px;border-radius:16px;margin:16px 0}code{color:#ffb36b}</style></head><body><h1>${escapeHtml(data.project.title)}</h1><p>${escapeHtml(data.project.subtitle)}</p>${data.nodes.map((node) => `<section><h2>${escapeHtml(node.title)}</h2><p>${escapeHtml(node.description || "")}</p><p><code>${escapeHtml(node.type)}</code> · ${(node.tags || []).map(escapeHtml).join(", ")}</p><ul>${(node.notes || []).map((note) => `<li>${escapeHtml(note)}</li>`).join("")}</ul></section>`).join("")}</body></html>`;
-        downloadText(`${slug(data.project.title)}-guide.html`, html, "text/html");
-      }
+    async function loadZip(file){
+      if(!file) return;
+      try{
+        const JSZipCtor = await loadJSZipIfNeeded();
+        const zip = await JSZipCtor.loadAsync(await file.arrayBuffer());
+        const files = Object.values(zip.files)
+          .filter(entry => !entry.dir)
+          .map(entry => ({
+            name: entry.name.split("/").pop(),
+            path: entry.name,
+            size: entry._data?.uncompressedSize || 0,
+            type: "",
+          }));
 
-      const renderActiveTab = () => {
-        if (activeTab === "load") return h(MotionWrap, { className: "grid3" },
-          h(Card, null, h("h2", null, "Load ZIP"), h("p", { className: "muted", style: { margin: "8px 0 14px" } }, "Inspect a ZIP package and auto-build the first hard blueprint."), h(Button, { onClick: () => zipInputRef.current?.click() }, h(I, { name: "Archive" }), " Load ZIP"), h("input", { ref: zipInputRef, type: "file", accept: ".zip", className: "hidden", onChange: (event) => loadZip(event.target.files?.[0]) })),
-          h(Card, null, h("h2", null, "Load Folder"), h("p", { className: "muted", style: { margin: "8px 0 14px" } }, "Use browser folder permission to inspect local project/game files."), h(Button, { onClick: () => folderInputRef.current?.click() }, h(I, { name: "FolderOpen" }), " Load Folder"), h("input", { ref: folderInputRef, type: "file", multiple: true, className: "hidden", webkitdirectory: "true", directory: "true", onChange: (event) => loadFolder(event.target.files) })),
-          h(Card, null, h("h2", null, "Import MEM File"), h("p", { className: "muted", style: { margin: "8px 0 14px" } }, "Reload a .memsave.json pair, .memdrawer.json drawer, drawer archive, .memsession, or project snapshot."), h(Button, { onClick: () => memSaveInputRef.current?.click() }, h(I, { name: "FileJson" }), " Import MEM File"), h("input", { ref: memSaveInputRef, type: "file", accept: ".json,.memsave,.memdrawer,.memsession", className: "hidden", onChange: (event) => importMemSave(event.target.files?.[0]) }))
-        );
+        const pkg = inspectFiles(files, "zip", file.name.replace(/\.zip$/i,""));
+        const blueprint = createBlueprintFromPackage(pkg);
+        let runtime = {
+          status: "loaded",
+          runMode: pkg.runMode,
+          internalHtml: "",
+          internalEntry: pkg.entryCandidates[0] || "",
+          externalInstructions: pkg.warnings,
+        };
 
-        if (activeTab === "inspect") return h(MotionWrap, { className: "space" },
-          h(Card, null, h("div", { className: "rowBetween" }, h("div", null, h("h1", null, "Package Inspector"), h("p", { className: "sub" }, data.package.name)), h(Pill, { tone: data.package.runMode === "internal-html" ? "green" : "blue" }, data.package.runMode))),
-          h("div", { className: "grid4" },
-            h(Card, null, h("div", { className: "statLabel" }, "Files"), h("div", { className: "statNum" }, data.package.importReport?.filesFound || 0)),
-            h(Card, null, h("div", { className: "statLabel" }, "Folders"), h("div", { className: "statNum" }, data.package.importReport?.foldersFound || 0)),
-            h(Card, null, h("div", { className: "statLabel" }, "Scripts"), h("div", { className: "statNum" }, data.package.importReport?.scriptsFound || 0)),
-            h(Card, null, h("div", { className: "statLabel" }, "Assets"), h("div", { className: "statNum" }, data.package.importReport?.assetsFound || 0))
-          ),
-          h(Card, null, h("h2", null, "Detected entries"), h("div", { className: "spaceSm", style: { marginTop: 12 } }, (data.package.entryCandidates || []).map((entry) => h("div", { key: entry, className: "fileLine mono" }, entry)), !data.package.entryCandidates?.length && h("p", { className: "empty" }, "No entry candidates detected."))),
-          !!data.package.warnings?.length && h(Card, null, h("h2", null, "Warnings"), h("ul", { className: "warn", style: { marginTop: 12 } }, data.package.warnings.map((warning) => h("li", { key: warning }, warning))))
-        );
-
-        if (activeTab === "play") return h(MotionWrap, { className: "playGrid" },
-          h(Card, null, h("div", { className: "rowBetween", style: { marginBottom: 12 } }, h("h2", null, "Play / Attach View"), h("div", { className: "buttons" }, h(Button, { variant: "ghost", onClick: startCapture }, h(I, { name: "Camera" }), " Attach Capture"), h(Button, { variant: "ghost", onClick: stopCapture }, "Stop Capture"), h(Button, { onClick: captureMoment }, h(I, { name: "Plus" }), " Capture Moment"))), data.runtime.runMode === "internal-html" && data.runtime.internalHtml ? h("iframe", { title: "Internal HTML Game", srcDoc: data.runtime.internalHtml, sandbox: "allow-scripts allow-same-origin", className: "preview" }) : h("video", { ref: videoRef, autoPlay: true, muted: true, playsInline: true, className: "preview" })),
-          h(Card, null, h("h2", null, "Runtime Mode"), h("div", { style: { marginTop: 12 } }, h(Pill, { tone: data.runtime.runMode === "internal-html" ? "green" : "blue" }, data.runtime.runMode)), h("p", { className: "muted", style: { marginTop: 14 } }, "Native PC games belong in External Attach Mode. Run the game normally, then attach screen/window capture."), h("p", { className: "tiny", style: { marginTop: 10 } }, "Internal HTML preview supports simple/self-contained HTML. ZIP asset rewriting is a later desktop-grade upgrade."))
-        );
-
-        if (activeTab === "cards") return h(MotionWrap, { className: "space" },
-          h(Card, null, h("div", { className: "rowBetween" }, h("div", null, h("h1", null, "Memory Card Bay"), h("p", { className: "muted", style: { marginTop: 8 } }, "GameCard stores the mechanical save identity/hash. PALCard stores the palace context. Together they form the MEM Save Pair."), h("p", { className: "tiny", style: { marginTop: 8 } }, "Browser Beta: save-file fingerprinting only. Desktop Edition: actual save restore/copy support.")), h("div", { className: "brandIcon" }, "▰"))),
-          h("div", { className: "split" }, h(Card, null, h("h2", null, "Create GameCard"), h("p", { className: "muted", style: { margin: "8px 0 14px" } }, "Import a game save file. The terminal fingerprints it with SHA-256."), h(Button, { onClick: () => saveFileInputRef.current?.click() }, h(I, { name: "Upload" }), " Import Save File"), h("input", { ref: saveFileInputRef, type: "file", className: "hidden", onChange: (event) => createGameCardFromSaveFile(event.target.files?.[0]) })), h(Card, null, h("h2", null, "Create PALCard"), h("p", { className: "muted", style: { margin: "8px 0 14px" } }, "Create a Palace Anchor Layer card from the current room, notes, captures, and timeline context."), h(Button, { onClick: createPALCardFromCurrentNode }, h(I, { name: "Plus" }), " Create From Current Node"))),
-          h("div", { className: "split" },
-            h(Card, null, h("h2", null, "GameCards"), h("div", { className: "spaceSm", style: { marginTop: 12 } }, (memoryCards.gameCards || []).map((card) => h("div", { key: card.id, className: "listItem" }, h("div", { className: "rowBetween" }, h("b", null, card.slotTitle), h(Pill, { tone: "blue" }, "GameCard")), h("p", { className: "tiny", style: { marginTop: 6 } }, `${card.saveFile.name} · ${Number(card.saveFile.sizeBytes || 0).toLocaleString()} bytes`), h("p", { className: "tiny mono truncate", style: { marginTop: 4 } }, card.saveFile.hash))), !memoryCards.gameCards?.length && h("p", { className: "empty" }, "No GameCards yet."))),
-            h(Card, null, h("h2", null, "PALCards"), h("div", { className: "spaceSm", style: { marginTop: 12 } }, (memoryCards.palCards || []).map((card) => h("div", { key: card.id, className: "listItem" }, h("div", { className: "rowBetween" }, h("b", null, card.title), h(Pill, null, "PALCard")), h("p", { className: "tiny", style: { marginTop: 6 } }, `Room: ${card.currentRoom}`), h("p", { className: "tiny", style: { marginTop: 4 } }, `Pair status: ${card.pairing?.pairStatus || "unpaired"}`))), !memoryCards.palCards?.length && h("p", { className: "empty" }, "No PALCards yet.")))
-          ),
-          h(Card, null, h("div", { className: "rowBetween", style: { marginBottom: 12 } }, h("div", null, h("h2", null, "Create MEM Save Pair"), h("p", { className: "muted" }, "Choose one mechanical save card and one palace context card.")), h(Button, { variant: "ghost", disabled: !memoryCards.gameCards?.length || !memoryCards.palCards?.length, onClick: autoPairLatestCards }, "Auto-pair latest")), h(PairCreator, { gameCards: memoryCards.gameCards || [], palCards: memoryCards.palCards || [], onPair: pairCards })),
-          h(Card, null, h("div", { className: "rowBetween", style: { marginBottom: 12 } }, h("div", null, h("h2", null, "MEM Save Pairs"), h("p", { className: "muted" }, "[GameCard] + [PALCard] = full restoration key.")), h("div", { className: "buttons" }, h(Button, { variant: "ghost", onClick: verifyPairs }, "Verify Pairs"), h(Button, { variant: "ghost", onClick: exportAllPairs }, h(I, { name: "Download" }), " Export All"))), h("div", { className: "spaceSm" }, pairViews.map((pair) => h("div", { key: pair.id, className: "listItem" }, h("div", { className: "rowBetween" }, h("div", null, h("div", { className: "buttons" }, h("b", null, pair.title), h(Pill, { tone: statusTone(pair.status) }, pair.status)), h("p", { className: "tiny", style: { marginTop: 6 } }, `Game: ${pair.gameCard?.slotTitle || "missing"} · PAL: ${pair.palCard?.currentRoom || "missing"}`)), h("div", { className: "buttons" }, h(Button, { variant: "ghost", onClick: () => loadPair(pair) }, "Load Pair"), h(Button, { variant: "ghost", onClick: () => duplicatePair(pair) }, "Duplicate"), h(Button, { variant: "ghost", onClick: () => exportPair(pair) }, "Export"), h(Button, { variant: "ghost", onClick: () => unpairCards(pair.id) }, "Unpair"))))), !pairViews.length && h("p", { className: "empty" }, "No paired cards yet.")))
-        );
-
-        if (activeTab === "history") {
-          const pinned = progressionDrawers.pinnedDrawerIds || [];
-          const sortedDrawers = [...(progressionDrawers.drawers || [])].sort((a, b) => { const aPinned = pinned.includes(a.drawerId) ? 1 : 0; const bPinned = pinned.includes(b.drawerId) ? 1 : 0; if (aPinned !== bPinned) return bPinned - aPinned; return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt)); });
-          return h(MotionWrap, { className: "space" },
-            h(Card, null, h("div", { className: "rowBetween" }, h("div", null, h("h1", null, "Progression History Drawers"), h("p", { className: "muted", style: { marginTop: 8 } }, "MEM Palace remembers the loaded world, current room, active cards, captures, notes, route, runtime mode, and workspace layout."), h("p", { className: "tiny", style: { marginTop: 8 } }, "GameCard = where the game is. PALCard = what the player knows. Drawer = how the workspace was left.")), h("div", { className: "brandIcon" }, "▣"))),
-            h("div", { className: "grid3" }, h(Card, null, h("div", { className: "statLabel" }, "Drawers"), h("div", { className: "statNum" }, progressionDrawers.drawers?.length || 0)), h(Card, null, h("div", { className: "statLabel" }, "Pinned"), h("div", { className: "statNum" }, progressionDrawers.pinnedDrawerIds?.length || 0)), h(Card, null, h("div", { className: "statLabel" }, "Active Drawer"), h("div", { className: "tiny truncate", style: { fontWeight: 900, color: "#fed7aa", marginTop: 8 } }, progressionDrawers.activeDrawerId || "none"))),
-            h(Card, null, h("div", { className: "rowBetween" }, h("div", null, h("h2", null, "Create Drawer Checkpoint"), h("p", { className: "muted" }, "Freeze the current workspace arrangement: package, room, active MEM pair, timeline cursor, runtime mode, and layout.")), h("div", { className: "buttons" }, h(Button, { onClick: () => createProgressionDrawer() }, h(I, { name: "Plus" }), " Save Current Drawer"), h(Button, { variant: "ghost", onClick: exportAllDrawers }, h(I, { name: "Download" }), " Export Drawers")))),
-            h("div", { className: "spaceSm" }, sortedDrawers.map((drawer) => { const pair = pairViews.find((item) => item.id === drawer.activePairId); const isPinned = pinned.includes(drawer.drawerId); return h(Card, { key: drawer.drawerId, className: drawer.drawerId === progressionDrawers.activeDrawerId ? "" : "" }, h("div", { className: "rowBetween" }, h("div", { style: { minWidth: 0 } }, h("div", { className: "buttons" }, h("h2", null, drawer.title), h(Pill, { tone: statusTone(drawer.status) }, drawer.status), isPinned && h(Pill, { tone: "purple" }, "pinned")), h("p", { className: "muted", style: { marginTop: 6 } }, `Room: ${drawer.currentRoom} · Runtime: ${drawer.runtimeMode} · Tab: ${drawer.activeTab}`), h("p", { className: "tiny", style: { marginTop: 4 } }, `Package: ${drawer.packageName} · Pair: ${pair?.title || drawer.activePairId || "none"}`), h("p", { className: "tiny", style: { marginTop: 4 } }, `Updated: ${drawer.updatedAt || drawer.createdAt}`)), h("div", { className: "buttons" }, h(Button, { variant: "ghost", onClick: () => resumeDrawer(drawer) }, "Resume Drawer"), h(Button, { variant: "ghost", onClick: () => togglePinDrawer(drawer.drawerId) }, isPinned ? "Unpin" : "Pin"), h(Button, { variant: "ghost", onClick: () => exportDrawer(drawer) }, "Export"), h(Button, { variant: "ghost", onClick: () => deleteDrawer(drawer.drawerId) }, "Delete")))); }), !sortedDrawers.length && h(Card, null, h("p", { className: "empty" }, "No drawers yet. Save a checkpoint when the workspace reaches a meaningful point.")))
-          );
+        if(pkg.runMode === "internal-html"){
+          const entry = pkg.entryCandidates.find(candidate => candidate.toLowerCase().endsWith(".html"));
+          const html = entry ? await zip.file(entry)?.async("string") : "";
+          runtime = { ...runtime, internalHtml: html || "<p>No HTML entry could be loaded.</p>", internalEntry: entry || "" };
         }
 
-        if (activeTab === "palace") return h(MotionWrap, { className: "split" },
-          h(Card, null, h("h2", null, "Palace Rooms"), h("div", { className: "spaceSm", style: { marginTop: 12 } }, data.nodes.map((node) => h("button", { key: node.id, onClick: () => updateData((prev) => ({ ...prev, currentNodeId: node.id })), className: cls("roomBtn", node.id === currentNode?.id && "active") }, h("div", { className: "rowBetween" }, h("b", null, node.title), h(Pill, null, node.type)), h("p", { className: "muted", style: { marginTop: 6 } }, node.description))))),
-          h(Card, null, h("h2", null, "Current Room"), h("h3", { style: { marginTop: 10 } }, currentNode?.title), h("p", { className: "muted", style: { marginTop: 8 } }, currentNode?.description), h("div", { className: "tagWrap" }, (currentNode?.tags || []).map((tag) => h(Pill, { key: tag }, tag))), h("div", { className: "roomCreate" }, h("input", { value: newNodeTitle, onChange: (event) => setNewNodeTitle(event.target.value), placeholder: "New node title", className: "input" }), h(Button, { onClick: () => addFastNode("location") }, "New Location"), h(Button, { variant: "ghost", onClick: () => addFastNode("battle") }, "New Battle")))
-        );
-
-        if (activeTab === "blueprint") return h(MotionWrap, { className: "space" },
-          h(Card, null, h("h2", null, "Blueprint Graph"), h("div", { className: "grid3", style: { marginTop: 12 } }, data.nodes.slice(0, 60).map((node) => h("div", { key: node.id, className: "listItem" }, h("div", { className: "rowBetween" }, h("b", null, node.title), h(Pill, { tone: node.type === "package" ? "purple" : "orange" }, node.type)), h("p", { className: "tiny", style: { marginTop: 6 } }, `${(node.connections || []).length} connections`))))),
-          h(Card, null, h("h2", null, "Edges"), h("div", { className: "spaceSm", style: { marginTop: 12 } }, data.edges.map((edge) => h("div", { key: edge.id, className: "fileLine mono tiny" }, `${edge.from} → ${edge.to} · ${edge.label}`))))
-        );
-
-        if (activeTab === "timeline") return h(MotionWrap, { className: "spaceSm" }, data.timeline.map((event) => h(Card, { key: event.id }, h("div", { className: "rowBetween" }, h("b", null, event.title), h(Pill, { tone: "blue" }, event.type)), h("p", { className: "muted", style: { marginTop: 6 } }, event.summary), h("p", { className: "tiny", style: { marginTop: 8 } }, `${event.timestamp} · ${event.nodeId}`))));
-
-        if (activeTab === "notes") return h(MotionWrap, { className: "split" }, h(Card, null, h("h2", null, `Add Note to ${currentNode?.title}`), h("textarea", { value: noteText, onChange: (event) => setNoteText(event.target.value), placeholder: "What did the player learn here?", style: { marginTop: 12 } }), h(Button, { className: "full", onClick: addNote }, "Save Note")), h(Card, null, h("h2", null, "Room Notes"), h("div", { className: "spaceSm", style: { marginTop: 12 } }, (currentNode?.notes || []).map((note, index) => h("div", { key: index, className: "listItem" }, note)), !(currentNode?.notes || []).length && h("p", { className: "empty" }, "No room notes yet."))));
-
-        return h(MotionWrap, { className: "grid3" }, h(Card, null, h("h2", null, "Export Project JSON"), h(Button, { className: "full", onClick: exportProjectJson }, h(I, { name: "Download" }), " Export JSON")), h(Card, null, h("h2", null, "Export HTML Guide"), h(Button, { className: "full", onClick: exportHtmlGuide }, h(I, { name: "Download" }), " Export HTML")), h(Card, null, h("h2", null, "Export MEM Save Pairs"), h(Button, { className: "full", onClick: exportAllPairs }, h(I, { name: "Download" }), " Export Pairs")));
-      };
-
-      return h("div", { className: "app" },
-        h("div", { className: "wrap" },
-          h("header", { className: "hero" }, h("div", { className: "heroRow" }, h("div", null, h("div", { className: "brand" }, h("div", { className: "brandIcon" }, "🎮"), h("h1", null, "MEM Palace Game Terminal")), h("p", { className: "sub caps" }, "LOAD → INSPECT → BLUEPRINT → RUN / ATTACH → OBSERVE → BUILD")), h(Pill, { tone: "purple" }, "Dual-card save architecture"))),
-          h("nav", { className: "nav" }, tabs.map(([id, label, icon]) => h("button", { key: id, onClick: () => setActiveTab(id), className: cls("navBtn", activeTab === id && "active") }, h(I, { name: icon }), label))),
-          h("div", { className: "layout" },
-            h("aside", null,
-              h(Card, null, h("h2", null, "Project Stats"), h("div", { className: "grid2", style: { marginTop: 12 } },
-                h("div", { className: "stat" }, h("div", { className: "statLabel" }, "Nodes"), h("div", { className: "statNum" }, data.nodes.length)),
-                h("div", { className: "stat" }, h("div", { className: "statLabel" }, "Events"), h("div", { className: "statNum" }, data.timeline.length)),
-                h("div", { className: "stat" }, h("div", { className: "statLabel" }, "Captures"), h("div", { className: "statNum" }, data.captures.length)),
-                h("div", { className: "stat" }, h("div", { className: "statLabel" }, "GameCards"), h("div", { className: "statNum" }, memoryCards.gameCards?.length || 0)),
-                h("div", { className: "stat" }, h("div", { className: "statLabel" }, "PALCards"), h("div", { className: "statNum" }, memoryCards.palCards?.length || 0)),
-                h("div", { className: "stat" }, h("div", { className: "statLabel" }, "Pairs"), h("div", { className: "statNum" }, memoryCards.pairs?.length || 0)),
-                h("div", { className: "stat" }, h("div", { className: "statLabel" }, "Drawers"), h("div", { className: "statNum" }, progressionDrawers.drawers?.length || 0))
-              )),
-              h(Card, null, h("h2", null, "Current Room"), h("p", { style: { marginTop: 10, color: "#fed7aa", fontWeight: 900 } }, currentNode?.title), h("p", { className: "muted", style: { marginTop: 4 } }, currentNode?.type), h("div", { className: "tagWrap" }, (currentNode?.tags || []).map((tag) => h(Pill, { key: tag }, tag))), h(Button, { className: "full", variant: "ghost", onClick: () => createProgressionDrawer() }, h(I, { name: "Archive" }), " Save Drawer"), h(Button, { className: "full", variant: "ghost", disabled: !progressionDrawers.activeDrawerId, onClick: () => { const activeDrawer = progressionDrawers.drawers?.find((drawer) => drawer.drawerId === progressionDrawers.activeDrawerId); if (activeDrawer) exportDrawer(activeDrawer); } }, h(I, { name: "Download" }), " Export Active Drawer"), h(Button, { className: "full", onClick: saveFullSession }, h(I, { name: "Download" }), " Save Full Session"))
-            ),
-            h("main", null, renderActiveTab())
-          )
-        ),
-        toast && h("div", { className: "toast" }, toast)
-      );
+        setData(prev => ({
+          ...prev,
+          package: pkg,
+          runtime,
+          nodes: [...prev.nodes.filter(node => node.source !== "package"), ...blueprint.nodes],
+          edges: [...prev.edges.filter(edge => edge.source !== "package"), ...blueprint.edges],
+          timeline: [{
+            id: uid("evt"),
+            timestamp: now(),
+            nodeId: prev.currentNodeId,
+            type: "load",
+            title: `Loaded package: ${pkg.name}`,
+            summary: `Inspected ${pkg.importReport.filesFound} files and generated a hard blueprint.`,
+            tags: ["load","package",pkg.sourceType],
+          }, ...prev.timeline],
+        }));
+        activeTab = "inspect";
+        render();
+      }catch(error){
+        alert(`ZIP load failed: ${error.message}`);
+      }
     }
 
-    createRoot(document.getElementById("root")).render(h(MemPalaceGameTerminal));
+    async function loadFolder(files){
+      const list = Array.from(files || []);
+      if(!list.length) return;
+      const root = list[0].webkitRelativePath?.split("/")[0] || "Loaded Folder";
+      const pkg = inspectFiles(list, "folder", root);
+      const blueprint = createBlueprintFromPackage(pkg);
+      setData(prev => ({
+        ...prev,
+        package: pkg,
+        runtime: {
+          status: "loaded",
+          runMode: pkg.runMode,
+          internalHtml: "",
+          internalEntry: pkg.entryCandidates[0] || "",
+          externalInstructions: pkg.warnings,
+        },
+        nodes: [...prev.nodes.filter(node => node.source !== "package"), ...blueprint.nodes],
+        edges: [...prev.edges.filter(edge => edge.source !== "package"), ...blueprint.edges],
+        timeline: [{
+          id: uid("evt"),
+          timestamp: now(),
+          nodeId: prev.currentNodeId,
+          type: "load",
+          title: `Loaded folder: ${pkg.name}`,
+          summary: `Inspected ${pkg.importReport.filesFound} files and generated a hard blueprint.`,
+          tags: ["load","folder"],
+        }, ...prev.timeline],
+      }));
+      activeTab = "inspect";
+      render();
+    }
+
+    function addFastNode(type = "location"){
+      const input = document.getElementById("newNodeTitle");
+      const title = (input?.value || "").trim() || `New ${type}`;
+      const nodeNow = currentNode();
+      const id = slug(`${type}-${title}-${Date.now()}`);
+      const eventId = uid("evt");
+      const node = {
+        id,
+        type,
+        title,
+        description: `Captured ${type} node from the current session.`,
+        connections: nodeNow ? [nodeNow.id] : [],
+        characters: [],
+        items: [],
+        events: [eventId],
+        screenshots: [],
+        notes: [],
+        tags: [type],
+        createdAt: now(),
+      };
+      setData(prev => ({
+        ...prev,
+        currentNodeId: id,
+        nodes: [node, ...prev.nodes],
+        edges: nodeNow ? [{ id: uid("edge"), from: nodeNow.id, to: id, label: "observed route" }, ...prev.edges] : prev.edges,
+        timeline: [{
+          id: eventId,
+          timestamp: now(),
+          nodeId: id,
+          type,
+          title: `New ${type}: ${title}`,
+          summary: "Created while mapping the loaded world.",
+          tags: [type,"manual"],
+        }, ...prev.timeline],
+      }));
+    }
+
+    async function createGameCardFromSaveFile(file){
+      if(!file) return;
+      const hash = await sha256File(file);
+      const nowTime = now();
+      const slotGuess = file.name.replace(/\.[^.]+$/,"\").replace(/[^a-z0-9_-]+/gi,"-").toLowerCase() || "slot-imported";
+      const card = {
+        cardType: "GameCard",
+        version: "0.1",
+        id: uid("gamecard"),
+        gameId: data.project?.id || "unknown-game",
+        gameTitle: data.project?.title || "Unknown Game",
+        slotId: slotGuess,
+        slotTitle: file.name,
+        createdAt: nowTime,
+        updatedAt: nowTime,
+        saveMode: "file-import-fingerprint",
+        saveFile: {
+          name: file.name,
+          relativePath: file.name,
+          hash,
+          sizeBytes: file.size,
+          lastModified: file.lastModified ? new Date(file.lastModified).toISOString() : nowTime,
+        },
+        gameRuntime: {
+          runMode: data.package?.runMode || "external-attach",
+          executableName: data.package?.detectedExecutables?.[0]?.name || "unknown",
+          packageId: data.project?.id || "unknown-package",
+        },
+      };
+      setData(prev => ({
+        ...prev,
+        memoryCards: { ...memoryCards(), gameCards: [card, ...(prev.memoryCards?.gameCards || [])] },
+        timeline: [{
+          id: uid("evt"),
+          timestamp: nowTime,
+          nodeId: prev.currentNodeId,
+          type: "load",
+          title: `GameCard created: ${file.name}`,
+          summary: "Imported save file fingerprint. This stores the mechanical save-state identity.",
+          tags: ["GameCard","save"],
+        }, ...prev.timeline],
+      }));
+      activeTab = "cards";
+      render();
+    }
+
+    function createPALCardFromCurrentNode(){
+      const node = currentNode();
+      if(!node) return;
+      const nowTime = now();
+      const capturesForNode = data.captures.filter(capture => capture.nodeId === node.id).map(capture => capture.id);
+      const eventsForNode = data.timeline.filter(event => event.nodeId === node.id).map(event => event.id);
+      const card = {
+        cardType: "PALCard",
+        version: "0.1",
+        id: uid("palcard"),
+        gameId: data.project?.id || "unknown-game",
+        title: `${node.title} Palace Context`,
+        palaceNodeId: node.id,
+        currentRoom: node.title,
+        createdAt: nowTime,
+        updatedAt: nowTime,
+        thumbnail: capturesForNode[0] || null,
+        context: {
+          summary: node.description || `Palace context for ${node.title}.`,
+          route: buildRouteFromNode(data.nodes,node.id),
+          tags: node.tags || [],
+          notes: node.notes || [],
+        },
+        linkedAssets: { captures: capturesForNode, blueprints: ["world-blueprint-v0"], timelineEvents: eventsForNode },
+        pairing: { gameCardId: null, gameSaveHash: null, pairStatus: "unpaired" },
+      };
+      setData(prev => ({
+        ...prev,
+        memoryCards: { ...memoryCards(), palCards: [card, ...(prev.memoryCards?.palCards || [])] },
+        timeline: [{
+          id: uid("evt"),
+          timestamp: nowTime,
+          nodeId: node.id,
+          type: "note",
+          title: `PALCard created: ${card.title}`,
+          summary: "Created Palace Anchor Layer card from the current room.",
+          tags: ["PALCard","memory"],
+        }, ...prev.timeline],
+      }));
+      activeTab = "cards";
+      render();
+    }
+
+    function pairCards(gameCardId, palCardId){
+      const cards = memoryCards();
+      const gameCard = cards.gameCards.find(card => card.id === gameCardId);
+      const palCard = cards.palCards.find(card => card.id === palCardId);
+      if(!gameCard || !palCard) return;
+      const nowTime = now();
+      const pairId = uid("pair");
+      const updatedPalCard = {
+        ...palCard,
+        updatedAt: nowTime,
+        pairing: { gameCardId, gameSaveHash: gameCard.saveFile?.hash || null, pairStatus: "synced" },
+      };
+      const status = getPairStatus(gameCard, updatedPalCard);
+      const pair = {
+        id: pairId,
+        title: `${gameCard.slotTitle} + ${palCard.currentRoom}`,
+        gameCardId,
+        palCardId,
+        status,
+        createdAt: nowTime,
+        updatedAt: nowTime,
+      };
+      setData(prev => ({
+        ...prev,
+        memoryCards: {
+          ...cards,
+          activePairId: pairId,
+          palCards: (prev.memoryCards?.palCards || []).map(card => card.id === palCardId ? updatedPalCard : card),
+          pairs: [pair, ...(prev.memoryCards?.pairs || [])],
+        },
+        timeline: [{
+          id: uid("evt"),
+          timestamp: nowTime,
+          nodeId: palCard.palaceNodeId,
+          type: "note",
+          title: "MEM Save Pair created",
+          summary: `${gameCard.slotTitle} paired with ${palCard.currentRoom}.`,
+          tags: ["MEM Save Pair","GameCard","PALCard"],
+        }, ...prev.timeline],
+      }));
+    }
+
+    function autoPairLatestCards(){
+      const cards = memoryCards();
+      const gameCard = cards.gameCards?.[0];
+      const palCard = cards.palCards?.[0];
+      if(gameCard && palCard) pairCards(gameCard.id, palCard.id);
+    }
+
+    function loadPair(pairId){
+      const pair = pairViews().find(item => item.id === pairId);
+      if(!pair?.palCard?.palaceNodeId) return;
+      setData(prev => ({
+        ...prev,
+        currentNodeId: pair.palCard.palaceNodeId,
+        memoryCards: { ...memoryCards(), activePairId: pair.id },
+        timeline: [{
+          id: uid("evt"),
+          timestamp: now(),
+          nodeId: pair.palCard.palaceNodeId,
+          type: "load",
+          title: "MEM Save Pair loaded",
+          summary: `Restored palace context for ${pair.palCard.currentRoom}.`,
+          tags: ["MEM Save Pair","load"],
+        }, ...prev.timeline],
+      }));
+      activeTab = "blueprint";
+      render();
+    }
+
+    function duplicatePair(pairId){
+      const pair = pairViews().find(item => item.id === pairId);
+      if(!pair) return;
+      const nowTime = now();
+      const cleanPair = {
+        id: uid("pair"),
+        title: `${pair.title} Copy`,
+        gameCardId: pair.gameCardId,
+        palCardId: pair.palCardId,
+        status: pair.status,
+        createdAt: nowTime,
+        updatedAt: nowTime,
+      };
+      setData(prev => ({ ...prev, memoryCards: { ...memoryCards(), pairs: [cleanPair, ...(prev.memoryCards?.pairs || [])] } }));
+    }
+
+    function unpairCards(pairId){
+      setData(prev => ({
+        ...prev,
+        memoryCards: {
+          ...memoryCards(),
+          pairs: (prev.memoryCards?.pairs || []).filter(pair => pair.id !== pairId),
+          activePairId: prev.memoryCards?.activePairId === pairId ? "" : prev.memoryCards?.activePairId || "",
+        },
+      }));
+    }
+
+    function exportPair(pairId){
+      const pair = pairViews().find(item => item.id === pairId);
+      if(!pair) return;
+      const manifest = {
+        memSaveVersion: "0.1",
+        savePairId: pair.id,
+        title: pair.title,
+        createdAt: pair.createdAt,
+        updatedAt: now(),
+        gameCard: pair.gameCard,
+        palCard: pair.palCard,
+        pairing: {
+          status: pair.status,
+          gameSaveHash: pair.gameCard?.saveFile?.hash || null,
+          palaceNodeId: pair.palCard?.palaceNodeId || null,
+        },
+        palaceProject: data,
+      };
+      downloadText(`${slug(pair.title) || "mem-save-pair"}.memsave.json`, JSON.stringify(manifest,null,2), "application/json");
+    }
+
+    function exportAllPairs(){
+      const manifest = {
+        memSaveVersion: "0.1",
+        title: `${data.project.title} MEM Save Pairs`,
+        exportedAt: now(),
+        memoryCards: memoryCards(),
+        palaceProject: data,
+      };
+      downloadText(`${data.project.id || "mem-palace"}-memsave.json`, JSON.stringify(manifest,null,2), "application/json");
+    }
+
+    function importMemSave(file){
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const parsed = JSON.parse(String(reader.result));
+          if(parsed.sessionVersion && parsed.palaceSnapshot?.nodes){
+            setData(parsed.palaceSnapshot);
+            activeTab = "history";
+            render();
+            return;
+          }
+          if(parsed.drawerArchiveVersion && parsed.progressionDrawers){
+            setData(prev => ({ ...prev, progressionDrawers: parsed.progressionDrawers }));
+            activeTab = "history";
+            render();
+            return;
+          }
+          if(parsed.drawerVersion && parsed.drawer){
+            setData(prev => ({
+              ...prev,
+              progressionDrawers: {
+                ...progressionDrawers(),
+                activeDrawerId: parsed.drawer.drawerId,
+                drawers: [parsed.drawer, ...(prev.progressionDrawers?.drawers || [])],
+              },
+            }));
+            activeTab = "history";
+            render();
+            return;
+          }
+          if(parsed.palaceProject?.nodes){
+            setData(parsed.palaceProject);
+          }else if(parsed.memoryCards){
+            setData(prev => ({ ...prev, memoryCards: parsed.memoryCards }));
+          }else{
+            alert("Imported JSON did not match a known MEM format.");
+          }
+          activeTab = "cards";
+          render();
+        }catch(error){
+          alert("Could not import MEM file. The file format is not valid JSON.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function verifyPairs(){
+      setData(prev => {
+        const cards = prev.memoryCards || { gameCards: [], palCards: [], pairs: [], activePairId: "" };
+        const pairs = (cards.pairs || []).map(pair => {
+          const gameCard = cards.gameCards.find(card => card.id === pair.gameCardId);
+          const palCard = cards.palCards.find(card => card.id === pair.palCardId);
+          return { ...pair, status: getPairStatus(gameCard,palCard), updatedAt: now() };
+        });
+        return { ...prev, memoryCards: { ...cards, pairs } };
+      });
+    }
+
+    function buildProgressionDrawer(titleOverride = ""){
+      const cards = memoryCards();
+      const pv = pairViews();
+      const activePair = pv.find(pair => pair.id === cards.activePairId) || pv[0] || null;
+      const lastCapture = data.captures?.[0] || null;
+      const lastEvent = data.timeline?.[0] || null;
+      const node = currentNode();
+      const drawerId = uid("drawer");
+      const drawerTitle = titleOverride.trim() || `${data.package?.name && data.package.name !== "No package loaded" ? data.package.name : data.project.title} - ${node?.title || "Current Room"}`;
+      return {
+        drawerId,
+        title: drawerTitle,
+        type: "progression-drawer",
+        status: activePair ? activePair.status : "legacy",
+        createdAt: now(),
+        updatedAt: now(),
+        packageId: data.project?.id || "unknown-package",
+        packageName: data.package?.name || data.project.title,
+        runtimeMode: data.runtime?.runMode || "none",
+        activeTab,
+        currentNodeId: data.currentNodeId,
+        currentRoom: node?.title || "Unknown Room",
+        activePairId: activePair?.id || cards.activePairId || "",
+        gameCardId: activePair?.gameCardId || "",
+        palCardId: activePair?.palCardId || "",
+        lastCaptureId: lastCapture?.id || "",
+        timelineCursor: lastEvent?.id || "",
+        layout: {
+          leftPanel: data.runtime?.runMode === "internal-html" ? "internal-html" : "capture",
+          rightPanel: "blueprint",
+          sidePanel: "memoryCards",
+        },
+        summary: `Resume ${node?.title || "the current room"} with package, palace, card, and timeline context.`,
+      };
+    }
+
+    function createProgressionDrawer(titleOverride = ""){
+      const drawer = buildProgressionDrawer(titleOverride);
+      setData(prev => ({
+        ...prev,
+        progressionDrawers: {
+          ...progressionDrawers(),
+          activeDrawerId: drawer.drawerId,
+          drawers: [drawer, ...(prev.progressionDrawers?.drawers || [])],
+        },
+        timeline: [{
+          id: uid("evt"),
+          timestamp: now(),
+          nodeId: prev.currentNodeId,
+          type: "checkpoint",
+          title: "Progression Drawer created",
+          summary: `${drawer.title} saved as a resumable MEM Palace session drawer.`,
+          tags: ["drawer","progression-history"],
+        }, ...prev.timeline],
+      }));
+      activeTab = "history";
+      render();
+    }
+
+    function saveFullSession(){
+      const drawer = buildProgressionDrawer();
+      const nextProgressionDrawers = {
+        ...progressionDrawers(),
+        activeDrawerId: drawer.drawerId,
+        drawers: [drawer, ...(progressionDrawers().drawers || [])],
+      };
+      const nextData = normalizeProject({
+        ...data,
+        progressionDrawers: nextProgressionDrawers,
+        timeline: [{
+          id: uid("evt"),
+          timestamp: now(),
+          nodeId: data.currentNodeId,
+          type: "checkpoint",
+          title: "Full Session saved",
+          summary: `${drawer.title} saved as a full MEM Palace session.`,
+          tags: ["drawer","full-session","progression-history"],
+        }, ...data.timeline],
+        project: { ...data.project, updatedAt: now() },
+      });
+      data = nextData;
+      persist();
+      const payload = {
+        sessionVersion: "0.1",
+        exportedAt: now(),
+        project: nextData.project,
+        package: nextData.package,
+        runtime: nextData.runtime,
+        currentNode: currentNode(),
+        memoryCards: nextData.memoryCards,
+        progressionDrawers: nextProgressionDrawers,
+        activeDrawer: drawer,
+        palaceSnapshot: nextData,
+        browserBetaNote: "This browser beta saves MEM Palace context, memory cards, progression drawers, captures, notes, and blueprint state. It does not freeze a native game process.",
+      };
+      downloadText(`${slug(data.project.title)}-full-session.memsession.json`, JSON.stringify(payload,null,2), "application/json");
+      activeTab = "history";
+      render();
+    }
+
+    function resumeDrawer(drawerId){
+      const drawer = progressionDrawers().drawers.find(item => item.drawerId === drawerId);
+      if(!drawer) return;
+      setData(prev => ({
+        ...prev,
+        currentNodeId: drawer.currentNodeId || prev.currentNodeId,
+        memoryCards: { ...memoryCards(), activePairId: drawer.activePairId || prev.memoryCards?.activePairId || "" },
+        progressionDrawers: {
+          ...progressionDrawers(),
+          activeDrawerId: drawer.drawerId,
+          drawers: (prev.progressionDrawers?.drawers || []).map(item => item.drawerId === drawer.drawerId ? { ...item, updatedAt: now() } : item),
+        },
+        timeline: [{
+          id: uid("evt"),
+          timestamp: now(),
+          nodeId: drawer.currentNodeId || prev.currentNodeId,
+          type: "load",
+          title: "Progression Drawer resumed",
+          summary: `Restored workspace drawer: ${drawer.title}.`,
+          tags: ["drawer","resume"],
+        }, ...prev.timeline],
+      }));
+      activeTab = drawer.activeTab && drawer.activeTab !== "history" ? drawer.activeTab : "palace";
+      render();
+    }
+
+    function exportDrawerById(drawerId){
+      const drawer = progressionDrawers().drawers.find(item => item.drawerId === drawerId);
+      if(!drawer) return;
+      const payload = {
+        drawerVersion: "0.1",
+        exportedAt: now(),
+        drawer,
+        linkedPair: pairViews().find(pair => pair.id === drawer.activePairId) || null,
+        palaceSnapshot: data,
+        browserBetaNote: "Browser Beta restores session context and save identity. Desktop Edition can relaunch/copy saves and reattach native runtimes.",
+      };
+      downloadText(`${slug(drawer.title)}.memdrawer.json`, JSON.stringify(payload,null,2), "application/json");
+    }
+
+    function deleteDrawer(drawerId){
+      setData(prev => ({
+        ...prev,
+        progressionDrawers: {
+          ...progressionDrawers(),
+          drawers: (prev.progressionDrawers?.drawers || []).filter(drawer => drawer.drawerId !== drawerId),
+          pinnedDrawerIds: (prev.progressionDrawers?.pinnedDrawerIds || []).filter(id => id !== drawerId),
+          activeDrawerId: prev.progressionDrawers?.activeDrawerId === drawerId ? "" : prev.progressionDrawers?.activeDrawerId || "",
+        },
+      }));
+    }
+
+    function togglePinDrawer(drawerId){
+      setData(prev => {
+        const drawers = prev.progressionDrawers || { drawers: [], activeDrawerId: "", pinnedDrawerIds: [] };
+        const existing = drawers.pinnedDrawerIds || [];
+        const pinnedDrawerIds = existing.includes(drawerId) ? existing.filter(id => id !== drawerId) : [drawerId, ...existing];
+        return { ...prev, progressionDrawers: { ...drawers, pinnedDrawerIds } };
+      });
+    }
+
+    function exportAllDrawers(){
+      const payload = {
+        drawerArchiveVersion: "0.1",
+        title: `${data.project.title} Progression Drawers`,
+        exportedAt: now(),
+        progressionDrawers: progressionDrawers(),
+        project: data.project,
+        palaceSnapshot: data,
+      };
+      downloadText(`${slug(data.project.title)}-drawers.memdrawer.json`, JSON.stringify(payload,null,2), "application/json");
+    }
+
+    async function startCapture(){
+      try{
+        if(!navigator.mediaDevices?.getDisplayMedia){
+          alert("Screen capture is not available in this browser.");
+          return;
+        }
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+        captureStream = stream;
+        const video = document.getElementById("captureVideo");
+        if(video) video.srcObject = stream;
+        const [track] = stream.getVideoTracks();
+        if(track){
+          track.onended = () => {
+            captureStream = null;
+            const currentVideo = document.getElementById("captureVideo");
+            if(currentVideo) currentVideo.srcObject = null;
+          };
+        }
+      }catch(error){
+        alert(`Screen capture failed: ${error.message}`);
+      }
+    }
+
+    function stopCapture(){
+      if(captureStream) captureStream.getTracks().forEach(track => track.stop());
+      captureStream = null;
+      const video = document.getElementById("captureVideo");
+      if(video) video.srcObject = null;
+    }
+
+    function captureMoment(){
+      const video = document.getElementById("captureVideo");
+      if(!video || !video.videoWidth){
+        alert("Start screen capture first. The capture button requires a capture.");
+        return;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      if(!ctx){
+        alert("Could not create canvas context for capture.");
+        return;
+      }
+      ctx.drawImage(video,0,0);
+      const dataUrl = canvas.toDataURL("image/webp",.82);
+      const captureId = uid("cap");
+      const eventId = uid("evt");
+      const node = currentNode();
+      setData(prev => ({
+        ...prev,
+        captures: [{ id: captureId, nodeId: prev.currentNodeId, screenshot: dataUrl, createdAt: now(), title: `Capture at ${node?.title || "current room"}` }, ...prev.captures],
+        nodes: prev.nodes.map(item => item.id === prev.currentNodeId ? { ...item, screenshots: [captureId, ...(item.screenshots || [])] } : item),
+        timeline: [{
+          id: eventId,
+          timestamp: now(),
+          nodeId: prev.currentNodeId,
+          type: "capture",
+          title: "Captured moment",
+          summary: `Screenshot attached to ${node?.title || "current room"}.`,
+          tags: ["capture"],
+        }, ...prev.timeline],
+      }));
+    }
+
+    function addNote(){
+      const noteEl = document.getElementById("noteText");
+      const note = (noteEl?.value || "").trim();
+      if(!note) return;
+      setData(prev => ({
+        ...prev,
+        nodes: prev.nodes.map(node => node.id === prev.currentNodeId ? { ...node, notes: [note, ...(node.notes || [])] } : node),
+        timeline: [{
+          id: uid("evt"),
+          timestamp: now(),
+          nodeId: prev.currentNodeId,
+          type: "note",
+          title: "Manual note",
+          summary: note,
+          tags: ["note"],
+        }, ...prev.timeline],
+      }));
+    }
+
+    function exportProjectJson(){
+      downloadText(`${slug(data.project.title)}.mempalace.json`, JSON.stringify(data,null,2), "application/json");
+    }
+
+    function exportHtmlGuide(){
+      const html = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(data.project.title)}</title><style>body{font-family:system-ui;background:#110905;color:#ffe8ce;padding:32px}section{border:1px solid #c87935;padding:16px;border-radius:16px;margin:16px 0}code{color:#ffb36b}</style></head><body><h1>${escapeHtml(data.project.title)}</h1><p>${escapeHtml(data.project.subtitle)}</p>${data.nodes.map(node => `<section><h2>${escapeHtml(node.title)}</h2><p>${escapeHtml(node.description || "")}</p><p><code>${escapeHtml(node.type)}</code> · ${(node.tags || []).map(escapeHtml).join(", ")}</p><ul>${(node.notes || []).map(note => `<li>${escapeHtml(note)}</li>`).join("")}</ul></section>`).join("")}</body></html>`;
+      downloadText(`${slug(data.project.title)}-guide.html`, html, "text/html");
+    }
+
+    function setActiveTab(tab){
+      activeTab = tab;
+      render();
+    }
+
+    function renderTabs(){
+      const tabsEl = document.getElementById("tabs");
+      tabsEl.innerHTML = tabs.map(([id,label,icon]) => `<button class="tab ${activeTab === id ? "active" : ""}" data-tab="${id}">${icon} ${escapeHtml(label)}</button>`).join("");
+      tabsEl.querySelectorAll(".tab").forEach(button => button.addEventListener("click", () => setActiveTab(button.dataset.tab)));
+    }
+
+    function renderStats(){
+      const cards = memoryCards();
+      const drawers = progressionDrawers();
+      const stats = [
+        ["Nodes", data.nodes.length],
+        ["Events", data.timeline.length],
+        ["Captures", data.captures.length],
+        ["GameCards", cards.gameCards?.length || 0],
+        ["PALCards", cards.palCards?.length || 0],
+        ["Pairs", cards.pairs?.length || 0],
+        ["Drawers", drawers.drawers?.length || 0],
+      ];
+      document.getElementById("statsGrid").innerHTML = stats.map(([label,num]) => `<div class="stat"><div class="label">${escapeHtml(label)}</div><div class="num">${num}</div></div>`).join("");
+      const node = currentNode();
+      document.getElementById("sideRoomTitle").textContent = node?.title || "No room";
+      document.getElementById("sideRoomType").textContent = node?.type || "";
+      document.getElementById("sideRoomTags").innerHTML = (node?.tags || []).map(tag => pill(tag)).join("");
+      const exportBtn = document.getElementById("sideExportActiveDrawer");
+      exportBtn.disabled = !drawers.activeDrawerId;
+    }
+
+    function renderLoad(){
+      return `
+        <div class="cards-grid cols-3">
+          <section class="card">
+            <h2>Load ZIP</h2>
+            <p class="muted" style="margin-bottom:16px">Inspect a ZIP package and auto-build the first hard blueprint.</p>
+            <button class="btn" id="loadZipBtn">🗄️ Load ZIP</button>
+          </section>
+          <section class="card">
+            <h2>Load Folder</h2>
+            <p class="muted" style="margin-bottom:16px">Use browser folder permission to inspect local project or game files.</p>
+            <button class="btn" id="loadFolderBtn">📂 Load Folder</button>
+          </section>
+          <section class="card">
+            <h2>Import MEM File</h2>
+            <p class="muted" style="margin-bottom:16px">Reload a .memsave.json pair, .memdrawer.json drawer, drawer archive, .memsession, or project snapshot.</p>
+            <button class="btn" id="importMemBtn">📄 Import MEM File</button>
+          </section>
+        </div>`;
+    }
+
+    function renderInspect(){
+      const report = data.package.importReport || {};
+      return `
+        <div class="cards-grid">
+          <section class="card top-actions">
+            <div><h1>Package Inspector</h1><p class="subtitle">${escapeHtml(data.package.name)}</p></div>
+            ${pill(data.package.runMode, data.package.runMode === "internal-html" ? "green" : "blue")}
+          </section>
+          <div class="cards-grid cols-4">
+            ${[["Files",report.filesFound||0],["Folders",report.foldersFound||0],["Scripts",report.scriptsFound||0],["Assets",report.assetsFound||0]].map(([label,num]) => `<section class="card"><div class="faint">${label}</div><div style="font-size:34px;font-weight:950">${num}</div></section>`).join("")}
+          </div>
+          <section class="card"><h2>Detected entries</h2><div class="list">${(data.package.entryCandidates || []).map(entry => `<div class="item mono">${escapeHtml(entry)}</div>`).join("") || `<p class="muted">No entry candidates detected.</p>`}</div></section>
+          ${(data.package.warnings || []).length ? `<section class="card"><h2>Warnings</h2><div class="list">${data.package.warnings.map(w => `<div class="notice warn">${escapeHtml(w)}</div>`).join("")}</div></section>` : ""}
+        </div>`;
+    }
+
+    function renderPlay(){
+      const internal = data.runtime.runMode === "internal-html" && data.runtime.internalHtml;
+      return `
+        <div class="play-grid">
+          <section class="card">
+            <div class="top-actions" style="margin-bottom:12px">
+              <h2 style="margin:0">Play / Attach View</h2>
+              <div class="btn-row">
+                <button class="btn ghost" id="startCaptureBtn">📷 Attach Capture</button>
+                <button class="btn ghost" id="stopCaptureBtn">Stop Capture</button>
+                <button class="btn" id="captureMomentBtn">➕ Capture Moment</button>
+              </div>
+            </div>
+            ${internal ? `<iframe title="Internal HTML Game" class="html-frame" sandbox="allow-scripts allow-same-origin" srcdoc="${escapeHtml(data.runtime.internalHtml)}"></iframe>` : `<video id="captureVideo" autoplay muted playsinline class="video-frame"></video>`}
+          </section>
+          <section class="card">
+            <h2>Runtime Mode</h2>
+            ${pill(data.runtime.runMode, data.runtime.runMode === "internal-html" ? "green" : "blue")}
+            <p class="muted" style="margin-top:16px">Native PC games belong in External Attach Mode. Run the game normally, then attach screen or window capture.</p>
+            <p class="faint" style="margin-top:12px">Internal HTML preview supports simple/self-contained HTML. ZIP asset rewriting is intentionally not faked in this standalone version.</p>
+          </section>
+        </div>`;
+    }
+
+    function renderCards(){
+      const cards = memoryCards();
+      const views = pairViews();
+      return `
+        <div class="cards-grid">
+          <section class="card top-actions">
+            <div>
+              <h1>Memory Card Bay</h1>
+              <p class="subtitle">GameCard stores the mechanical save identity/hash. PALCard stores the palace context. Together they form the MEM Save Pair.</p>
+              <p class="faint" style="margin-top:8px">Browser Beta: save-file fingerprinting only. Desktop Edition: actual save restore/copy support.</p>
+            </div>
+            <span style="font-size:42px">💳</span>
+          </section>
+          <div class="two-col">
+            <section class="card"><h2>Create GameCard</h2><p class="muted" style="margin-bottom:16px">Import a game save file. The terminal fingerprints it with SHA-256.</p><button class="btn" id="importSaveFileBtn">⬆️ Import Save File</button></section>
+            <section class="card"><h2>Create PALCard</h2><p class="muted" style="margin-bottom:16px">Create a Palace Anchor Layer card from the current room, notes, captures, and timeline context.</p><button class="btn" id="createPalBtn">➕ Create From Current Node</button></section>
+          </div>
+          <div class="two-col">
+            <section class="card"><h2>GameCards</h2><div class="list">${(cards.gameCards || []).map(card => `<div class="item"><div class="item-head"><b>${escapeHtml(card.slotTitle)}</b>${pill("GameCard","blue")}</div><p class="faint" style="margin-top:6px">${escapeHtml(card.saveFile.name)} · ${(card.saveFile.sizeBytes||0).toLocaleString()} bytes</p><p class="mono truncate" style="margin-top:6px">${escapeHtml(card.saveFile.hash)}</p></div>`).join("") || `<p class="muted">No GameCards yet.</p>`}</div></section>
+            <section class="card"><h2>PALCards</h2><div class="list">${(cards.palCards || []).map(card => `<div class="item"><div class="item-head"><b>${escapeHtml(card.title)}</b>${pill("PALCard")}</div><p class="faint" style="margin-top:6px">Room: ${escapeHtml(card.currentRoom)}</p><p class="faint" style="margin-top:6px">Pair status: ${escapeHtml(card.pairing?.pairStatus || "unpaired")}</p></div>`).join("") || `<p class="muted">No PALCards yet.</p>`}</div></section>
+          </div>
+          <section class="card">
+            <div class="top-actions" style="margin-bottom:12px"><div><h2 style="margin:0">Create MEM Save Pair</h2><p class="muted">Choose one mechanical save card and one palace context card.</p></div><button class="btn ghost" id="autoPairBtn" ${!cards.gameCards?.length || !cards.palCards?.length ? "disabled" : ""}>Auto-pair latest</button></div>
+            <div class="form-grid">
+              <label><span>GameCard</span><select id="gameCardSelect"><option value="">Choose GameCard</option>${(cards.gameCards || []).map(card => `<option value="${escapeHtml(card.id)}">${escapeHtml(card.slotTitle)}</option>`).join("")}</select></label>
+              <label><span>PALCard</span><select id="palCardSelect"><option value="">Choose PALCard</option>${(cards.palCards || []).map(card => `<option value="${escapeHtml(card.id)}">${escapeHtml(card.title)}</option>`).join("")}</select></label>
+              <button class="btn" id="pairCardsBtn">Pair Cards</button>
+            </div>
+          </section>
+          <section class="card">
+            <div class="top-actions" style="margin-bottom:12px"><div><h2 style="margin:0">MEM Save Pairs</h2><p class="muted">[GameCard] + [PALCard] = full restoration key.</p></div><div class="btn-row"><button class="btn ghost" id="verifyPairsBtn">Verify Pairs</button><button class="btn ghost" id="exportAllPairsBtn">⬇️ Export All</button></div></div>
+            <div class="list">${views.map(pair => `<div class="item"><div class="item-head"><div><div class="item-head" style="justify-content:flex-start"><b>${escapeHtml(pair.title)}</b>${pill(pair.status,statusTone(pair.status))}</div><p class="faint" style="margin-top:6px">Game: ${escapeHtml(pair.gameCard?.slotTitle || "missing")} · PAL: ${escapeHtml(pair.palCard?.currentRoom || "missing")}</p></div><div class="btn-row"><button class="btn ghost" data-load-pair="${pair.id}">Load Pair</button><button class="btn ghost" data-duplicate-pair="${pair.id}">Duplicate</button><button class="btn ghost" data-export-pair="${pair.id}">Export</button><button class="btn ghost" data-unpair="${pair.id}">Unpair</button></div></div></div>`).join("") || `<p class="muted">No paired cards yet.</p>`}</div>
+          </section>
+        </div>`;
+    }
+
+    function renderHistory(){
+      const drawers = progressionDrawers();
+      const pinned = drawers.pinnedDrawerIds || [];
+      const sorted = [...(drawers.drawers || [])].sort((a,b) => {
+        const ap = pinned.includes(a.drawerId) ? 1 : 0;
+        const bp = pinned.includes(b.drawerId) ? 1 : 0;
+        if(ap !== bp) return bp - ap;
+        return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
+      });
+      const views = pairViews();
+      return `
+        <div class="cards-grid">
+          <section class="card top-actions"><div><h1>Progression History Drawers</h1><p class="subtitle">MEM Palace remembers the loaded world, current room, active cards, captures, notes, route, runtime mode, and workspace layout.</p><p class="faint" style="margin-top:8px">GameCard = where the game is. PALCard = what the player knows. Drawer = how the workspace was left.</p></div><span style="font-size:42px">🗄️</span></section>
+          <div class="cards-grid cols-3">
+            <section class="card"><div class="faint">Drawers</div><div style="font-size:34px;font-weight:950">${drawers.drawers?.length || 0}</div></section>
+            <section class="card"><div class="faint">Pinned</div><div style="font-size:34px;font-weight:950">${drawers.pinnedDrawerIds?.length || 0}</div></section>
+            <section class="card"><div class="faint">Active Drawer</div><div class="truncate" style="font-weight:950;color:var(--orange2)">${escapeHtml(drawers.activeDrawerId || "none")}</div></section>
+          </div>
+          <section class="card top-actions"><div><h2 style="margin:0">Create Drawer Checkpoint</h2><p class="muted">Freeze the current workspace arrangement: package, room, active MEM pair, timeline cursor, runtime mode, and layout.</p></div><div class="btn-row"><button class="btn" id="saveCurrentDrawerBtn">➕ Save Current Drawer</button><button class="btn ghost" id="exportDrawersBtn">⬇️ Export Drawers</button></div></section>
+          <div class="list">${sorted.map(drawer => {
+            const pair = views.find(item => item.id === drawer.activePairId);
+            const isPinned = pinned.includes(drawer.drawerId);
+            return `<section class="card ${drawer.drawerId === drawers.activeDrawerId ? "active" : ""}"><div class="item-head"><div class="truncate"><div class="item-head" style="justify-content:flex-start"><h2 style="margin:0">${escapeHtml(drawer.title)}</h2>${pill(drawer.status,statusTone(drawer.status))}${isPinned ? pill("pinned","purple") : ""}</div><p class="muted" style="margin-top:6px">Room: ${escapeHtml(drawer.currentRoom)} · Runtime: ${escapeHtml(drawer.runtimeMode)} · Tab: ${escapeHtml(drawer.activeTab)}</p><p class="faint" style="margin-top:6px">Package: ${escapeHtml(drawer.packageName)} · Pair: ${escapeHtml(pair?.title || drawer.activePairId || "none")}</p><p class="faint" style="margin-top:6px">Updated: ${escapeHtml(drawer.updatedAt || drawer.createdAt)}</p></div><div class="btn-row"><button class="btn ghost" data-resume-drawer="${drawer.drawerId}">Resume Drawer</button><button class="btn ghost" data-pin-drawer="${drawer.drawerId}">${isPinned ? "Unpin" : "Pin"}</button><button class="btn ghost" data-export-drawer="${drawer.drawerId}">Export</button><button class="btn ghost" data-delete-drawer="${drawer.drawerId}">Delete</button></div></div></section>`;
+          }).join("") || `<section class="card"><p class="muted">No drawers yet. Save a checkpoint when the workspace reaches a meaningful point.</p></section>`}</div>
+        </div>`;
+    }
+
+    function renderPalace(){
+      const node = currentNode();
+      return `
+        <div class="two-col">
+          <section class="card rooms"><h2>Palace Rooms</h2><div class="list">${data.nodes.map(item => `<button class="${item.id === node?.id ? "active" : ""}" data-room="${item.id}"><div class="item-head"><b>${escapeHtml(item.title)}</b>${pill(item.type)}</div><p class="muted" style="margin-top:6px">${escapeHtml(item.description || "")}</p></button>`).join("")}</div></section>
+          <section class="card"><h2>Current Room</h2><h3>${escapeHtml(node?.title || "No room")}</h3><p class="muted">${escapeHtml(node?.description || "")}</p><div class="tag-row">${(node?.tags || []).map(tag => pill(tag)).join("")}</div><div class="room-create"><input id="newNodeTitle" placeholder="New node title" /><button class="btn" id="newLocationBtn">New Location</button><button class="btn ghost" id="newBattleBtn">New Battle</button></div></section>
+        </div>`;
+    }
+
+    function renderBlueprint(){
+      return `
+        <div class="cards-grid">
+          <section class="card"><h2>Blueprint Graph</h2><div class="cards-grid cols-3">${data.nodes.slice(0,60).map(node => `<div class="item"><div class="item-head"><b>${escapeHtml(node.title)}</b>${pill(node.type,node.type === "package" ? "purple" : "orange")}</div><p class="faint" style="margin-top:6px">${(node.connections || []).length} connections</p></div>`).join("")}</div></section>
+          <section class="card"><h2>Edges</h2><div class="list">${data.edges.map(edge => `<div class="item mono">${escapeHtml(edge.from)} → ${escapeHtml(edge.to)} · ${escapeHtml(edge.label)}</div>`).join("") || `<p class="muted">No edges yet.</p>`}</div></section>
+        </div>`;
+    }
+
+    function renderTimeline(){
+      return `<div class="cards-grid">${data.timeline.map(event => `<section class="card"><div class="item-head"><b>${escapeHtml(event.title)}</b>${pill(event.type,"blue")}</div><p class="muted" style="margin-top:8px">${escapeHtml(event.summary)}</p><p class="faint" style="margin-top:10px">${escapeHtml(event.timestamp)} · ${escapeHtml(event.nodeId)}</p></section>`).join("")}</div>`;
+    }
+
+    function renderNotes(){
+      const node = currentNode();
+      return `
+        <div class="two-col">
+          <section class="card"><h2>Add Note to ${escapeHtml(node?.title || "current room")}</h2><textarea id="noteText" placeholder="What did the player learn here?"></textarea><button class="btn" id="saveNoteBtn" style="margin-top:12px">Save Note</button></section>
+          <section class="card"><h2>Room Notes</h2><div class="list">${(node?.notes || []).map(note => `<div class="item">${escapeHtml(note)}</div>`).join("") || `<p class="muted">No notes for this room yet.</p>`}</div></section>
+        </div>`;
+    }
+
+    function renderBuild(){
+      return `<div class="cards-grid cols-3"><section class="card"><h2>Export Project JSON</h2><button class="btn" id="exportProjectBtn">⬇️ Export JSON</button></section><section class="card"><h2>Export HTML Guide</h2><button class="btn" id="exportHtmlGuideBtn">⬇️ Export HTML</button></section><section class="card"><h2>Export MEM Save Pairs</h2><button class="btn" id="exportPairsBuildBtn">⬇️ Export Pairs</button></section></div>`;
+    }
+
+    function renderMain(){
+      const main = document.getElementById("main");
+      const map = {
+        load: renderLoad,
+        inspect: renderInspect,
+        play: renderPlay,
+        cards: renderCards,
+        history: renderHistory,
+        palace: renderPalace,
+        blueprint: renderBlueprint,
+        timeline: renderTimeline,
+        notes: renderNotes,
+        build: renderBuild,
+      };
+      main.innerHTML = (map[activeTab] || renderLoad)();
+    }
+
+    function bindEvents(){
+      document.getElementById("sideSaveDrawer").onclick = () => createProgressionDrawer();
+      document.getElementById("sideExportActiveDrawer").onclick = () => {
+        const id = progressionDrawers().activeDrawerId;
+        if(id) exportDrawerById(id);
+      };
+      document.getElementById("sideSaveFullSession").onclick = () => saveFullSession();
+
+      document.getElementById("loadZipBtn")?.addEventListener("click", () => document.getElementById("zipInput").click());
+      document.getElementById("loadFolderBtn")?.addEventListener("click", () => document.getElementById("folderInput").click());
+      document.getElementById("importMemBtn")?.addEventListener("click", () => document.getElementById("memFileInput").click());
+
+      document.getElementById("startCaptureBtn")?.addEventListener("click", startCapture);
+      document.getElementById("stopCaptureBtn")?.addEventListener("click", stopCapture);
+      document.getElementById("captureMomentBtn")?.addEventListener("click", captureMoment);
+
+      document.getElementById("importSaveFileBtn")?.addEventListener("click", () => document.getElementById("saveFileInput").click());
+      document.getElementById("createPalBtn")?.addEventListener("click", createPALCardFromCurrentNode);
+      document.getElementById("autoPairBtn")?.addEventListener("click", autoPairLatestCards);
+      document.getElementById("pairCardsBtn")?.addEventListener("click", () => {
+        const gameId = document.getElementById("gameCardSelect")?.value;
+        const palId = document.getElementById("palCardSelect")?.value;
+        if(gameId && palId) pairCards(gameId,palId);
+      });
+      document.getElementById("verifyPairsBtn")?.addEventListener("click", verifyPairs);
+      document.getElementById("exportAllPairsBtn")?.addEventListener("click", exportAllPairs);
+
+      document.querySelectorAll("[data-load-pair]").forEach(btn => btn.onclick = () => loadPair(btn.dataset.loadPair));
+      document.querySelectorAll("[data-duplicate-pair]").forEach(btn => btn.onclick = () => duplicatePair(btn.dataset.duplicatePair));
+      document.querySelectorAll("[data-export-pair]").forEach(btn => btn.onclick = () => exportPair(btn.dataset.exportPair));
+      document.querySelectorAll("[data-unpair]").forEach(btn => btn.onclick = () => unpairCards(btn.dataset.unpair));
+
+      document.getElementById("saveCurrentDrawerBtn")?.addEventListener("click", () => createProgressionDrawer());
+      document.getElementById("exportDrawersBtn")?.addEventListener("click", exportAllDrawers);
+      document.querySelectorAll("[data-resume-drawer]").forEach(btn => btn.onclick = () => resumeDrawer(btn.dataset.resumeDrawer));
+      document.querySelectorAll("[data-pin-drawer]").forEach(btn => btn.onclick = () => togglePinDrawer(btn.dataset.pinDrawer));
+      document.querySelectorAll("[data-export-drawer]").forEach(btn => btn.onclick = () => exportDrawerById(btn.dataset.exportDrawer));
+      document.querySelectorAll("[data-delete-drawer]").forEach(btn => btn.onclick = () => deleteDrawer(btn.dataset.deleteDrawer));
+
+      document.querySelectorAll("[data-room]").forEach(btn => btn.onclick = () => setData(prev => ({ ...prev, currentNodeId: btn.dataset.room })));
+      document.getElementById("newLocationBtn")?.addEventListener("click", () => addFastNode("location"));
+      document.getElementById("newBattleBtn")?.addEventListener("click", () => addFastNode("battle"));
+
+      document.getElementById("saveNoteBtn")?.addEventListener("click", addNote);
+      document.getElementById("exportProjectBtn")?.addEventListener("click", exportProjectJson);
+      document.getElementById("exportHtmlGuideBtn")?.addEventListener("click", exportHtmlGuide);
+      document.getElementById("exportPairsBuildBtn")?.addEventListener("click", exportAllPairs);
+    }
+
+    function render(){
+      renderTabs();
+      renderStats();
+      renderMain();
+      bindEvents();
+    }
+
+    document.getElementById("zipInput").addEventListener("change", event => loadZip(event.target.files?.[0]));
+    document.getElementById("folderInput").addEventListener("change", event => loadFolder(event.target.files));
+    document.getElementById("saveFileInput").addEventListener("change", event => createGameCardFromSaveFile(event.target.files?.[0]));
+    document.getElementById("memFileInput").addEventListener("change", event => importMemSave(event.target.files?.[0]));
+
+    render();
   </script>
 </body>
 </html>
